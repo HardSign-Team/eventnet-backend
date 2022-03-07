@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventnet", "Eventnet\Eventnet.csproj", "{68CDF298-1CBA-4A4E-BAFC-0F1A12CF9A35}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventnet.Api", "Eventnet.Api\Eventnet.Api.csproj", "{68CDF298-1CBA-4A4E-BAFC-0F1A12CF9A35}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
