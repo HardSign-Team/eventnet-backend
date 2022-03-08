@@ -2,6 +2,6 @@
 
 namespace Eventnet.Models;
 
-public record LoginModel(    
+public record LoginModel(
     [Required] string Username,
     [Required] string Password);
