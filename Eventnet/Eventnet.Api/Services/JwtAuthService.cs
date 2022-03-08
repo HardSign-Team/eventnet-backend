@@ -27,9 +27,6 @@ public class JwtAuthService : IJwtAuthService
             signingCredentials: new SigningCredentials(new SymmetricSecurityKey(secret),
                 SecurityAlgorithms.HmacSha256Signature));
 
-        return new JwtAuthResult
-        {
-            AccessToken = jwtToken
-        };
+        return new JwtAuthResult(jwtToken);
     }
 }
