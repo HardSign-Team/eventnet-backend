@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventnet.Api", "Eventnet.Api\Eventnet.Api.csproj", "{68CDF298-1CBA-4A4E-BAFC-0F1A12CF9A35}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventnet.DataAccess", "Eventnet.DataAccess\Eventnet.DataAccess.csproj", "{9C39B16D-BF9B-4FC3-B13F-259BDD3965FA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{68CDF298-1CBA-4A4E-BAFC-0F1A12CF9A35}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{68CDF298-1CBA-4A4E-BAFC-0F1A12CF9A35}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{68CDF298-1CBA-4A4E-BAFC-0F1A12CF9A35}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C39B16D-BF9B-4FC3-B13F-259BDD3965FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C39B16D-BF9B-4FC3-B13F-259BDD3965FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C39B16D-BF9B-4FC3-B13F-259BDD3965FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C39B16D-BF9B-4FC3-B13F-259BDD3965FA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

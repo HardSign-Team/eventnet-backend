@@ -1,4 +1,4 @@
-namespace Eventnet;
+namespace Eventnet.Models;
 
 public class WeatherForecast
 {
