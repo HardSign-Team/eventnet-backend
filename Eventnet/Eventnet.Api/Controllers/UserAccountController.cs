@@ -104,4 +104,29 @@ public class UserAccountController : Controller
         // TODO: replace with CreatedAtAction when implement UserController 
         return Ok(new RegisterResult("User created successfully", user));
     }
+
+    [HttpPost("change-password")]
+    [Authorize]
+    public async Task<IActionResult> ChangePassword([FromBody] RestorePasswordModel restorePasswordModel)
+    {
+        if (restorePasswordModel.OldPassword == restorePasswordModel.NewPassword)
+            return BadRequest("Passwords should be different");
+
+        var userName = User.Claims
+            .FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
+
+        if (userName == null)
+            return NotFound();
+
+        var user = await userManager.FindByNameAsync(userName);
+
+        var changePasswordResult = await userManager.ChangePasswordAsync(user,
+            restorePasswordModel.OldPassword, restorePasswordModel.NewPassword);
+
+        if (changePasswordResult.Succeeded)
+            return Ok();
+
+        var errors = string.Join(", ", changePasswordResult.Errors.Select(e => e.Description));
+        return BadRequest(errors);
+    }
 }
