@@ -43,7 +43,7 @@ public class AuthController : Controller
     }
     
     [HttpPost("login")]
-    [Produces(typeof(LoginResponseModel))]
+    [Produces(typeof(LoginResult))]
     public async Task<IActionResult> Login([FromBody] LoginModel loginModel)
     {
         if (!ModelState.IsValid)
@@ -67,7 +67,7 @@ public class AuthController : Controller
 
         var (jwtSecurityToken, refreshToken) = jwtAuthService.GenerateTokens(user.UserName, authClaims, DateTime.Now);
 
-        return Ok(new LoginResponseModel(
+        return Ok(new LoginResult(
             new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
             jwtSecurityToken.ValidTo,
             refreshToken.TokenString,
@@ -91,6 +91,7 @@ public class AuthController : Controller
     }
 
     [HttpPost("refresh-token")]
+    [Produces(typeof(LoginResult))]
     [Authorize]
     public async Task<ActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
     {
@@ -116,7 +117,7 @@ public class AuthController : Controller
             var (jwtSecurityToken, (_, tokenString, _)) =
                 jwtAuthService.Refresh(request.RefreshToken, accessToken, DateTime.Now);
 
-            return Ok(new LoginResponseModel(
+            return Ok(new LoginResult(
                 new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
                 jwtSecurityToken.ValidTo,
                 tokenString,
@@ -159,10 +160,6 @@ public class AuthController : Controller
             return BadRequest("User creation failed");
 
         // TODO: replace with CreatedAtAction when implement UserController 
-        return Ok(new
-        {
-            Message = "User created successfully",
-            User = user
-        });
+        return Ok(new RegisterResult("User created successfully", user));
     }
 }
