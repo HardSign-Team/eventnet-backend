@@ -3,6 +3,6 @@
 namespace Eventnet.Models;
 
 public record LoginModel(
-    string? Username,
+    string? UserName,
     string? Email,
     [Required] string Password);

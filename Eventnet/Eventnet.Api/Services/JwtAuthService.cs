@@ -35,7 +35,7 @@ public class JwtAuthService : IJwtAuthService
         };
     }
 
-    public JwtAuthResult GenerateTokens(string username, IEnumerable<Claim> claims, DateTime now)
+    public JwtAuthResult GenerateTokens(string userName, IEnumerable<Claim> claims, DateTime now)
     {
         var jwtToken = new JwtSecurityToken(
             jwtTokenConfig.Issuer,
@@ -46,7 +46,7 @@ public class JwtAuthService : IJwtAuthService
                 SecurityAlgorithms.HmacSha256Signature));
 
         var refreshToken = new RefreshToken(
-            username,
+            userName,
             GenerateRefreshTokenString(),
             now.AddMinutes(jwtTokenConfig.RefreshTokenExpiration));
 

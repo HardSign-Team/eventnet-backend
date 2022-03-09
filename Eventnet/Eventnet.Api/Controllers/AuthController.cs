@@ -49,7 +49,7 @@ public class AuthController : Controller
         if (!ModelState.IsValid)
             return UnprocessableEntity(ModelState);
 
-        var user = await userManager.FindByNameAsync(loginModel.Username)
+        var user = await userManager.FindByNameAsync(loginModel.UserName)
             ?? await userManager.FindByEmailAsync(loginModel.Email);
 
         if (user == null || !await userManager.CheckPasswordAsync(user, loginModel.Password))
@@ -137,7 +137,7 @@ public class AuthController : Controller
         if (!ModelState.IsValid)
             return UnprocessableEntity(ModelState);
 
-        var userExists = await userManager.FindByNameAsync(registerModel.Username);
+        var userExists = await userManager.FindByNameAsync(registerModel.UserName);
 
         if (userExists != null)
             return BadRequest("User already exists");
@@ -146,7 +146,7 @@ public class AuthController : Controller
         {
             Email = registerModel.Email,
             SecurityStamp = Guid.NewGuid().ToString(),
-            UserName = registerModel.Username,
+            UserName = registerModel.UserName,
             PhoneNumber = registerModel.Phone
         };
 
