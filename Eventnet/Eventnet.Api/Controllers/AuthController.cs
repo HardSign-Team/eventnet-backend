@@ -60,6 +60,20 @@ public class AuthController : Controller
             roles
         ));
     }
+    
+    [HttpPost("logout")]
+    [Authorize]
+    public ActionResult Logout()
+    {
+        var userName = User.Claims
+            .FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
+
+        if (userName == null)
+            return Unauthorized();
+        
+        jwtAuthService.RemoveRefreshTokenByUserName(userName);
+        return Ok();
+    }
 
     [HttpPost("refresh-token")]
     [Authorize]

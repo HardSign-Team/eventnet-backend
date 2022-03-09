@@ -74,6 +74,16 @@ public class JwtAuthService : IJwtAuthService
 
         return GenerateTokens(userName, principal.Claims.ToArray(), now);
     }
+    
+    public void RemoveRefreshTokenByUserName(string userName)
+    {
+        var refreshTokens = usersRefreshTokens
+            .Where(x => x.Value.UserName == userName)
+            .ToList();
+        
+        foreach (var refreshToken in refreshTokens)
+            usersRefreshTokens.TryRemove(refreshToken.Key, out _);
+    }
 
     private (ClaimsPrincipal principal, JwtSecurityToken?) DecodeJwtToken(string token)
     {
