@@ -53,7 +53,6 @@ services.AddAuthentication(options =>
         };
     });
 
-
 services.AddSwaggerGen(option =>
 {
     option.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });

@@ -49,13 +49,12 @@ public class AuthController : Controller
 
         var token = jwtAuthService.GenerateTokens(authClaims.ToArray(), DateTime.Now);
 
-        return Ok(new LoginResponseModel
-        {
-            AccessToken = new JwtSecurityTokenHandler().WriteToken(token.AccessToken),
-            ExpiredAt = token.AccessToken.ValidTo,
-            User = user,
-            UserRoles = userRoles
-        });
+        return Ok(new LoginResponseModel(
+            new JwtSecurityTokenHandler().WriteToken(token.AccessToken),
+            token.AccessToken.ValidTo,
+            user,
+            userRoles
+        ));
     }
 
     [HttpPost("register")]

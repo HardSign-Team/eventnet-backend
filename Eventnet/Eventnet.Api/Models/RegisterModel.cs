@@ -2,18 +2,9 @@
 
 namespace Eventnet.Models;
 
-public class RegisterModel
-{
-    [Required(ErrorMessage = "User Name is required")]
-    public string Username { get; set; }
-
-    [EmailAddress]
-    [Required(ErrorMessage = "Email is required")]
-    public string Email { get; set; }
-
-    [Required(ErrorMessage = "Password is required")]
-    [DataType(DataType.Password)]
-    public string Password { get; set; }
-
-    [Phone] public string Phone { get; set; }
-}
+public record RegisterModel(
+    [Required] string Username,
+    [Required] [EmailAddress] string Email,
+    [Required] [DataType(DataType.Password)]
+    string Password,
+    [Phone] string? Phone);

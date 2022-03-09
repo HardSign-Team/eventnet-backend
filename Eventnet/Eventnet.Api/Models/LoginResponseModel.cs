@@ -2,10 +2,4 @@
 
 namespace Eventnet.Models;
 
-public class LoginResponseModel
-{
-    public string AccessToken { get; set; }
-    public DateTime ExpiredAt { get; set; }
-    public ApplicationUser User { get; set; }
-    public IList<string> UserRoles { get; set; }
-}
+public record LoginResponseModel(string AccessToken, DateTime ExpiredAt, ApplicationUser User, IList<string> UserRoles);
