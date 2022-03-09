@@ -1,4 +1,6 @@
-﻿namespace Eventnet.Models;
+﻿#pragma warning disable CS8618
+// Used for Configuration
+namespace Eventnet.Models;
 
 public class JwtTokenConfig
 {
