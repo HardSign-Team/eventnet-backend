@@ -49,6 +49,7 @@ services.AddAuthentication(options =>
             ValidateAudience = true,
             ValidAudience = jwtTokenConfig.Audience,
             ValidIssuer = jwtTokenConfig.Issuer,
+            ValidateLifetime = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtTokenConfig.Secret))
         };
     });

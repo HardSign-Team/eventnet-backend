@@ -3,8 +3,11 @@ using System.Security.Claims;
 using Eventnet.DataAccess;
 using Eventnet.Models;
 using Eventnet.Services;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Eventnet.Controllers;
 
@@ -31,30 +34,71 @@ public class AuthController : Controller
         if (!ModelState.IsValid)
             return UnprocessableEntity(ModelState);
 
-        var user = await userManager.FindByNameAsync(loginModel.Username);
+        var user = await userManager.FindByNameAsync(loginModel.Username)
+            ?? await userManager.FindByEmailAsync(loginModel.Email);
 
         if (user == null || !await userManager.CheckPasswordAsync(user, loginModel.Password))
-            return BadRequest(new { Error = "Incorrect login or password" });
+            return Unauthorized();
 
-        var userRoles = await userManager.GetRolesAsync(user);
-
+        var roles = await userManager.GetRolesAsync(user);
         var authClaims = new List<Claim>
         {
             new(ClaimTypes.Name, user.UserName),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
-        authClaims.AddRange(userRoles
+        authClaims.AddRange(roles
             .Select(userRole => new Claim(ClaimTypes.Role, userRole)));
 
-        var token = jwtAuthService.GenerateTokens(authClaims.ToArray(), DateTime.Now);
+        var (jwtSecurityToken, refreshToken) = jwtAuthService.GenerateTokens(user.UserName, authClaims, DateTime.Now);
 
         return Ok(new LoginResponseModel(
-            new JwtSecurityTokenHandler().WriteToken(token.AccessToken),
-            token.AccessToken.ValidTo,
+            new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
+            jwtSecurityToken.ValidTo,
+            refreshToken.TokenString,
             user,
-            userRoles
+            roles
         ));
+    }
+
+    [HttpPost("refresh-token")]
+    [Authorize]
+    public async Task<ActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
+    {
+        try
+        {
+            var userName = User.Claims
+                .FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
+
+            if (userName == null)
+                return Unauthorized();
+
+            var user = await userManager.FindByNameAsync(userName);
+            var userRoles = await userManager.GetRolesAsync(user);
+
+            if (string.IsNullOrWhiteSpace(request.RefreshToken))
+                return Unauthorized();
+
+            var accessToken = await HttpContext.GetTokenAsync("Bearer", "access_token");
+
+            if (string.IsNullOrEmpty(accessToken))
+                return Unauthorized();
+
+            var (jwtSecurityToken, (_, tokenString, _)) =
+                jwtAuthService.Refresh(request.RefreshToken, accessToken, DateTime.Now);
+
+            return Ok(new LoginResponseModel(
+                new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
+                jwtSecurityToken.ValidTo,
+                tokenString,
+                user,
+                userRoles
+            ));
+        }
+        catch (SecurityTokenException e)
+        {
+            return Unauthorized(e.Message);
+        }
     }
 
     [HttpPost("register")]

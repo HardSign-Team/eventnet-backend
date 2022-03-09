@@ -5,5 +5,6 @@ namespace Eventnet.Services;
 
 public interface IJwtAuthService
 {
-    JwtAuthResult GenerateTokens(Claim[] claims, DateTime now);
+    JwtAuthResult GenerateTokens(string username, IEnumerable<Claim> claims, DateTime now);
+    JwtAuthResult Refresh(string refreshToken, string accessToken, DateTime now);
 }
