@@ -27,6 +27,21 @@ public class AuthController : Controller
         this.jwtAuthService = jwtAuthService;
     }
 
+    [Authorize]
+    [HttpGet("me")]
+    public async Task<IActionResult> GetCurrentUser()
+    {
+        var userName = User.Claims
+            .FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
+
+        if (userName == null)
+            return Unauthorized();
+
+        var user = await userManager.FindByNameAsync(userName);
+
+        return Ok(user); // TODO: return business model 
+    }
+    
     [HttpPost("login")]
     [Produces(typeof(LoginResponseModel))]
     public async Task<IActionResult> Login([FromBody] LoginModel loginModel)
