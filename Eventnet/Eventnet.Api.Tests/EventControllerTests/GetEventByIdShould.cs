@@ -1,6 +1,9 @@
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
+using Eventnet.Api.Tests.Helpers;
 using Eventnet.DataAccess;
 using FluentAssertions;
 using NUnit.Framework;
@@ -10,56 +13,56 @@ namespace Eventnet.Api.Tests.EventControllerTests;
 public class GetEventByIdShould : EventApiTestsBase
 {
     [Test]
-    public void ResponseCode404_WhenInvalidGuid()
+    public async Task ResponseCode404_WhenInvalidGuid()
     {
         var request = new HttpRequestMessage();
         request.Method = HttpMethod.Get;
         request.RequestUri = BuildEventsByIdUri("trash");
         request.Headers.Add("Accept", "application/json");
 
-        var response = HttpClient.Send(request);
+        var response = await HttpClient.SendAsync(request);
         
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         response.ShouldNotHaveHeader("Content-Type");
     }
 
     [Test]
-    public void ResponseCode404_WhenEventNotFound()
+    public async Task ResponseCode404_WhenEventNotFound()
     {
         var request = new HttpRequestMessage();
         request.Method = HttpMethod.Get;
         request.RequestUri = BuildEventsByIdUri(Guid.NewGuid());
         request.Headers.Add("Accept", "application/json");
 
-        var response = HttpClient.Send(request);
+        var response = await HttpClient.SendAsync(request);
         
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         response.ShouldNotHaveHeader("Content-Type");
     }
     
     [Test]
-    public void ResponseCode422_WhenEmptyGuid()
+    public async Task ResponseCode422_WhenEmptyGuid()
     {
         var request = new HttpRequestMessage();
         request.Method = HttpMethod.Get;
         request.RequestUri = BuildEventsByIdUri(Guid.Empty);
         request.Headers.Add("Accept", "application/json");
 
-        var response = HttpClient.Send(request);
+        var response = await HttpClient.SendAsync(request);
         
         response.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
     }
     
     [Test]
-    public void ResponseCode200_WhenEventExists()
+    public async Task ResponseCode200_WhenEventExists()
     {
-        var eventEntity = CreateEvent();
+        var eventEntity = ApplyToDb(context => context.Events.First());
         var request = new HttpRequestMessage();
         request.Method = HttpMethod.Get;
         request.RequestUri = BuildEventsByIdUri(eventEntity.Id);
         request.Headers.Add("Accept", "application/json");
         
-        var response = HttpClient.Send(request);
+        var response = await HttpClient.SendAsync(request);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         response.ShouldHaveHeader("Content-Type", "application/json; charset=utf-8");
@@ -73,16 +76,5 @@ public class GetEventByIdShould : EventApiTestsBase
             endDate = eventEntity.EndDate,
             locationEntity = eventEntity.Location
         });
-    }
-
-    private EventEntity CreateEvent()
-    {
-        return new EventEntity(Guid.NewGuid(),
-            "",
-            new DateTime(2022, 02, 24),
-            null,
-            "Event",
-            "No description",
-            new LocationEntity(49d, 32d));
     }
 }

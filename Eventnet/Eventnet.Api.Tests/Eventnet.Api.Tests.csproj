@@ -10,6 +10,7 @@
     <ItemGroup>
         <PackageReference Include="FluentAssertions" Version="6.5.1" />
         <PackageReference Include="FluentAssertions.AspNetCore.Mvc" Version="4.2.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.3" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.0-preview.1.22076.6" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
         <PackageReference Include="NUnit" Version="3.13.2" />
@@ -18,6 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Eventnet.Api\Eventnet.Api.csproj" />
       <ProjectReference Include="..\Eventnet.DataAccess\Eventnet.DataAccess.csproj" />
     </ItemGroup>
 

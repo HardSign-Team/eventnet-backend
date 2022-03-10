@@ -1,20 +1,13 @@
 ﻿using System;
-using System.Net.Http;
 using System.Web;
-using Eventnet.DataAccess;
-using Microsoft.EntityFrameworkCore;
 
 namespace Eventnet.Api.Tests.EventControllerTests;
 
-public abstract class EventApiTestsBase
+public abstract class EventApiTestsBase : TestsBase
 {
-    protected readonly HttpClient HttpClient = new();
-    protected const string BaseRoute = "/api/events";
+    private const string BaseRoute = "/api/events";
 
-    protected Uri BuildEventsByIdUri(Guid guid)
-    {
-        return BuildEventsByIdUri(guid.ToString());
-    }
+    protected Uri BuildEventsByIdUri(Guid guid) => BuildEventsByIdUri(guid.ToString());
 
     protected Uri BuildEventsByIdUri(string guid)
     {
@@ -24,5 +17,4 @@ public abstract class EventApiTestsBase
         };
         return uriBuilder.Uri;
     }
-
 }
