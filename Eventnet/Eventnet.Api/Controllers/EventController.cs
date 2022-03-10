@@ -8,6 +8,7 @@ namespace Eventnet.Controllers;
 public class EventController : Controller
 {
     private readonly ApplicationDbContext dbContext;
+
     public EventController(ApplicationDbContext dbContext)
     {
         this.dbContext = dbContext;
@@ -37,7 +38,7 @@ public class EventController : Controller
     {
         throw new NotImplementedException();
     }
-    
+
     [HttpPost("create")]
     public IActionResult CreateEvent([FromBody] CreateEventModel createModel)
     {
@@ -56,5 +57,3 @@ public class EventController : Controller
         throw new NotImplementedException();
     }
 }
-
-

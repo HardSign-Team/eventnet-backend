@@ -4,7 +4,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Eventnet.Api.Tests.Helpers;
-using Eventnet.DataAccess;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -21,7 +20,7 @@ public class GetEventByIdShould : EventApiTestsBase
         request.Headers.Add("Accept", "application/json");
 
         var response = await HttpClient.SendAsync(request);
-        
+
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         response.ShouldNotHaveHeader("Content-Type");
     }
@@ -35,11 +34,11 @@ public class GetEventByIdShould : EventApiTestsBase
         request.Headers.Add("Accept", "application/json");
 
         var response = await HttpClient.SendAsync(request);
-        
+
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         response.ShouldNotHaveHeader("Content-Type");
     }
-    
+
     [Test]
     public async Task ResponseCode422_WhenEmptyGuid()
     {
@@ -49,10 +48,10 @@ public class GetEventByIdShould : EventApiTestsBase
         request.Headers.Add("Accept", "application/json");
 
         var response = await HttpClient.SendAsync(request);
-        
+
         response.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
     }
-    
+
     [Test]
     public async Task ResponseCode200_WhenEventExists()
     {
@@ -61,7 +60,7 @@ public class GetEventByIdShould : EventApiTestsBase
         request.Method = HttpMethod.Get;
         request.RequestUri = BuildEventsByIdUri(eventEntity.Id);
         request.Headers.Add("Accept", "application/json");
-        
+
         var response = await HttpClient.SendAsync(request);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);

@@ -8,9 +8,8 @@ namespace Eventnet.Api.Tests;
 
 public class TestsBase
 {
-    private readonly WebApplicationFactory<Program> factory = new TestWebApplicationFactory<Program>();
-
     protected HttpClient HttpClient => factory.CreateClient();
+    private readonly WebApplicationFactory<Program> factory = new TestWebApplicationFactory<Program>();
 
     protected void ApplyToDb(Action<ApplicationDbContext> action)
     {
@@ -19,7 +18,7 @@ public class TestsBase
         var context = scope.ServiceProvider.GetService<ApplicationDbContext>();
         action(context!);
     }
-    
+
     protected T ApplyToDb<T>(Func<ApplicationDbContext, T> action)
     {
         var scopeFactory = factory.Services.GetService<IServiceScopeFactory>();

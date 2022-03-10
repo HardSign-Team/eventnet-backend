@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Web;
+using Eventnet.Api.Tests.Helpers;
 
 namespace Eventnet.Api.Tests.EventControllerTests;
 

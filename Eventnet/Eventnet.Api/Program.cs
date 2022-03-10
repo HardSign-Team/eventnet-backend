@@ -98,6 +98,9 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
 // ReSharper disable once UnusedType.Global Use for integration tests
 // https://docs.microsoft.com/ru-ru/aspnet/core/test/integration-tests?view=aspnetcore-6.0#basic-tests-with-the-default-webapplicationfactory
-public partial class Program { }
+public partial class Program
+{
+}

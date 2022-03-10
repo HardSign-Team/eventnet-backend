@@ -4,7 +4,7 @@ using FluentAssertions;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 
-namespace Eventnet.Api.Tests;
+namespace Eventnet.Api.Tests.Helpers;
 
 public static class Extensions
 {
@@ -20,20 +20,22 @@ public static class Extensions
         {
             return responseHeaderValues.ToArray();
         }
-        else if (hasContentHeader)
+
+        if (hasContentHeader)
         {
             return contentHeaderValues.ToArray();
         }
+
         Assert.Fail($"Should have '{headerName}' header");
         return null;
     }
-    
+
     public static void ShouldHaveHeader(this HttpResponseMessage response, string headerName, string headerValue)
     {
         var actualHeaderValue = GetRequiredHeader(response, headerName);
         actualHeaderValue.Should().BeEquivalentTo(headerValue);
     }
-    
+
     public static void ShouldNotHaveHeader(this HttpResponseMessage response, string headerName)
     {
         var hasResponseHeader = response.Headers.TryGetValues(headerName, out var _);
@@ -42,7 +44,7 @@ public static class Extensions
 
         hasHeader.Should().BeFalse();
     }
-    
+
     public static JToken ReadContentAsJson(this HttpResponseMessage response)
     {
         var content = response.Content.ReadAsStringAsync().Result;
