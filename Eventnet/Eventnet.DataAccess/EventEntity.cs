@@ -13,7 +13,7 @@ public class EventEntity
     public DateTime? EndDate { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }
-    public LocationEntity Location { get; set; }
+    public LocationEntity Location { get; set; } = new();
 
     private EventEntity(Guid id, 
         string ownerId, 

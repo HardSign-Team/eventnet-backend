@@ -13,7 +13,7 @@ public class TestsBase
 
     protected void ApplyToDb(Action<ApplicationDbContext> action)
     {
-        var scopeFactory = factory.Server.Host.Services.GetService<IServiceScopeFactory>();
+        var scopeFactory = factory.Services.GetService<IServiceScopeFactory>();
         using var scope = scopeFactory!.CreateScope();
         var context = scope.ServiceProvider.GetService<ApplicationDbContext>();
         action(context!);

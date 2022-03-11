@@ -1,6 +1,10 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
 using FluentAssertions;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 
@@ -18,16 +22,16 @@ public static class Extensions
 
         if (hasResponseHeader)
         {
-            return responseHeaderValues.ToArray();
+            return responseHeaderValues!.ToArray();
         }
 
         if (hasContentHeader)
         {
-            return contentHeaderValues.ToArray();
+            return contentHeaderValues!.ToArray();
         }
 
         Assert.Fail($"Should have '{headerName}' header");
-        return null;
+        throw new InvalidOperationException();
     }
 
     public static void ShouldHaveHeader(this HttpResponseMessage response, string headerName, string headerValue)
@@ -49,6 +53,16 @@ public static class Extensions
     {
         var content = response.Content.ReadAsStringAsync().Result;
         return JToken.Parse(content);
+    }
+    
+    public static ByteArrayContent SerializeToJsonContent(this object obj,
+        string contentType = "application/json")
+    {
+        var json = JsonConvert.SerializeObject(obj);
+        var bytes = Encoding.UTF8.GetBytes(json);
+        var content = new ByteArrayContent(bytes);
+        content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
+        return content;
     }
 
     public static void ShouldHaveJsonContentEquivalentTo(this HttpResponseMessage response, object expected)

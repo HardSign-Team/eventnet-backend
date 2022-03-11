@@ -15,6 +15,7 @@ var jwtTokenConfig = builder.Configuration.GetSection("JWT").Get<JwtTokenConfig>
 
 services.AddSingleton(jwtTokenConfig);
 services.AddSingleton<IJwtAuthService, JwtAuthService>();
+services.AddSingleton<IEventFilterService, EventFilterService>();
 
 services.AddControllers();
 
