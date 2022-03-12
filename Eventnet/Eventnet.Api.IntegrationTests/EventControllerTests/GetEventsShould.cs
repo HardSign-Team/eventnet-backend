@@ -26,7 +26,7 @@ public class GetEventsShould : EventApiTestsBase
     {
         ApplyToDb(Utilities.ReinitializeDbForTests);
     }
-    
+
     [TestCaseSource(nameof(GetIncorrectFilterRequests))]
     public async Task ResponseCode400_WhenIncorrectFilterParameters(FilterEventsModel filterModel)
     {
@@ -129,17 +129,6 @@ public class GetEventsShould : EventApiTestsBase
         pagination.TotalPages.Should().Be(0);
     }
 
-    private void SetEvents(IEnumerable<EventEntity> events)
-    {
-        ApplyToDb(context =>
-        {
-            context.Events.RemoveRange(context.Events);
-            context.SaveChanges();
-            context.Events.AddRange(events);
-            context.SaveChanges();
-        });
-    }
-
     [Test]
     public async Task ResponseCode200_WhenHasEvents_FirstPage()
     {
@@ -172,7 +161,7 @@ public class GetEventsShould : EventApiTestsBase
         resultEvents.Should().NotBeEmpty();
         resultEvents.Should().HaveCount(3);
     }
-    
+
     [Test]
     public async Task ResponseCode200_WhenHasEvents_SecondPage()
     {
@@ -226,6 +215,17 @@ public class GetEventsShould : EventApiTestsBase
             .SetName("Radius is zero");
     }
 
+    private void SetEvents(IEnumerable<EventEntity> events)
+    {
+        ApplyToDb(context =>
+        {
+            context.Events.RemoveRange(context.Events);
+            context.SaveChanges();
+            context.Events.AddRange(events);
+            context.SaveChanges();
+        });
+    }
+
     private EventEntity GenerateEventAt(Location location)
     {
         return new EventEntity(Guid.NewGuid(),
@@ -248,7 +248,7 @@ public class GetEventsShould : EventApiTestsBase
     }
 
     private HttpRequestMessage CreateDefaultRequestMessage(FilterEventsModel filterModel,
-       int pageNumber = 1, int pageSize = DefaultPageSize)
+        int pageNumber = 1, int pageSize = DefaultPageSize)
     {
         var request = new HttpRequestMessage();
         request.Method = HttpMethod.Post;

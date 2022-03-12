@@ -102,11 +102,11 @@ public class EventController : Controller
         {
             return NotFound();
         }
-        
+
         dbContext.Events.Remove(eventEntity);
         await dbContext.SaveChangesAsync();
 
-        return Ok(new{ eventId });
+        return Ok(new { eventId });
     }
 
     private string? GenerateEventsPageLink(int pageNumber, int pageSize)

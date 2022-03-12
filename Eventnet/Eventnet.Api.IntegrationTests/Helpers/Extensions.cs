@@ -54,7 +54,7 @@ public static class Extensions
         var content = response.Content.ReadAsStringAsync().Result;
         return JToken.Parse(content);
     }
-    
+
     public static ByteArrayContent SerializeToJsonContent(this object obj,
         string contentType = "application/json")
     {
