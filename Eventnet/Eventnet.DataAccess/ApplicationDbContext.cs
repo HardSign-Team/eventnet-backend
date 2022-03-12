@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Eventnet.DataAccess;
 
-public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+public class ApplicationDbContext : IdentityDbContext<UserEntity>
 {
     public DbSet<EventEntity> Events { get; set; }
     

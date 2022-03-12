@@ -24,7 +24,7 @@ services.AddEndpointsApiExplorer();
 services.AddDbContext<ApplicationDbContext>(
     opt => opt.UseNpgsql(connectionString));
 
-services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+services.AddIdentity<UserEntity, IdentityRole>(options =>
     {
         options.Password.RequireDigit = false;
         options.Password.RequireNonAlphanumeric = false;

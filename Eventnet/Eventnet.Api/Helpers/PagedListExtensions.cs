@@ -1,8 +1,10 @@
-﻿namespace Eventnet.Helpers;
+﻿using PagedList;
+
+namespace Eventnet.Helpers;
 
 public static class PagedListExtensions3
 {
-    public static object ToPaginationHeader<T>(this PagedList.PagedList<T> pagedList, 
+    public static object ToPaginationHeader<T>(this PagedList<T> pagedList,
         Func<int, int, string?> generatePageLink) =>
         new
         {
@@ -15,6 +17,6 @@ public static class PagedListExtensions3
             totalCount = pagedList.TotalItemCount,
             pageSize = pagedList.PageSize,
             currentPage = pagedList.PageNumber,
-            totalPages = pagedList.PageCount,
+            totalPages = pagedList.PageCount
         };
 }

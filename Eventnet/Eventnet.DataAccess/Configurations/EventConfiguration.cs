@@ -8,7 +8,7 @@ public class EventConfiguration : IEntityTypeConfiguration<EventEntity>
     public void Configure(EntityTypeBuilder<EventEntity> builder)
     {
         builder.Property(x => x.Id);
-        builder.HasOne<ApplicationUser>()
+        builder.HasOne<UserEntity>()
             .WithMany()
             .HasForeignKey(x => x.OwnerId)
             .IsRequired()

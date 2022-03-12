@@ -11,15 +11,15 @@ namespace Eventnet.Controllers;
 [Route("api/events")]
 public class EventController : Controller
 {
+    public const int MaxPageSize = 20;
+    public const int DefaultPageSize = 10;
     private readonly IEventFilterService filterService;
     private readonly ApplicationDbContext dbContext;
     private readonly LinkGenerator linkGenerator;
-    public const int MaxPageSize = 20;
-    public const int DefaultPageSize = 10;
 
     public EventController(
-        IEventFilterService filterService, 
-        ApplicationDbContext dbContext, 
+        IEventFilterService filterService,
+        ApplicationDbContext dbContext,
         LinkGenerator linkGenerator)
     {
         this.filterService = filterService;
@@ -46,7 +46,7 @@ public class EventController : Controller
     }
 
     [HttpPost(Name = nameof(GetEvents))]
-    public IActionResult GetEvents([FromBody] FilterEventsModel? filterModel, 
+    public IActionResult GetEvents([FromBody] FilterEventsModel? filterModel,
         [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = DefaultPageSize)
     {
         if (filterModel is null)
@@ -56,31 +56,27 @@ public class EventController : Controller
 
         if (filterModel.Radius <= 0)
         {
-            ModelState.AddModelError(nameof(FilterEventsModel.Radius), $"Radius should be positive, but was {filterModel.Radius}");
+            ModelState.AddModelError(nameof(FilterEventsModel.Radius),
+                $"Radius should be positive, but was {filterModel.Radius}");
         }
-        
+
         if (!ModelState.IsValid)
         {
             return UnprocessableEntity(ModelState);
         }
-            
+
         pageNumber = Normalize(pageNumber, 1);
         pageSize = Normalize(pageSize, 1, MaxPageSize);
 
         var filteredEvents = filterService.Filter(dbContext.Events, filterModel);
         var events = new PagedList<EventEntity>(filteredEvents, pageNumber, pageSize);
         var paginationHeader = events.ToPaginationHeader(GenerateEventsPageLink);
-        
+
         Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationHeader));
-        
+
         return Ok(events);
     }
 
-    private string? GenerateEventsPageLink(int pageNumber, int pageSize)
-    {
-        return linkGenerator.GetUriByRouteValues(HttpContext, nameof(GetEvents), new { pageNumber, pageSize });
-    }
-    
     [HttpPost("create")]
     public IActionResult CreateEvent([FromBody] CreateEventModel createModel)
     {
@@ -98,6 +94,11 @@ public class EventController : Controller
     public IActionResult DeleteEvent(Guid eventId)
     {
         throw new NotImplementedException();
+    }
+
+    private string? GenerateEventsPageLink(int pageNumber, int pageSize)
+    {
+        return linkGenerator.GetUriByRouteValues(HttpContext, nameof(GetEvents), new { pageNumber, pageSize });
     }
 
     private static int Normalize(int x, int min, int max = int.MaxValue) => Math.Max(min, Math.Min(x, max));
