@@ -69,8 +69,8 @@ public class EventController : Controller
             return UnprocessableEntity(ModelState);
         }
 
-        pageNumber = Normalize(pageNumber, 1);
-        pageSize = Normalize(pageSize, 1, MaxPageSize);
+        pageNumber = NumberHelper.Normalize(pageNumber, 1);
+        pageSize = NumberHelper.Normalize(pageSize, 1, MaxPageSize);
 
         var filteredEvents = filterService.Filter(dbContext.Events, filterModel);
         var events = new PagedList<EventEntity>(filteredEvents, pageNumber, pageSize);
@@ -95,15 +95,22 @@ public class EventController : Controller
     }
 
     [HttpDelete("{eventId:guid}")]
-    public IActionResult DeleteEvent(Guid eventId)
+    public async Task<IActionResult> DeleteEvent(Guid eventId)
     {
-        throw new NotImplementedException();
+        var eventEntity = dbContext.Events.FirstOrDefault(x => x.Id == eventId);
+        if (eventEntity is null)
+        {
+            return NotFound();
+        }
+        
+        dbContext.Events.Remove(eventEntity);
+        await dbContext.SaveChangesAsync();
+
+        return Ok(new{ eventId });
     }
 
     private string? GenerateEventsPageLink(int pageNumber, int pageSize)
     {
         return linkGenerator.GetUriByRouteValues(HttpContext, nameof(GetEvents), new { pageNumber, pageSize });
     }
-
-    private static int Normalize(int x, int min, int max = int.MaxValue) => Math.Max(min, Math.Min(x, max));
 }

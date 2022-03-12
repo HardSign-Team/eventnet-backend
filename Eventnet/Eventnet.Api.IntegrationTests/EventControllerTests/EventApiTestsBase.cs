@@ -11,7 +11,16 @@ public abstract class EventApiTestsBase : TestsBase
 
     protected Uri BuildEventsByIdUri(Guid guid) => BuildEventsByIdUri(guid.ToString());
 
-    protected Uri BuildEventsByIdUri(string guid)
+    protected Uri BuildEventsByIdUri(string? guid)
+    {
+        var uriBuilder = new UriBuilder(Configuration.BaseUrl)
+        {
+            Path = $"{BaseRoute}/{HttpUtility.UrlEncode(guid)}"
+        };
+        return uriBuilder.Uri;
+    }
+
+    protected Uri BuildDeleteEventUri(string? guid)
     {
         var uriBuilder = new UriBuilder(Configuration.BaseUrl)
         {
