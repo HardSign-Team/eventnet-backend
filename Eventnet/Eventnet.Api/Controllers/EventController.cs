@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using AutoMapper;
 using Eventnet.DataAccess;
 using Eventnet.Helpers;
 using Eventnet.Models;
@@ -15,15 +16,18 @@ public class EventController : Controller
     public const int DefaultPageSize = 10;
     private readonly IEventFilterService filterService;
     private readonly ApplicationDbContext dbContext;
+    private readonly IMapper mapper;
     private readonly LinkGenerator linkGenerator;
 
     public EventController(
         IEventFilterService filterService,
         ApplicationDbContext dbContext,
+        IMapper mapper,
         LinkGenerator linkGenerator)
     {
         this.filterService = filterService;
         this.dbContext = dbContext;
+        this.mapper = mapper;
         this.linkGenerator = linkGenerator;
     }
 
@@ -42,7 +46,7 @@ public class EventController : Controller
             return NotFound();
         }
 
-        return Ok(eventEntity);
+        return Ok(mapper.Map<Event>(eventEntity));
     }
 
     [HttpPost(Name = nameof(GetEvents))]
@@ -74,7 +78,7 @@ public class EventController : Controller
 
         Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationHeader));
 
-        return Ok(events);
+        return Ok(mapper.Map<IEnumerable<Event>>(events));
     }
 
     [HttpPost("create")]

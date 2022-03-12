@@ -1,4 +1,5 @@
 using System.Text;
+using Eventnet.Config;
 using Eventnet.DataAccess;
 using Eventnet.Models;
 using Eventnet.Services;
@@ -23,6 +24,8 @@ services.AddEndpointsApiExplorer();
 
 services.AddDbContext<ApplicationDbContext>(
     opt => opt.UseNpgsql(connectionString));
+
+services.AddAutoMapper(opt => opt.AddProfile<ApplicationMappingProfile>());
 
 services.AddIdentity<UserEntity, IdentityRole>(options =>
     {
