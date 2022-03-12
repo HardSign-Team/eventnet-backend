@@ -3,11 +3,11 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Eventnet.Api.Tests.Helpers;
+using Eventnet.Api.IntegrationTests.Helpers;
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace Eventnet.Api.Tests.EventControllerTests;
+namespace Eventnet.Api.IntegrationTests.EventControllerTests;
 
 public class GetEventByIdShould : EventApiTestsBase
 {

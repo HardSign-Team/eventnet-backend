@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Eventnet.DataAccess;
 
-namespace Eventnet.Api.Tests.Helpers;
+namespace Eventnet.Api.IntegrationTests.Helpers;
 
 public class Utilities
 {

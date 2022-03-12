@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Web;
-using Eventnet.Api.Tests.Helpers;
+using Eventnet.Api.IntegrationTests.Helpers;
 using Microsoft.AspNetCore.Http.Extensions;
 
-namespace Eventnet.Api.Tests.EventControllerTests;
+namespace Eventnet.Api.IntegrationTests.EventControllerTests;
 
 public abstract class EventApiTestsBase : TestsBase
 {

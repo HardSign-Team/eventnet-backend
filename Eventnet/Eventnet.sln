@@ -4,7 +4,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventnet.Api", "Eventnet.Ap
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventnet.DataAccess", "Eventnet.DataAccess\Eventnet.DataAccess.csproj", "{9C39B16D-BF9B-4FC3-B13F-259BDD3965FA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventnet.Api.Tests", "Eventnet.Api.Tests\Eventnet.Api.Tests.csproj", "{397E1243-CE29-404F-8CEF-5583FE0EF3FD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventnet.Api.IntegrationTests", "Eventnet.Api.IntegrationTests\Eventnet.Api.IntegrationTests.csproj", "{397E1243-CE29-404F-8CEF-5583FE0EF3FD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

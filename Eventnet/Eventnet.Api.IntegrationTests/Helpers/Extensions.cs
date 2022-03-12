@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 
-namespace Eventnet.Api.Tests.Helpers;
+namespace Eventnet.Api.IntegrationTests.Helpers;
 
 public static class Extensions
 {

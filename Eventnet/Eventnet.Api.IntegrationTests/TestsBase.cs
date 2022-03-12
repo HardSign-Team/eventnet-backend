@@ -4,7 +4,7 @@ using Eventnet.DataAccess;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Eventnet.Api.Tests;
+namespace Eventnet.Api.IntegrationTests;
 
 public class TestsBase
 {

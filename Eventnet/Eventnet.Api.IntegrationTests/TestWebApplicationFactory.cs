@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Eventnet.Api.Tests.Helpers;
+using Eventnet.Api.IntegrationTests.Helpers;
 using Eventnet.DataAccess;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Eventnet.Api.Tests;
+namespace Eventnet.Api.IntegrationTests;
 
 public class TestWebApplicationFactory<TStartup> : WebApplicationFactory<TStartup> where TStartup : class
 {

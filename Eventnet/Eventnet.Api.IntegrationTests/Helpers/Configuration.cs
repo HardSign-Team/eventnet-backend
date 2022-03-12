@@ -1,4 +1,4 @@
-﻿namespace Eventnet.Api.Tests.Helpers;
+﻿namespace Eventnet.Api.IntegrationTests.Helpers;
 
 public class Configuration
 {
