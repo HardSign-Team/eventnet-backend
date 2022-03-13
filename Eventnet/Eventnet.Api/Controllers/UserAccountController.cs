@@ -1,6 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Eventnet.DataAccess;
+using Eventnet.Domain;
 using Eventnet.Models;
 using Eventnet.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -15,14 +16,17 @@ public class UserAccountController : Controller
     private readonly UserManager<ApplicationUser> userManager;
     private readonly RoleManager<IdentityRole> roleManager;
     private readonly IJwtAuthService jwtAuthService;
+    private readonly IEmailService emailService;
 
     public UserAccountController(UserManager<ApplicationUser> userManager,
         RoleManager<IdentityRole> roleManager,
-        IJwtAuthService jwtAuthService)
+        IJwtAuthService jwtAuthService,
+        IEmailService emailService)
     {
         this.userManager = userManager;
         this.roleManager = roleManager;
         this.jwtAuthService = jwtAuthService;
+        this.emailService = emailService;
     }
 
     [HttpPost("login")]
@@ -37,6 +41,9 @@ public class UserAccountController : Controller
 
         if (user == null || !await userManager.CheckPasswordAsync(user, loginModel.Password))
             return Unauthorized();
+
+        if (!user.EmailConfirmed)
+            return BadRequest(new { Status = "please confirm your email" });
 
         var roles = await userManager.GetRolesAsync(user);
         var authClaims = new List<Claim>
@@ -101,8 +108,10 @@ public class UserAccountController : Controller
         if (!result.Succeeded)
             return BadRequest("User creation failed");
 
+        await SendEmailConfirmationMessageAsync(user);
+
         // TODO: replace with CreatedAtAction when implement UserController 
-        return Ok(new RegisterResult("User created successfully", user));
+        return Ok(new RegisterResult("User created successfully. Please check your email", user));
     }
 
     [HttpPost("change-password")]
@@ -128,5 +137,31 @@ public class UserAccountController : Controller
 
         var errors = string.Join(", ", changePasswordResult.Errors.Select(e => e.Description));
         return BadRequest(errors);
+    }
+
+    [HttpGet("confirm-email", Name = nameof(ConfirmEmail))]
+    public async Task<IActionResult> ConfirmEmail(string userId, string code)
+    {
+        var user = await userManager.FindByIdAsync(userId);
+        if (user == null)
+            return BadRequest();
+
+        var result = await userManager.ConfirmEmailAsync(user, code);
+
+        if (result.Succeeded)
+            return Ok("Email confirmed");
+
+        return BadRequest();
+    }
+
+    public async Task SendEmailConfirmationMessageAsync(ApplicationUser user)
+    {
+        var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
+        var callbackUrl = Url.Link(nameof(ConfirmEmail), new { userId = user.Id, code });
+
+        await emailService.SendEmailAsync(
+            user.Email,
+            "jopa",
+            $"Подтвердите регистрацию, перейдя по ссылке: <a href='{callbackUrl}'>link</a>");
     }
 }

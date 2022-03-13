@@ -1,5 +1,7 @@
 using System.Text;
 using Eventnet.DataAccess;
+using Eventnet.Domain;
+using Eventnet.Infrastructure;
 using Eventnet.Models;
 using Eventnet.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -12,10 +14,12 @@ var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var jwtTokenConfig = builder.Configuration.GetSection("JWT").Get<JwtTokenConfig>();
+var emailConfig = builder.Configuration.GetSection("Email").Get<EmailConfiguration>();
 
+services.AddSingleton(emailConfig);
 services.AddSingleton(jwtTokenConfig);
 services.AddSingleton<IJwtAuthService, JwtAuthService>();
-
+services.AddScoped<IEmailService, EmailService>();
 services.AddControllers();
 
 services.AddEndpointsApiExplorer();
