@@ -152,7 +152,7 @@ public class UserAccountController : Controller
         return Ok();
     }
 
-    [HttpGet("confirm-email", Name = nameof(ConfirmEmail))]
+    [HttpPost("confirm-email", Name = nameof(ConfirmEmail))]
     public async Task<IActionResult> ConfirmEmail(string userId, string code)
     {
         var user = await userManager.FindByIdAsync(userId);
@@ -166,8 +166,44 @@ public class UserAccountController : Controller
 
         return BadRequest();
     }
+    
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword(ForgotPasswordModel model)
+    {
+        var user = await userManager.FindByEmailAsync(model.Email);
 
-    public async Task SendEmailConfirmationMessageAsync(UserEntity user)
+        if (user == null || !await userManager.IsEmailConfirmedAsync(user))
+            return NotFound(); // return NotFound to don't discover is email exists or not
+        
+        var code = await userManager.GeneratePasswordResetTokenAsync(user);
+        var callbackUrl = Url.Link(nameof(ResetPassword), new { userId = user.Id, code});
+        
+        // TODO: вместо resetPassword по идее должен быть линк на фронтовую страницу, где юзер будет вводить пароль
+        
+        await emailService.SendEmailAsync(
+            user.Email,
+            "jopa",
+            $"Для сброса пароля пройдите по ссылке: <a href='{callbackUrl}'>link</a>");
+
+        return Ok();
+    }
+
+    [HttpPost("reset-password", Name = nameof(ResetPassword))]
+    public async Task<IActionResult> ResetPassword(string userId, string code, string newPassword)
+    {
+        var user = await userManager.FindByIdAsync(userId);
+        if (user == null)
+            return BadRequest();
+        
+        var result = await userManager.ResetPasswordAsync(user, code, newPassword);
+        if (result.Succeeded)
+            return Ok();
+        
+        var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+        return BadRequest(errors);
+    } 
+
+    private async Task SendEmailConfirmationMessageAsync(UserEntity user)
     {
         var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
         var callbackUrl = Url.Link(nameof(ConfirmEmail), new { userId = user.Id, code });
