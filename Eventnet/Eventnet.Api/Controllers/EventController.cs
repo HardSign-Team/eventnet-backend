@@ -5,6 +5,7 @@ using Eventnet.Helpers;
 using Eventnet.Models;
 using Eventnet.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using X.PagedList;
 
 namespace Eventnet.Controllers;
@@ -32,7 +33,7 @@ public class EventController : Controller
     }
 
     [HttpGet("{eventId:guid}")]
-    public IActionResult GetEventById(Guid eventId)
+    public async Task<IActionResult> GetEventById(Guid eventId)
     {
         if (Guid.Empty == eventId)
         {
@@ -40,7 +41,7 @@ public class EventController : Controller
             return UnprocessableEntity(ModelState);
         }
 
-        var eventEntity = dbContext.Events.FirstOrDefault(x => x.Id == eventId);
+        var eventEntity = await dbContext.Events.FirstOrDefaultAsync(x => x.Id == eventId);
         if (eventEntity is null)
         {
             return NotFound();
@@ -72,7 +73,7 @@ public class EventController : Controller
         pageNumber = NumberHelper.Normalize(pageNumber, 1);
         pageSize = NumberHelper.Normalize(pageSize, 1, MaxPageSize);
 
-        var filteredEvents = filterService.Filter(dbContext.Events, filterModel);
+        var filteredEvents = filterService.FilterAsync(dbContext.Events, filterModel);
 
         var events = new PagedList<EventEntity>(filteredEvents, pageNumber, pageSize);
         var paginationHeader = events.ToPaginationHeader(GenerateEventsPageLink);
@@ -98,7 +99,7 @@ public class EventController : Controller
     [HttpDelete("{eventId:guid}")]
     public async Task<IActionResult> DeleteEvent(Guid eventId)
     {
-        var eventEntity = dbContext.Events.FirstOrDefault(x => x.Id == eventId);
+        var eventEntity = await dbContext.Events.FirstOrDefaultAsync(x => x.Id == eventId);
         if (eventEntity is null)
         {
             return NotFound();

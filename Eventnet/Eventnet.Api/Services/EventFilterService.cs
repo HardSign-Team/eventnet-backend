@@ -5,7 +5,7 @@ namespace Eventnet.Services;
 
 public class EventFilterService : IEventFilterService
 {
-    public IEnumerable<EventEntity> Filter(IQueryable<EventEntity> query, FilterEventsModel filterModel)
+    public IEnumerable<EventEntity> FilterAsync(IQueryable<EventEntity> query, FilterEventsModel filterModel)
     {
         // TODO need more complicated solution. Later.
         var (location, radius) = filterModel;
