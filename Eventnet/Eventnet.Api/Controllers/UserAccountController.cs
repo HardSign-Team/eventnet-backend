@@ -13,12 +13,12 @@ namespace Eventnet.Controllers;
 [Route("api/auth")]
 public class UserAccountController : Controller
 {
-    private readonly UserManager<ApplicationUser> userManager;
+    private readonly UserManager<UserEntity> userManager;
     private readonly RoleManager<IdentityRole> roleManager;
     private readonly IJwtAuthService jwtAuthService;
     private readonly IEmailService emailService;
 
-    public UserAccountController(UserManager<ApplicationUser> userManager,
+    public UserAccountController(UserManager<UserEntity> userManager,
         RoleManager<IdentityRole> roleManager,
         IJwtAuthService jwtAuthService,
         IEmailService emailService)
@@ -91,7 +91,7 @@ public class UserAccountController : Controller
         if (userExists != null)
             return BadRequest("User already exists");
 
-        var user = new ApplicationUser
+        var user = new UserEntity
         {
             Email = registerModel.Email,
             SecurityStamp = Guid.NewGuid().ToString(),
@@ -167,7 +167,7 @@ public class UserAccountController : Controller
         return BadRequest();
     }
 
-    public async Task SendEmailConfirmationMessageAsync(ApplicationUser user)
+    public async Task SendEmailConfirmationMessageAsync(UserEntity user)
     {
         var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
         var callbackUrl = Url.Link(nameof(ConfirmEmail), new { userId = user.Id, code });

@@ -2,6 +2,6 @@
 
 namespace Eventnet.DataAccess;
 
-public class ApplicationUser : IdentityUser
+public class UserEntity : IdentityUser
 {
 }

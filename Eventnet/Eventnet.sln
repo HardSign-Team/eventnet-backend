@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventnet.Api", "Eventnet.Ap
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventnet.DataAccess", "Eventnet.DataAccess\Eventnet.DataAccess.csproj", "{9C39B16D-BF9B-4FC3-B13F-259BDD3965FA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventnet.Api.IntegrationTests", "Eventnet.Api.IntegrationTests\Eventnet.Api.IntegrationTests.csproj", "{397E1243-CE29-404F-8CEF-5583FE0EF3FD}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventnet.Api.Tests", "Eventnet.Api.Tests\Eventnet.Api.Tests.csproj", "{2262AE97-B81E-4FA4-B6DB-6E6FCE26E8FB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventnet.Infrastructure", "Eventnet.Infrastructure\Eventnet.Infrastructure.csproj", "{BDF89BD0-9549-438C-B1CD-E38E401F12CF}"
@@ -36,5 +38,9 @@ Global
 		{A16B0492-77D4-44CE-8E26-7A98A9C088E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A16B0492-77D4-44CE-8E26-7A98A9C088E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A16B0492-77D4-44CE-8E26-7A98A9C088E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{397E1243-CE29-404F-8CEF-5583FE0EF3FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{397E1243-CE29-404F-8CEF-5583FE0EF3FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{397E1243-CE29-404F-8CEF-5583FE0EF3FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{397E1243-CE29-404F-8CEF-5583FE0EF3FD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

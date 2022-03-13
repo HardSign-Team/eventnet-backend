@@ -1,4 +1,5 @@
 using System.Text;
+using Eventnet.Config;
 using Eventnet.DataAccess;
 using Eventnet.Domain;
 using Eventnet.Infrastructure;
@@ -19,6 +20,8 @@ var emailConfig = builder.Configuration.GetSection("Email").Get<EmailConfigurati
 services.AddSingleton(emailConfig);
 services.AddSingleton(jwtTokenConfig);
 services.AddSingleton<IJwtAuthService, JwtAuthService>();
+services.AddSingleton<IEventFilterService, EventFilterService>();
+
 services.AddScoped<IEmailService, EmailService>();
 services.AddControllers();
 
@@ -27,7 +30,9 @@ services.AddEndpointsApiExplorer();
 services.AddDbContext<ApplicationDbContext>(
     opt => opt.UseNpgsql(connectionString));
 
-services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+services.AddAutoMapper(opt => opt.AddProfile<ApplicationMappingProfile>());
+
+services.AddIdentity<UserEntity, IdentityRole>(options =>
     {
         options.Password.RequireDigit = false;
         options.Password.RequireNonAlphanumeric = false;
@@ -103,3 +108,9 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+// ReSharper disable once UnusedType.Global Use for integration tests
+// https://docs.microsoft.com/ru-ru/aspnet/core/test/integration-tests?view=aspnetcore-6.0#basic-tests-with-the-default-webapplicationfactory
+public partial class Program
+{
+}

@@ -2,4 +2,4 @@
 
 namespace Eventnet.Models;
 
-public record RegisterResult(string Status, ApplicationUser User);
+public record RegisterResult(string Status, UserEntity User);

@@ -15,9 +15,9 @@ namespace Eventnet.Controllers;
 public class TokenController : Controller
 {
     private readonly IJwtAuthService jwtAuthService;
-    private readonly UserManager<ApplicationUser> userManager;
+    private readonly UserManager<UserEntity> userManager;
 
-    public TokenController(UserManager<ApplicationUser> userManager,
+    public TokenController(UserManager<UserEntity> userManager,
         IJwtAuthService jwtAuthService)
     {
         this.userManager = userManager;
