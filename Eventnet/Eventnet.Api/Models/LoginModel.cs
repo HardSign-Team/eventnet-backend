@@ -1,8 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Eventnet.Models;
+﻿namespace Eventnet.Models;
 
 public record LoginModel(
     string? UserName,
     string? Email,
-    [Required] string Password);
+    string Password);

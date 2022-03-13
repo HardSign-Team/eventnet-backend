@@ -3,8 +3,8 @@
 namespace Eventnet.Models;
 
 public record RegisterModel(
-    [Required] string UserName,
-    [Required] [EmailAddress] string Email,
-    [Required] [DataType(DataType.Password)]
+    string UserName,
+    [EmailAddress] string Email,
+    [DataType(DataType.Password)]
     string Password,
     [Phone] string? Phone);
