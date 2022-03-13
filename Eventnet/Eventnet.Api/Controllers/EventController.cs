@@ -5,7 +5,7 @@ using Eventnet.Helpers;
 using Eventnet.Models;
 using Eventnet.Services;
 using Microsoft.AspNetCore.Mvc;
-using PagedList;
+using X.PagedList;
 
 namespace Eventnet.Controllers;
 
@@ -73,6 +73,7 @@ public class EventController : Controller
         pageSize = NumberHelper.Normalize(pageSize, 1, MaxPageSize);
 
         var filteredEvents = filterService.Filter(dbContext.Events, filterModel);
+
         var events = new PagedList<EventEntity>(filteredEvents, pageNumber, pageSize);
         var paginationHeader = events.ToPaginationHeader(GenerateEventsPageLink);
 
