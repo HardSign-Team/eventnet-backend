@@ -139,6 +139,19 @@ public class UserAccountController : Controller
         return BadRequest(errors);
     }
 
+    [HttpGet("email-confirmation-message")]
+    public async Task<IActionResult> SendEmailConfirmation(string userName)
+    {
+        var user = await userManager.FindByNameAsync(userName);
+
+        if (user == null)
+            return NotFound();
+
+        await SendEmailConfirmationMessageAsync(user);
+
+        return Ok();
+    }
+
     [HttpGet("confirm-email", Name = nameof(ConfirmEmail))]
     public async Task<IActionResult> ConfirmEmail(string userId, string code)
     {
