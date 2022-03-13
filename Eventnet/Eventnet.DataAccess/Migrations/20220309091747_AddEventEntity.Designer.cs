@@ -3,6 +3,7 @@ using System;
 using Eventnet.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Eventnet.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220309091747_AddEventEntity")]
+    partial class AddEventEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -114,7 +116,7 @@ namespace Eventnet.DataAccess.Migrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("Events", (string)null);
+                    b.ToTable("Events");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -257,7 +259,7 @@ namespace Eventnet.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("Eventnet.DataAccess.EventEntity.Location#Eventnet.DataAccess.LocationEntity", "Location", b1 =>
+                    b.OwnsOne("Eventnet.DataAccess.LocationEntity", "Location", b1 =>
                         {
                             b1.Property<Guid>("EventEntityId")
                                 .HasColumnType("uuid");
@@ -270,7 +272,7 @@ namespace Eventnet.DataAccess.Migrations
 
                             b1.HasKey("EventEntityId");
 
-                            b1.ToTable("Events", (string)null);
+                            b1.ToTable("Events");
 
                             b1.WithOwner()
                                 .HasForeignKey("EventEntityId");

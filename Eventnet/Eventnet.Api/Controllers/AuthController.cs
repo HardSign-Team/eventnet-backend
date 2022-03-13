@@ -13,9 +13,9 @@ public class AuthController : Controller
 {
     private readonly IJwtAuthService jwtAuthService;
     private readonly RoleManager<IdentityRole> roleManager;
-    private readonly UserManager<ApplicationUser> userManager;
+    private readonly UserManager<UserEntity> userManager;
 
-    public AuthController(UserManager<ApplicationUser> userManager,
+    public AuthController(UserManager<UserEntity> userManager,
         RoleManager<IdentityRole> roleManager,
         IJwtAuthService jwtAuthService)
     {
@@ -68,7 +68,7 @@ public class AuthController : Controller
         if (userExists != null)
             return BadRequest("User already exists");
 
-        var user = new ApplicationUser
+        var user = new UserEntity
         {
             Email = registerModel.Email,
             SecurityStamp = Guid.NewGuid().ToString(),
