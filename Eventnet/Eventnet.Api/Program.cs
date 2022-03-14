@@ -1,6 +1,7 @@
 using System.Text;
 using Eventnet.Config;
 using Eventnet.DataAccess;
+using Eventnet.Helpers.EventFilterFactories;
 using Eventnet.Domain;
 using Eventnet.Infrastructure;
 using Eventnet.Models;
@@ -20,7 +21,12 @@ var emailConfig = builder.Configuration.GetSection("Email").Get<EmailConfigurati
 services.AddSingleton(emailConfig);
 services.AddSingleton(jwtTokenConfig);
 services.AddSingleton<IJwtAuthService, JwtAuthService>();
+
 services.AddSingleton<IEventFilterService, EventFilterService>();
+services.AddSingleton<IEventFilterFactory, LocationFilterFactory>();
+services.AddSingleton<IEventFilterFactory, StartDateFilterFactory>();
+services.AddSingleton<IEventFilterFactory, EndDateFilterFactory>();
+services.AddSingleton<IEventFilterFactory, OwnerFilterFactory>();
 
 services.AddScoped<IEmailService, EmailService>();
 services.AddControllers();

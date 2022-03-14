@@ -5,7 +5,8 @@ using Eventnet.Helpers;
 using Eventnet.Models;
 using Eventnet.Services;
 using Microsoft.AspNetCore.Mvc;
-using PagedList;
+using Microsoft.EntityFrameworkCore;
+using X.PagedList;
 
 namespace Eventnet.Controllers;
 
@@ -32,7 +33,7 @@ public class EventController : Controller
     }
 
     [HttpGet("{eventId:guid}")]
-    public IActionResult GetEventById(Guid eventId)
+    public async Task<IActionResult> GetEventById(Guid eventId)
     {
         if (Guid.Empty == eventId)
         {
@@ -40,7 +41,7 @@ public class EventController : Controller
             return UnprocessableEntity(ModelState);
         }
 
-        var eventEntity = dbContext.Events.FirstOrDefault(x => x.Id == eventId);
+        var eventEntity = await dbContext.Events.FirstOrDefaultAsync(x => x.Id == eventId);
         if (eventEntity is null)
         {
             return NotFound();
@@ -58,11 +59,7 @@ public class EventController : Controller
             return BadRequest();
         }
 
-        if (filterModel.Radius <= 0)
-        {
-            ModelState.AddModelError(nameof(FilterEventsModel.Radius),
-                $"Radius should be positive, but was {filterModel.Radius}");
-        }
+        ValidateFilterModel(filterModel);
 
         if (!ModelState.IsValid)
         {
@@ -72,7 +69,9 @@ public class EventController : Controller
         pageNumber = NumberHelper.Normalize(pageNumber, 1);
         pageSize = NumberHelper.Normalize(pageSize, 1, MaxPageSize);
 
-        var filteredEvents = filterService.Filter(dbContext.Events, filterModel);
+        var query = dbContext.Events.AsNoTracking().AsEnumerable();
+        var filteredEvents = filterService.Filter(query, filterModel);
+
         var events = new PagedList<EventEntity>(filteredEvents, pageNumber, pageSize);
         var paginationHeader = events.ToPaginationHeader(GenerateEventsPageLink);
 
@@ -97,7 +96,7 @@ public class EventController : Controller
     [HttpDelete("{eventId:guid}")]
     public async Task<IActionResult> DeleteEvent(Guid eventId)
     {
-        var eventEntity = dbContext.Events.FirstOrDefault(x => x.Id == eventId);
+        var eventEntity = await dbContext.Events.FirstOrDefaultAsync(x => x.Id == eventId);
         if (eventEntity is null)
         {
             return NotFound();
@@ -107,6 +106,18 @@ public class EventController : Controller
         await dbContext.SaveChangesAsync();
 
         return Ok(new { eventId });
+    }
+
+    private void ValidateFilterModel(FilterEventsModel filterModel)
+    {
+        if (filterModel.RadiusLocation is { } radiusLocation)
+        {
+            var radius = radiusLocation.Radius;
+            if (radius <= 0)
+            {
+                ModelState.AddModelError(nameof(radius), $"Radius should be positive, but was {radius}");
+            }
+        }
     }
 
     private string? GenerateEventsPageLink(int pageNumber, int pageSize)

@@ -5,5 +5,5 @@ namespace Eventnet.Services;
 
 public interface IEventFilterService
 {
-    IEnumerable<EventEntity> Filter(IQueryable<EventEntity> query, FilterEventsModel filterModel);
+    IEnumerable<EventEntity> Filter(IEnumerable<EventEntity> query, FilterEventsModel filterModel);
 }
