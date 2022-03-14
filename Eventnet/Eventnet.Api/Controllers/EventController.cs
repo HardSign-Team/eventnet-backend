@@ -59,11 +59,7 @@ public class EventController : Controller
             return BadRequest();
         }
 
-        if (filterModel.Radius <= 0)
-        {
-            ModelState.AddModelError(nameof(FilterEventsModel.Radius),
-                $"Radius should be positive, but was {filterModel.Radius}");
-        }
+        ValidateFilterModel(filterModel);
 
         if (!ModelState.IsValid)
         {
@@ -73,7 +69,8 @@ public class EventController : Controller
         pageNumber = NumberHelper.Normalize(pageNumber, 1);
         pageSize = NumberHelper.Normalize(pageSize, 1, MaxPageSize);
 
-        var filteredEvents = filterService.FilterAsync(dbContext.Events, filterModel);
+        var query = dbContext.Events.AsNoTracking().AsEnumerable();
+        var filteredEvents = filterService.Filter(query, filterModel);
 
         var events = new PagedList<EventEntity>(filteredEvents, pageNumber, pageSize);
         var paginationHeader = events.ToPaginationHeader(GenerateEventsPageLink);
@@ -109,6 +106,18 @@ public class EventController : Controller
         await dbContext.SaveChangesAsync();
 
         return Ok(new { eventId });
+    }
+
+    private void ValidateFilterModel(FilterEventsModel filterModel)
+    {
+        if (filterModel.RadiusLocation is { } radiusLocation)
+        {
+            var radius = radiusLocation.Radius;
+            if (radius <= 0)
+            {
+                ModelState.AddModelError(nameof(radius), $"Radius should be positive, but was {radius}");
+            }
+        }
     }
 
     private string? GenerateEventsPageLink(int pageNumber, int pageSize)

@@ -1,19 +1,37 @@
 ﻿using Eventnet.DataAccess;
+using Eventnet.Helpers.EventFilterFactories;
+using Eventnet.Helpers.EventFilters;
 using Eventnet.Models;
 
 namespace Eventnet.Services;
 
 public class EventFilterService : IEventFilterService
 {
-    public IEnumerable<EventEntity> FilterAsync(IQueryable<EventEntity> query, FilterEventsModel filterModel)
+    private readonly IEnumerable<IEventFilterFactory> factories;
+
+    public EventFilterService(IEnumerable<IEventFilterFactory> factories)
     {
-        // TODO need more complicated solution. Later.
-        var (location, radius) = filterModel;
-        return query
-            .AsEnumerable()
-            .Where(x => location.DistanceTo(ToLocation(x.Location)) <= radius);
+        this.factories = factories;
     }
 
-    private static Location ToLocation(LocationEntity locationEntity) =>
-        new(locationEntity.Latitude, locationEntity.Longitude);
+    public IEnumerable<EventEntity> Filter(IEnumerable<EventEntity> query, FilterEventsModel filterModel)
+    {
+        var filters = factories
+            .Where(x => x.ShouldCreate(filterModel))
+            .Select(x => x.Create(filterModel));
+        var filter = CreateComposedFilter(filters);
+        return query.Where(x => filter(x));
+    }
+
+    private Func<EventEntity, bool> CreateComposedFilter(IEnumerable<IEventFilter> filters)
+    {
+        var filter = (EventEntity ev) => true;
+        foreach (var f in filters)
+        {
+            var copy = filter;
+            filter = (ev) => copy(ev) && f.Filter(ev);
+        }
+
+        return filter;
+    }
 }

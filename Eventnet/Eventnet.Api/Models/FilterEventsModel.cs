@@ -1,3 +1,9 @@
 ﻿namespace Eventnet.Models;
 
-public record FilterEventsModel(Location Location, double Radius);
+public class FilterEventsModel
+{
+    public LocationFilterModel? RadiusLocation { get; init; }
+    public DateFilterModel? StartDate { get; init; }
+    public DateFilterModel? EndDate { get; init; }
+    public OwnerFilterModel? Owner { get; init; }
+}

@@ -108,7 +108,10 @@ public class GetEventsShould : EventApiTestsBase
     [Test]
     public async Task ResponseCode200_WhenNoEvents()
     {
-        var filterModel = new FilterEventsModel(new Location(0, 0), 5);
+        var filterModel = new FilterEventsModel
+        {
+            RadiusLocation = new LocationFilterModel(new Location(0, 0), 5)
+        };
         var events = new[]
         {
             GenerateEventAt(new Location(45, 0))
@@ -132,7 +135,10 @@ public class GetEventsShould : EventApiTestsBase
     [Test]
     public async Task ResponseCode200_WhenHasEvents_FirstPage()
     {
-        var requestModel = new FilterEventsModel(new Location(0, 0), 500);
+        var requestModel = new FilterEventsModel
+        {
+            RadiusLocation = new LocationFilterModel(new Location(0, 0), 500)
+        };
         var events = new[]
         {
             GenerateEventAt(new Location(0.0013, 0)),
@@ -165,7 +171,10 @@ public class GetEventsShould : EventApiTestsBase
     [Test]
     public async Task ResponseCode200_WhenHasEvents_SecondPage()
     {
-        var requestModel = new FilterEventsModel(new Location(0, 0), 500);
+        var requestModel = new FilterEventsModel
+        {
+            RadiusLocation = new LocationFilterModel(new Location(0, 0), 500)
+        };
         var events = new[]
         {
             GenerateEventAt(new Location(0.0013, 0)),
@@ -203,15 +212,24 @@ public class GetEventsShould : EventApiTestsBase
 
     public static IEnumerable<TestCaseData> GetInconsistentFilterRequests()
     {
-#pragma warning disable CS8625 Use for test case
-        yield return new TestCaseData(new FilterEventsModel(null, 1))
+        yield return new TestCaseData(new FilterEventsModel
+            {
+#pragma warning disable CS8625
+                RadiusLocation = new LocationFilterModel(null, 1)
 #pragma warning restore CS8625
+            })
             .SetName("Location is null");
 
-        yield return new TestCaseData(new FilterEventsModel(new Location(0, 0), -1))
+        yield return new TestCaseData(new FilterEventsModel
+            {
+                RadiusLocation = new LocationFilterModel(new Location(0, 0), -1),
+            })
             .SetName("Radius is negative");
 
-        yield return new TestCaseData(new FilterEventsModel(new Location(0, 0), 0))
+        yield return new TestCaseData(new FilterEventsModel
+            {
+                RadiusLocation = new LocationFilterModel(new Location(0, 0), 0)
+            })
             .SetName("Radius is zero");
     }
 
@@ -242,7 +260,10 @@ public class GetEventsShould : EventApiTestsBase
         var request = new HttpRequestMessage();
         request.Method = HttpMethod.Post;
         request.RequestUri = BuildEventsPageUri(pageNumber, pageSize);
-        request.Content = new FilterEventsModel(new Location(0, 0), 1).SerializeToJsonContent();
+        request.Content = new FilterEventsModel
+        {
+            RadiusLocation = new LocationFilterModel(new Location(0, 0), 1)
+        }.SerializeToJsonContent();
         request.Headers.Add("Accept", "application/json");
         return request;
     }
