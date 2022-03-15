@@ -1,6 +1,7 @@
 ﻿using Eventnet.DataAccess;
+using Eventnet.Domain.Events.Filters.Data;
 
-namespace Eventnet.Helpers.EventFilters;
+namespace Eventnet.Domain.Events.Filters.EventFilters;
 
 public class StartDateFilter : BaseDateFilter
 {

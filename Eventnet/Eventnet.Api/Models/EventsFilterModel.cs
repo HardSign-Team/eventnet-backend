@@ -1,6 +1,6 @@
 ﻿namespace Eventnet.Models;
 
-public class FilterEventsModel
+public class EventsFilterModel
 {
     public LocationFilterModel? RadiusLocation { get; init; }
     public DateFilterModel? StartDate { get; init; }

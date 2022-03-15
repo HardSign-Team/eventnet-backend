@@ -15,18 +15,18 @@ public class EventController : Controller
 {
     public const int MaxPageSize = 20;
     public const int DefaultPageSize = 10;
-    private readonly IEventFilterService filterService;
+    private readonly IEventFilterMapper filterMapper;
     private readonly ApplicationDbContext dbContext;
     private readonly IMapper mapper;
     private readonly LinkGenerator linkGenerator;
 
     public EventController(
-        IEventFilterService filterService,
+        IEventFilterMapper filterMapper,
         ApplicationDbContext dbContext,
         IMapper mapper,
         LinkGenerator linkGenerator)
     {
-        this.filterService = filterService;
+        this.filterMapper = filterMapper;
         this.dbContext = dbContext;
         this.mapper = mapper;
         this.linkGenerator = linkGenerator;
@@ -51,7 +51,7 @@ public class EventController : Controller
     }
 
     [HttpPost(Name = nameof(GetEvents))]
-    public IActionResult GetEvents([FromBody] FilterEventsModel? filterModel,
+    public IActionResult GetEvents([FromBody] EventsFilterModel? filterModel,
         [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = DefaultPageSize)
     {
         if (filterModel is null)
@@ -70,7 +70,8 @@ public class EventController : Controller
         pageSize = NumberHelper.Normalize(pageSize, 1, MaxPageSize);
 
         var query = dbContext.Events.AsNoTracking().AsEnumerable();
-        var filteredEvents = filterService.Filter(query, filterModel);
+        var filter = filterMapper.Map(filterModel);
+        var filteredEvents = filter.Filter(query);
 
         var events = new PagedList<EventEntity>(filteredEvents, pageNumber, pageSize);
         var paginationHeader = events.ToPaginationHeader(GenerateEventsPageLink);
@@ -108,9 +109,9 @@ public class EventController : Controller
         return Ok(new { eventId });
     }
 
-    private void ValidateFilterModel(FilterEventsModel filterModel)
+    private void ValidateFilterModel(EventsFilterModel eventsFilterModel)
     {
-        if (filterModel.RadiusLocation is { } radiusLocation)
+        if (eventsFilterModel.RadiusLocation is { } radiusLocation)
         {
             var radius = radiusLocation.Radius;
             if (radius <= 0)

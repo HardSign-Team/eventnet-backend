@@ -18,11 +18,11 @@ var jwtTokenConfig = builder.Configuration.GetSection("JWT").Get<JwtTokenConfig>
 services.AddSingleton(jwtTokenConfig);
 services.AddSingleton<IJwtAuthService, JwtAuthService>();
 
-services.AddSingleton<IEventFilterService, EventFilterService>();
 services.AddSingleton<IEventFilterFactory, LocationFilterFactory>();
 services.AddSingleton<IEventFilterFactory, StartDateFilterFactory>();
 services.AddSingleton<IEventFilterFactory, EndDateFilterFactory>();
 services.AddSingleton<IEventFilterFactory, OwnerFilterFactory>();
+services.AddSingleton<IEventFilterMapper, EventFilterMapper>();
 
 services.AddControllers();
 

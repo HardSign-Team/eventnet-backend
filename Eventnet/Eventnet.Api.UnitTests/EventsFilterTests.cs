@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutoFixture;
+using AutoFixture.Kernel;
 using Eventnet.DataAccess;
+using Eventnet.Domain.Events.Filters;
+using Eventnet.Domain.Events.Filters.Data;
 using Eventnet.Helpers.EventFilterFactories;
-using Eventnet.Helpers.EventFilters;
 using Eventnet.Models;
 using Eventnet.Services;
 using FluentAssertions;
@@ -12,7 +14,7 @@ using NUnit.Framework;
 
 namespace Eventnet.Api.UnitTests;
 
-public class EventFilterServiceTests
+public class EventsFilterTests
 {
     [Test]
     public void Filter_ShouldFilterLocation()
@@ -30,14 +32,14 @@ public class EventFilterServiceTests
             CreateEventAt(fixture, new LocationEntity(45.432157465480515, 40.55582995809704)),
             CreateEventAt(fixture, new LocationEntity(56.114515134214784, 69.52740360680868))
         };
-        var filterModel = new FilterEventsModel
+        var filterModel = new EventsFilterModel
         {
             RadiusLocation = new LocationFilterModel(new Location(56.83541102242807, 60.61150834516072), 25_000)
         };
-        var sut = CreateDefaultService();
+        var sut = CreateDefaultService(filterModel);
         var rnd = new Random();
 
-        var filtered = sut.Filter(events.OrderBy(_ => rnd.Next()), filterModel).ToArray();
+        var filtered = sut.Filter(events.OrderBy(_ => rnd.Next())).ToArray();
 
         filtered.Should().Contain(events[..4]);
         filtered.Should().HaveCount(4);
@@ -49,14 +51,14 @@ public class EventFilterServiceTests
         DateFilterModel model,
         ICollection<EventEntity> expected)
     {
-        var filterModel = new FilterEventsModel
+        var filterModel = new EventsFilterModel
         {
             StartDate = model
         };
-        var sut = CreateDefaultService();
+        var sut = CreateDefaultService(filterModel);
         var rnd = new Random();
 
-        var filtered = sut.Filter(events.OrderBy(_ => rnd.Next()), filterModel).ToArray();
+        var filtered = sut.Filter(events.OrderBy(_ => rnd.Next())).ToArray();
 
         filtered.Should().Contain(expected);
         filtered.Should().HaveCount(expected.Count);
@@ -68,14 +70,14 @@ public class EventFilterServiceTests
         DateFilterModel model,
         ICollection<EventEntity> expected)
     {
-        var filterModel = new FilterEventsModel
+        var filterModel = new EventsFilterModel
         {
             EndDate = model
         };
-        var sut = CreateDefaultService();
+        var sut = CreateDefaultService(filterModel);
         var rnd = new Random();
 
-        var filtered = sut.Filter(events.OrderBy(_ => rnd.Next()), filterModel).ToArray();
+        var filtered = sut.Filter(events.OrderBy(_ => rnd.Next())).ToArray();
 
         filtered.Should().Contain(expected);
         filtered.Should().HaveCount(expected.Count);
@@ -93,13 +95,13 @@ public class EventFilterServiceTests
             CreateEventWithOwner(fixture, "B"),
             CreateEventWithOwner(fixture, "AB")
         };
-        var sut = CreateDefaultService();
-        var filterModel = new FilterEventsModel
+        var filterModel = new EventsFilterModel
         {
             Owner = new OwnerFilterModel("A")
         };
+        var sut = CreateDefaultService(filterModel);
 
-        var filteredEvents = sut.Filter(events, filterModel).ToArray();
+        var filteredEvents = sut.Filter(events).ToArray();
 
         filteredEvents.Should().Contain(events[..3]);
         filteredEvents.Should().HaveCount(3);
@@ -137,15 +139,16 @@ public class EventFilterServiceTests
             .SetName("Filter same day start date");
     }
 
-    private static IEventFilterService CreateDefaultService()
+    private static IEventsFilter CreateDefaultService(EventsFilterModel filterModel)
     {
-        return new EventFilterService(new IEventFilterFactory[]
+        var mapper = new EventFilterMapper(new IEventFilterFactory[]
         {
             new LocationFilterFactory(),
             new StartDateFilterFactory(),
             new EndDateFilterFactory(),
             new OwnerFilterFactory()
         });
+        return mapper.Map(filterModel);
     }
 
     private static IEnumerable<TestCaseData> GetFilterEndDateCases()
@@ -181,7 +184,7 @@ public class EventFilterServiceTests
             .SetName("Filter same day end date");
     }
 
-    private static EventEntity CreateEventAt(Fixture fixture, LocationEntity location)
+    private static EventEntity CreateEventAt(IFixture fixture, LocationEntity location)
     {
         return fixture
             .Build<EventEntity>()
@@ -189,17 +192,17 @@ public class EventFilterServiceTests
             .Create();
     }
 
-    private static EventEntity CreateEventStartedAt(Fixture fixture, DateTime startDate)
+    private static EventEntity CreateEventStartedAt(IFixture fixture, DateTime startDate)
     {
         return fixture.Build<EventEntity>().With(x => x.StartDate, startDate).Create();
     }
 
-    private static EventEntity CreateEventEndedAt(Fixture fixture, DateTime? endDate)
+    private static EventEntity CreateEventEndedAt(IFixture fixture, DateTime? endDate)
     {
         return fixture.Build<EventEntity>().With(x => x.EndDate, endDate).Create();
     }
 
-    private static EventEntity CreateEventWithOwner(Fixture fixture, string ownerId)
+    private static EventEntity CreateEventWithOwner(ISpecimenBuilder fixture, string ownerId)
     {
         return new EventEntity(Guid.NewGuid(),
             ownerId,

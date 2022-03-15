@@ -27,6 +27,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Eventnet.DataAccess\Eventnet.DataAccess.csproj" />
+        <ProjectReference Include="..\Eventnet.Domain\Eventnet.Domain.csproj" />
     </ItemGroup>
 
 </Project>

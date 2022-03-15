@@ -1,4 +1,4 @@
-﻿namespace Eventnet.Helpers.EventFilters;
+﻿namespace Eventnet.Domain.Events.Filters.Data;
 
 public enum DateEquality
 {
