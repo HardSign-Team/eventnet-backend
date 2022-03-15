@@ -59,8 +59,6 @@ public class EventController : Controller
             return BadRequest();
         }
 
-        ValidateFilterModel(filterModel);
-
         if (!ModelState.IsValid)
         {
             return UnprocessableEntity(ModelState);
@@ -107,18 +105,6 @@ public class EventController : Controller
         await dbContext.SaveChangesAsync();
 
         return Ok(new { eventId });
-    }
-
-    private void ValidateFilterModel(EventsFilterModel eventsFilterModel)
-    {
-        if (eventsFilterModel.RadiusLocation is { } radiusLocation)
-        {
-            var radius = radiusLocation.Radius;
-            if (radius <= 0)
-            {
-                ModelState.AddModelError(nameof(radius), $"Radius should be positive, but was {radius}");
-            }
-        }
     }
 
     private string? GenerateEventsPageLink(int pageNumber, int pageSize)
