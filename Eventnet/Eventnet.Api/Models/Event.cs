@@ -1,6 +1,4 @@
-﻿using Eventnet.Domain.Events.Filters.Data;
-
-namespace Eventnet.Models;
+﻿namespace Eventnet.Models;
 
 public record Event(
     Guid Id,

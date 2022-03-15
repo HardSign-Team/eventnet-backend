@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using Eventnet.Api.IntegrationTests.Helpers;
 using Eventnet.Controllers;
 using Eventnet.DataAccess;
-using Eventnet.Domain.Events.Filters.Data;
 using Eventnet.Models;
 using FluentAssertions;
 using Newtonsoft.Json;
