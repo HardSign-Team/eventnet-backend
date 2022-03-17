@@ -1,4 +1,6 @@
-﻿namespace Eventnet.Infrastructure;
+﻿#pragma warning disable CS8618
+// Used for Configuration
+namespace Eventnet.Infrastructure;
 
 public record EmailConfiguration
 {
