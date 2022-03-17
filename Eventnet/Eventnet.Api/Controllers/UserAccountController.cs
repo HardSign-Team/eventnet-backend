@@ -37,8 +37,8 @@ public class UserAccountController : Controller
         if (!ModelState.IsValid)
             return UnprocessableEntity(ModelState);
 
-        var user = await userManager.FindByNameAsync(loginModel.UserName)
-            ?? await userManager.FindByEmailAsync(loginModel.Email);
+        var user = await userManager.FindByNameAsync(loginModel.Login)
+            ?? await userManager.FindByEmailAsync(loginModel.Login);
 
         if (user == null || !await userManager.CheckPasswordAsync(user, loginModel.Password))
             return Unauthorized();
