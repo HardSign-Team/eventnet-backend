@@ -1,8 +1,8 @@
 using System.Text;
 using Eventnet.Config;
 using Eventnet.DataAccess;
-using Eventnet.Helpers.EventFilterFactories;
 using Eventnet.Domain;
+using Eventnet.Helpers.EventFilterFactories;
 using Eventnet.Infrastructure;
 using Eventnet.Models;
 using Eventnet.Services;

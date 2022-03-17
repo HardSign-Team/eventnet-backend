@@ -25,8 +25,8 @@ public class CurrentUserService
 
         return await userManager.FindByNameAsync(userName);
     }
-    
-    public string? GetCurrentUserName() => 
+
+    public string? GetCurrentUserName() =>
         httpContextAccessor.HttpContext?.User.Claims
             .FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
 }

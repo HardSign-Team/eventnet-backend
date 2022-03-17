@@ -222,7 +222,7 @@ public class GetEventsShould : EventApiTestsBase
 
         yield return new TestCaseData(new FilterEventsModel
             {
-                RadiusLocation = new LocationFilterModel(new Location(0, 0), -1),
+                RadiusLocation = new LocationFilterModel(new Location(0, 0), -1)
             })
             .SetName("Radius is negative");
 
@@ -291,11 +291,11 @@ public class GetEventsShould : EventApiTestsBase
     [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Local")]
     private class Pagination
     {
-        public string? PreviousPageLink { get; set; }
-        public string? NextPageLink { get; set; }
-        public int? TotalCount { get; set; }
-        public int? PageSize { get; set; }
         public int? CurrentPage { get; set; }
+        public string? NextPageLink { get; set; }
+        public int? PageSize { get; set; }
+        public string? PreviousPageLink { get; set; }
+        public int? TotalCount { get; set; }
         public int? TotalPages { get; set; }
     }
 }

@@ -122,7 +122,7 @@ public class UserAccountController : Controller
     {
         if (restorePasswordModel.OldPassword == restorePasswordModel.NewPassword)
             return BadRequest("Passwords should be different");
-        
+
         var user = await currentUserService.GetCurrentUser();
 
         if (user == null)
@@ -165,7 +165,7 @@ public class UserAccountController : Controller
 
         return BadRequest();
     }
-    
+
     [HttpPost("forgot-password")]
     public async Task<IActionResult> ForgotPassword(ForgotPasswordModel model)
     {
@@ -173,12 +173,12 @@ public class UserAccountController : Controller
 
         if (user == null || !await userManager.IsEmailConfirmedAsync(user))
             return NotFound(); // return NotFound to don't discover is email exists or not
-        
+
         var code = await userManager.GeneratePasswordResetTokenAsync(user);
-        var callbackUrl = Url.Link(nameof(ResetPassword), new { userId = user.Id, code});
-        
+        var callbackUrl = Url.Link(nameof(ResetPassword), new { userId = user.Id, code });
+
         // TODO: вместо resetPassword по идее должен быть линк на фронтовую страницу, где юзер будет вводить пароль
-        
+
         await emailService.SendEmailAsync(
             user.Email,
             "jopa",
@@ -193,14 +193,14 @@ public class UserAccountController : Controller
         var user = await userManager.FindByIdAsync(userId);
         if (user == null)
             return BadRequest();
-        
+
         var result = await userManager.ResetPasswordAsync(user, code, newPassword);
         if (result.Succeeded)
             return Ok();
-        
+
         var errors = string.Join(", ", result.Errors.Select(e => e.Description));
         return BadRequest(errors);
-    } 
+    }
 
     private async Task SendEmailConfirmationMessageAsync(UserEntity user)
     {

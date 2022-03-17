@@ -1,5 +1,4 @@
-﻿
-using Eventnet.DataAccess;
+﻿using Eventnet.DataAccess;
 
 namespace Eventnet.Models;
 
