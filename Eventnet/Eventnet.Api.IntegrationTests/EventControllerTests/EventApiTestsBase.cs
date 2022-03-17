@@ -49,4 +49,17 @@ public abstract class EventApiTestsBase : TestsBase
         };
         return uriBuilder.Uri;
     }
+
+    protected Uri BuildEventsByNameUri(string? name, int? maxCount)
+    {
+        var query = new QueryBuilder();
+        if (maxCount.HasValue) query.Add("m", maxCount.Value.ToString());
+
+        var uriBuilder = new UriBuilder(Configuration.BaseUrl)
+        {
+            Path = $"{BaseRoute}/searchByName/{name}",
+            Query = query.ToString()
+        };
+        return uriBuilder.Uri;
+    }
 }

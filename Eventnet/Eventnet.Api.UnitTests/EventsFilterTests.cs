@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutoFixture;
-using AutoFixture.Kernel;
+using Eventnet.Api.TestsUtils;
 using Eventnet.DataAccess;
 using Eventnet.Domain.Events.Filters;
 using Eventnet.Domain.Events.Filters.Data;
@@ -22,15 +22,15 @@ public class EventsFilterTests
         var fixture = new Fixture();
         var events = new[]
         {
-            CreateEventAt(fixture, new LocationEntity(56.840234511156446, 60.616096578611625)),
-            CreateEventAt(fixture, new LocationEntity(56.84391149402939, 60.65316741081937)),
-            CreateEventAt(fixture, new LocationEntity(56.81781873425029, 60.61238225939552)),
-            CreateEventAt(fixture, new LocationEntity(56.81787873103509, 60.54074620394152)),
-            CreateEventAt(fixture, new LocationEntity(57.15411119263984, 65.66351129051274)),
-            CreateEventAt(fixture, new LocationEntity(51.15781435465198, 71.46714484897487)),
-            CreateEventAt(fixture, new LocationEntity(55.75982632261345, 37.61909029735618)),
-            CreateEventAt(fixture, new LocationEntity(45.432157465480515, 40.55582995809704)),
-            CreateEventAt(fixture, new LocationEntity(56.114515134214784, 69.52740360680868))
+            fixture.CreateEventAt(new LocationEntity(56.840234511156446, 60.616096578611625)),
+            fixture.CreateEventAt(new LocationEntity(56.84391149402939, 60.65316741081937)),
+            fixture.CreateEventAt(new LocationEntity(56.81781873425029, 60.61238225939552)),
+            fixture.CreateEventAt(new LocationEntity(56.81787873103509, 60.54074620394152)),
+            fixture.CreateEventAt(new LocationEntity(57.15411119263984, 65.66351129051274)),
+            fixture.CreateEventAt(new LocationEntity(51.15781435465198, 71.46714484897487)),
+            fixture.CreateEventAt(new LocationEntity(55.75982632261345, 37.61909029735618)),
+            fixture.CreateEventAt(new LocationEntity(45.432157465480515, 40.55582995809704)),
+            fixture.CreateEventAt(new LocationEntity(56.114515134214784, 69.52740360680868))
         };
         var filterModel = new EventsFilterModel
         {
@@ -89,11 +89,11 @@ public class EventsFilterTests
         var fixture = new Fixture();
         var events = new[]
         {
-            CreateEventWithOwner(fixture, "A"),
-            CreateEventWithOwner(fixture, "A"),
-            CreateEventWithOwner(fixture, "A"),
-            CreateEventWithOwner(fixture, "B"),
-            CreateEventWithOwner(fixture, "AB")
+            fixture.CreateEventWithOwner("A"),
+            fixture.CreateEventWithOwner("A"),
+            fixture.CreateEventWithOwner("A"),
+            fixture.CreateEventWithOwner("B"),
+            fixture.CreateEventWithOwner("AB")
         };
         var filterModel = new EventsFilterModel
         {
@@ -112,12 +112,12 @@ public class EventsFilterTests
         var fixture = new Fixture();
         var store = new[]
         {
-            CreateEventStartedAt(fixture, new DateTime(2002, 1, 31, 12, 00, 00)),
-            CreateEventStartedAt(fixture, new DateTime(2002, 1, 31, 14, 18, 0)),
-            CreateEventStartedAt(fixture, new DateTime(2015, 2, 1)),
-            CreateEventStartedAt(fixture, new DateTime(2015, 12, 31)),
-            CreateEventStartedAt(fixture, new DateTime(2022, 2, 2)),
-            CreateEventStartedAt(fixture, new DateTime(2022, 2, 24))
+            fixture.CreateEventStartedAt(new DateTime(2002, 1, 31, 12, 00, 00)),
+            fixture.CreateEventStartedAt(new DateTime(2002, 1, 31, 14, 18, 0)),
+            fixture.CreateEventStartedAt(new DateTime(2015, 2, 1)),
+            fixture.CreateEventStartedAt(new DateTime(2015, 12, 31)),
+            fixture.CreateEventStartedAt(new DateTime(2022, 2, 2)),
+            fixture.CreateEventStartedAt(new DateTime(2022, 2, 24))
         };
 
         yield return new TestCaseData(
@@ -156,13 +156,13 @@ public class EventsFilterTests
         var fixture = new Fixture();
         var store = new[]
         {
-            CreateEventEndedAt(fixture, new DateTime(2002, 1, 31, 12, 00, 00)),
-            CreateEventEndedAt(fixture, new DateTime(2002, 1, 31, 14, 18, 0)),
-            CreateEventEndedAt(fixture, new DateTime(2015, 2, 1)),
-            CreateEventEndedAt(fixture, new DateTime(2015, 12, 31)),
-            CreateEventEndedAt(fixture, new DateTime(2022, 2, 2)),
-            CreateEventEndedAt(fixture, new DateTime(2022, 2, 24)),
-            CreateEventEndedAt(fixture, null)
+            fixture.CreateEventEndedAt(new DateTime(2002, 1, 31, 12, 00, 00)),
+            fixture.CreateEventEndedAt(new DateTime(2002, 1, 31, 14, 18, 0)),
+            fixture.CreateEventEndedAt(new DateTime(2015, 2, 1)),
+            fixture.CreateEventEndedAt(new DateTime(2015, 12, 31)),
+            fixture.CreateEventEndedAt(new DateTime(2022, 2, 2)),
+            fixture.CreateEventEndedAt(new DateTime(2022, 2, 24)),
+            fixture.CreateEventEndedAt(null)
         };
 
         yield return new TestCaseData(
@@ -182,35 +182,5 @@ public class EventsFilterTests
                 new DateFilterModel(new DateTime(2002, 1, 31), DateEquality.SameDay),
                 store[..2])
             .SetName("Filter same day end date");
-    }
-
-    private static EventEntity CreateEventAt(IFixture fixture, LocationEntity location)
-    {
-        return fixture
-            .Build<EventEntity>()
-            .With(x => x.Location, location)
-            .Create();
-    }
-
-    private static EventEntity CreateEventStartedAt(IFixture fixture, DateTime startDate)
-    {
-        return fixture.Build<EventEntity>().With(x => x.StartDate, startDate).Create();
-    }
-
-    private static EventEntity CreateEventEndedAt(IFixture fixture, DateTime? endDate)
-    {
-        return fixture.Build<EventEntity>().With(x => x.EndDate, endDate).Create();
-    }
-
-    private static EventEntity CreateEventWithOwner(ISpecimenBuilder fixture, string ownerId)
-    {
-        return new EventEntity(Guid.NewGuid(),
-            ownerId,
-            fixture.Create<DateTime>(),
-            fixture.Create<DateTime?>(),
-            fixture.Create<string>(),
-            fixture.Create<string>(),
-            fixture.Create<LocationEntity>()
-        );
     }
 }

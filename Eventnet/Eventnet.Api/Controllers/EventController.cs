@@ -2,6 +2,7 @@
 using System.Text.Json;
 using AutoMapper;
 using Eventnet.DataAccess;
+using Eventnet.Domain.Events.Selectors;
 using Eventnet.Helpers;
 using Eventnet.Models;
 using Eventnet.Services;
@@ -46,6 +47,27 @@ public class EventController : Controller
         if (eventEntity is null) return NotFound();
 
         return Ok(mapper.Map<Event>(eventEntity));
+    }
+    
+    [HttpGet("searchByName/{eventName}")]
+    public IActionResult GetEventsByName(string? eventName, [FromQuery(Name="m")] int maxCount = 10)
+    {
+        eventName = eventName?.Trim();
+        switch (eventName)
+        {
+            case null:
+                return BadRequest($"{nameof(eventName)} undefined");
+            case "":
+                return UnprocessableEntity($"Expected {nameof(eventName)} is non-empty string");
+        }
+
+        var selector = new EventsByNameSelector(eventName);
+        var result = selector
+            .Select(dbContext.Events.AsEnumerable(), maxCount)
+            .Select(x => mapper.Map<EventNameModel>(x))
+            .ToArray();
+
+        return Ok(new EventNameListModel(result.Length, result));
     }
 
     [HttpGet(Name = nameof(GetEvents))]
