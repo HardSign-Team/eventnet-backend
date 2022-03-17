@@ -15,16 +15,19 @@ public class UserAccountController : Controller
 {
     private readonly UserManager<UserEntity> userManager;
     private readonly RoleManager<IdentityRole> roleManager;
+    private readonly CurrentUserService currentUserService;
     private readonly IJwtAuthService jwtAuthService;
     private readonly IEmailService emailService;
 
     public UserAccountController(UserManager<UserEntity> userManager,
         RoleManager<IdentityRole> roleManager,
+        CurrentUserService currentUserService,
         IJwtAuthService jwtAuthService,
         IEmailService emailService)
     {
         this.userManager = userManager;
         this.roleManager = roleManager;
+        this.currentUserService = currentUserService;
         this.jwtAuthService = jwtAuthService;
         this.emailService = emailService;
     }
@@ -70,8 +73,7 @@ public class UserAccountController : Controller
     [Authorize]
     public ActionResult Logout()
     {
-        var userName = User.Claims
-            .FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
+        var userName = currentUserService.GetCurrentUserName();
 
         if (userName == null)
             return Unauthorized();
@@ -120,14 +122,11 @@ public class UserAccountController : Controller
     {
         if (restorePasswordModel.OldPassword == restorePasswordModel.NewPassword)
             return BadRequest("Passwords should be different");
+        
+        var user = await currentUserService.GetCurrentUser();
 
-        var userName = User.Claims
-            .FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
-
-        if (userName == null)
+        if (user == null)
             return NotFound();
-
-        var user = await userManager.FindByNameAsync(userName);
 
         var changePasswordResult = await userManager.ChangePasswordAsync(user,
             restorePasswordModel.OldPassword, restorePasswordModel.NewPassword);

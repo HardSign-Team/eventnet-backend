@@ -21,6 +21,7 @@ var emailConfig = builder.Configuration.GetSection("Email").Get<EmailConfigurati
 services.AddSingleton(emailConfig);
 services.AddSingleton(jwtTokenConfig);
 services.AddSingleton<IJwtAuthService, JwtAuthService>();
+services.AddScoped<CurrentUserService>();
 
 services.AddSingleton<IEventFilterService, EventFilterService>();
 services.AddSingleton<IEventFilterFactory, LocationFilterFactory>();
@@ -29,6 +30,9 @@ services.AddSingleton<IEventFilterFactory, EndDateFilterFactory>();
 services.AddSingleton<IEventFilterFactory, OwnerFilterFactory>();
 
 services.AddScoped<IEmailService, EmailService>();
+
+services.AddHttpContextAccessor();
+
 services.AddControllers();
 
 services.AddEndpointsApiExplorer();
