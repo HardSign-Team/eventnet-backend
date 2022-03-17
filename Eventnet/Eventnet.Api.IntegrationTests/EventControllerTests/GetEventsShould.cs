@@ -35,7 +35,6 @@ public class GetEventsShould : EventApiTestsBase
         var response = await HttpClient.SendAsync(request);
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        response.ShouldNotHaveHeader("Content-Type");
     }
 
     [TestCase(null)]
