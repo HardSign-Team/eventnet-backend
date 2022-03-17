@@ -1,4 +1,6 @@
-﻿using System.Text.Json;
+﻿using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using AutoMapper;
 using Eventnet.DataAccess;
 using Eventnet.Helpers;
@@ -50,15 +52,20 @@ public class EventController : Controller
         return Ok(mapper.Map<Event>(eventEntity));
     }
 
-    [HttpPost(Name = nameof(GetEvents))]
-    public IActionResult GetEvents([FromBody] EventsFilterModel? filterModel,
-        [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = DefaultPageSize)
+    [HttpGet(Name = nameof(GetEvents))]
+    public IActionResult GetEvents(
+        [FromQuery(Name = "f")] string? filterModelBase64,
+        [FromQuery(Name = "p")] int pageNumber = 1, 
+        [FromQuery(Name ="ps")] int pageSize = DefaultPageSize)
     {
+        var filterModel = ParseEventsFilterModel(filterModelBase64);
         if (filterModel is null)
         {
             return BadRequest();
         }
 
+        TryValidateModel(filterModel);
+        
         if (!ModelState.IsValid)
         {
             return UnprocessableEntity(ModelState);
@@ -72,13 +79,33 @@ public class EventController : Controller
         var filteredEvents = filter.Filter(query);
 
         var events = new PagedList<EventEntity>(filteredEvents, pageNumber, pageSize);
-        var paginationHeader = events.ToPaginationHeader(GenerateEventsPageLink);
+        var paginationHeader = events
+                .ToPaginationHeader((p, ps) => GenerateEventsPageLink(filterModelBase64, p, ps));
 
         Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationHeader));
 
         return Ok(mapper.Map<IEnumerable<Event>>(events));
     }
 
+    private EventsFilterModel? ParseEventsFilterModel(string? base64Model)
+    {
+        if (base64Model is null)
+        {
+            return null;
+        }
+
+        try
+        {
+            var bytes = Convert.FromBase64String(base64Model);
+            var json = Encoding.Default.GetString(bytes);
+            return JsonSerializer.Deserialize<EventsFilterModel>(json);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+    
     [HttpPost("create")]
     public IActionResult CreateEvent([FromBody] CreateEventModel createModel)
     {
@@ -107,8 +134,9 @@ public class EventController : Controller
         return Ok(new { eventId });
     }
 
-    private string? GenerateEventsPageLink(int pageNumber, int pageSize)
+    private string? GenerateEventsPageLink(string filterModelBase64, int pageNumber, int pageSize)
     {
-        return linkGenerator.GetUriByRouteValues(HttpContext, nameof(GetEvents), new { pageNumber, pageSize });
+        var values = new { f = filterModelBase64, p = pageNumber, ps = pageSize };
+        return linkGenerator.GetUriByRouteValues(HttpContext, nameof(GetEvents), values);
     }
 }

@@ -257,23 +257,19 @@ public class GetEventsShould : EventApiTestsBase
 
     private HttpRequestMessage CreateDefaultRequestMessage(int? pageNumber, int? pageSize)
     {
-        var request = new HttpRequestMessage();
-        request.Method = HttpMethod.Post;
-        request.RequestUri = BuildEventsPageUri(pageNumber, pageSize);
-        request.Content = new EventsFilterModel
+        var filterModel = new EventsFilterModel
         {
             RadiusLocation = new LocationFilterModel(new Location(0, 0), 1)
-        }.SerializeToJsonContent();
-        request.Headers.Add("Accept", "application/json");
-        return request;
+        };
+        return CreateDefaultRequestMessage(filterModel, pageNumber, pageSize);
     }
 
     private HttpRequestMessage CreateDefaultRequestMessage(EventsFilterModel eventsFilterModel,
-        int pageNumber = 1, int pageSize = DefaultPageSize)
+        int? pageNumber = 1, int? pageSize = DefaultPageSize)
     {
         var request = new HttpRequestMessage();
-        request.Method = HttpMethod.Post;
-        request.RequestUri = BuildEventsPageUri(pageNumber, pageSize);
+        request.Method = HttpMethod.Get;
+        request.RequestUri = BuildEventsPageUri(eventsFilterModel, pageNumber, pageSize);
         request.Content = eventsFilterModel.SerializeToJsonContent();
         request.Headers.Add("Accept", "application/json");
         return request;
