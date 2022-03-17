@@ -3,7 +3,7 @@ using System.Security.Claims;
 using Eventnet.DataAccess;
 using Eventnet.DataAccess.Models;
 using Eventnet.Domain;
-using Eventnet.Models;
+using Eventnet.Models.Authentication;
 using Eventnet.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -127,11 +127,13 @@ public class UserAccountController : Controller
         var changePasswordResult = await userManager.ChangePasswordAsync(user,
             restorePasswordModel.OldPassword, restorePasswordModel.NewPassword);
 
-        if (changePasswordResult.Succeeded)
-            return Ok();
+        if (!changePasswordResult.Succeeded)
+        {
+            var errors = string.Join(", ", changePasswordResult.Errors.Select(e => e.Description));
+            return BadRequest(errors);
+        }
 
-        var errors = string.Join(", ", changePasswordResult.Errors.Select(e => e.Description));
-        return BadRequest(errors);
+        return Ok();
     }
 
     [HttpGet("email-confirmation-message")]

@@ -1,5 +1,5 @@
 ﻿using System.Security.Claims;
-using Eventnet.Models;
+using Eventnet.Models.Authentication.Tokens;
 
 namespace Eventnet.Services;
 

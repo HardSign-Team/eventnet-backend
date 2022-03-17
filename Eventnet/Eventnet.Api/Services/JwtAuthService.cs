@@ -3,7 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using Eventnet.Models;
+using Eventnet.Models.Authentication.Tokens;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Eventnet.Services;

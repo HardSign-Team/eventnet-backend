@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Eventnet.Models;
+namespace Eventnet.Models.Authentication;
 
 public record RestorePasswordModel(
     [DataType(DataType.Password)] string OldPassword,

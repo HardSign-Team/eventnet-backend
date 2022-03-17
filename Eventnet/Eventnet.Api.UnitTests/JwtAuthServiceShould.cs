@@ -2,7 +2,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
-using Eventnet.Models;
+using Eventnet.Models.Authentication.Tokens;
 using Eventnet.Services;
 using FluentAssertions;
 using Microsoft.IdentityModel.Tokens;

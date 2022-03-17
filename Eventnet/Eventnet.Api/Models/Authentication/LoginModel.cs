@@ -1,4 +1,4 @@
-﻿namespace Eventnet.Models;
+﻿namespace Eventnet.Models.Authentication;
 
 public record LoginModel(
     string? UserName,

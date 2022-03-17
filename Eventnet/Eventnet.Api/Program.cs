@@ -4,7 +4,7 @@ using Eventnet.DataAccess;
 using Eventnet.Domain;
 using Eventnet.Helpers.EventFilterFactories;
 using Eventnet.Infrastructure;
-using Eventnet.Models;
+using Eventnet.Models.Authentication.Tokens;
 using Eventnet.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -121,6 +121,9 @@ app.Run();
 
 // ReSharper disable once UnusedType.Global Use for integration tests
 // https://docs.microsoft.com/ru-ru/aspnet/core/test/integration-tests?view=aspnetcore-6.0#basic-tests-with-the-default-webapplicationfactory
-public partial class Program
+namespace Eventnet
 {
+    public class Program
+    {
+    }
 }

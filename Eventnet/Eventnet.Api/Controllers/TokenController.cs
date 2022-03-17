@@ -1,6 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using Eventnet.DataAccess;
-using Eventnet.Models;
+using Eventnet.Models.Authentication;
+using Eventnet.Models.Authentication.Tokens;
 using Eventnet.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
