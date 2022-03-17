@@ -8,9 +8,9 @@ using FluentAssertions;
 using Microsoft.IdentityModel.Tokens;
 using NUnit.Framework;
 
-namespace Eventnet.Api.Tests;
+namespace Eventnet.Api.UnitTests;
 
-public class JwtAuthService_Should
+public class JwtAuthServiceShould
 {
     private const string ValidJwtToken =
         "eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9." +
@@ -69,13 +69,13 @@ public class JwtAuthService_Should
         const string userName2 = "user2";
         var claims2 = new[] { new Claim(ClaimTypes.Name, userName2) };
 
-        var tokens1 = sut.GenerateTokens(userName1, claims1, now);
-        var tokens2 = sut.GenerateTokens(userName2, claims2, now);
-        var accessToken1 = new JwtSecurityTokenHandler().WriteToken(tokens1.AccessToken);
-        var accessToken2 = new JwtSecurityTokenHandler().WriteToken(tokens2.AccessToken);
+        var (jwtSecurityToken1, refreshToken1) = sut.GenerateTokens(userName1, claims1, now);
+        var (jwtSecurityToken2, refreshToken2) = sut.GenerateTokens(userName2, claims2, now);
+        var accessToken1 = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken1);
+        var accessToken2 = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken2);
 
         accessToken1.Should().NotBe(accessToken2);
-        tokens1.RefreshToken.TokenString.Should().NotBe(tokens2.RefreshToken.TokenString);
+        refreshToken1.TokenString.Should().NotBe(refreshToken2.TokenString);
     }
 
     [Test]
@@ -87,11 +87,11 @@ public class JwtAuthService_Should
             new Claim(ClaimTypes.Name, userName)
         };
 
-        var tokens1 = sut.GenerateTokens(userName, claims, now);
-        var accessToken = new JwtSecurityTokenHandler().WriteToken(tokens1.AccessToken);
-        var refreshedToken = sut.Refresh(tokens1.RefreshToken.TokenString, accessToken, now);
+        var (jwtSecurityToken, (_, tokenString, _)) = sut.GenerateTokens(userName, claims, now);
+        var accessToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
+        var refreshedToken = sut.Refresh(tokenString, accessToken, now);
 
-        refreshedToken.RefreshToken.TokenString.Should().NotBe(tokens1.RefreshToken.TokenString);
+        refreshedToken.RefreshToken.TokenString.Should().NotBe(tokenString);
     }
 
     [Test]
@@ -103,9 +103,9 @@ public class JwtAuthService_Should
             new Claim(ClaimTypes.Name, userName)
         };
 
-        var tokens1 = sut.GenerateTokens(userName, claims, now);
-        var accessToken = new JwtSecurityTokenHandler().WriteToken(tokens1.AccessToken);
-        var refreshedToken = sut.Refresh(tokens1.RefreshToken.TokenString, accessToken, now);
+        var (jwtSecurityToken, refreshToken) = sut.GenerateTokens(userName, claims, now);
+        var accessToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
+        var refreshedToken = sut.Refresh(refreshToken.TokenString, accessToken, now);
         var accessToken2 = new JwtSecurityTokenHandler().WriteToken(refreshedToken.AccessToken);
 
         accessToken2.Should().NotBe(accessToken);
@@ -139,11 +139,11 @@ public class JwtAuthService_Should
         const string userName = "admin";
         var claims = Array.Empty<Claim>();
 
-        var tokens1 = sut.GenerateTokens(userName, claims, now);
-        var accessToken = new JwtSecurityTokenHandler().WriteToken(tokens1.AccessToken);
+        var (jwtSecurityToken, refreshToken) = sut.GenerateTokens(userName, claims, now);
+        var accessToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
 
         Assert.Throws<SecurityTokenException>(
-            () => sut.Refresh(tokens1.RefreshToken.TokenString, accessToken, now));
+            () => sut.Refresh(refreshToken.TokenString, accessToken, now));
     }
 
     [Test]
@@ -155,11 +155,11 @@ public class JwtAuthService_Should
             new Claim(ClaimTypes.Name, userName)
         };
 
-        var tokens1 = sut.GenerateTokens(userName, claims, now);
-        var accessToken = new JwtSecurityTokenHandler().WriteToken(tokens1.AccessToken);
+        var (jwtSecurityToken, refreshToken) = sut.GenerateTokens(userName, claims, now);
+        var accessToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
 
         Assert.Throws<SecurityTokenException>(
-            () => sut.Refresh(tokens1.RefreshToken.TokenString, accessToken, now + TimeSpan.FromHours(2)));
+            () => sut.Refresh(refreshToken.TokenString, accessToken, now + TimeSpan.FromHours(2)));
     }
 
     [Test]
@@ -171,12 +171,12 @@ public class JwtAuthService_Should
             new Claim(ClaimTypes.Name, userName)
         };
 
-        var tokens1 = sut.GenerateTokens(userName, claims, now);
-        var accessToken = new JwtSecurityTokenHandler().WriteToken(tokens1.AccessToken);
+        var (jwtSecurityToken, refreshToken) = sut.GenerateTokens(userName, claims, now);
+        var accessToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
 
         sut.RemoveRefreshTokenByUserName(userName);
 
         Assert.Throws<SecurityTokenException>(
-            () => sut.Refresh(tokens1.RefreshToken.TokenString, accessToken, now));
+            () => sut.Refresh(refreshToken.TokenString, accessToken, now));
     }
 }
