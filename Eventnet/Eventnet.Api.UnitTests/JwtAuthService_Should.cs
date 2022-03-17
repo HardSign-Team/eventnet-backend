@@ -12,11 +12,6 @@ namespace Eventnet.Api.UnitTests;
 
 public class JwtAuthServiceShould
 {
-    private const string ValidJwtToken =
-        "eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9." +
-        "eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYWRtaW4iLCJleHAiOjE2NDY4NTA3MTUsImlzcyI6InRlc3QiLCJhdWQiOiJ0ZXN0In0." +
-        "NnTZma9Wm-u9DilwLGApGT44Bh5e-Bc6tWmkyqr7uWs";
-
     private static readonly JwtTokenConfig DefaultConfig = new()
     {
         AccessTokenExpiration = 60,
@@ -124,13 +119,6 @@ public class JwtAuthServiceShould
 
         Assert.Throws<SecurityTokenException>(
             () => sut.Refresh(tokens.RefreshToken.TokenString, "", now));
-    }
-
-    [Test]
-    public void Throw_Exception_When_Refresh_Before_Generate()
-    {
-        Assert.Throws<SecurityTokenException>(
-            () => sut.Refresh("test refresh", ValidJwtToken, now));
     }
 
     [Test]
