@@ -1,6 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Eventnet.DataAccess;
+using Eventnet.DataAccess.Models;
 using Eventnet.Domain;
 using Eventnet.Models;
 using Eventnet.Services;
@@ -14,19 +15,16 @@ namespace Eventnet.Controllers;
 public class UserAccountController : Controller
 {
     private readonly UserManager<UserEntity> userManager;
-    private readonly RoleManager<IdentityRole> roleManager;
     private readonly CurrentUserService currentUserService;
     private readonly IJwtAuthService jwtAuthService;
     private readonly IEmailService emailService;
 
     public UserAccountController(UserManager<UserEntity> userManager,
-        RoleManager<IdentityRole> roleManager,
         CurrentUserService currentUserService,
         IJwtAuthService jwtAuthService,
         IEmailService emailService)
     {
         this.userManager = userManager;
-        this.roleManager = roleManager;
         this.currentUserService = currentUserService;
         this.jwtAuthService = jwtAuthService;
         this.emailService = emailService;
@@ -103,8 +101,6 @@ public class UserAccountController : Controller
 
         var result = await userManager.CreateAsync(user, registerModel.Password);
 
-        if (!await roleManager.RoleExistsAsync(UserRoles.User))
-            await roleManager.CreateAsync(new IdentityRole(UserRoles.User));
         await userManager.AddToRoleAsync(user, UserRoles.User);
 
         if (!result.Succeeded)
