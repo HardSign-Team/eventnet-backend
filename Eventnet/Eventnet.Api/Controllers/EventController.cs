@@ -49,7 +49,7 @@ public class EventController : Controller
         return Ok(mapper.Map<Event>(eventEntity));
     }
     
-    [HttpGet("searchByName/{eventName}")]
+    [HttpGet("search-by-name/{eventName}")]
     public IActionResult GetEventsByName(string? eventName, [FromQuery(Name="m")] int maxCount = 10)
     {
         eventName = eventName?.Trim();

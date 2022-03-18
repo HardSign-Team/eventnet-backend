@@ -19,7 +19,7 @@ public class UserController : Controller
         this.mapper = mapper;
     }
 
-    [HttpGet("searchByPrefix/{prefix:alpha:required}")]
+    [HttpGet("search-by-prefix/{prefix:alpha:required}")]
     public async Task<IActionResult> GetUsers(string prefix, [FromQuery] int maxUsers = 100)
     {
         maxUsers = NumberHelper.Normalize(maxUsers, 10, 100);
