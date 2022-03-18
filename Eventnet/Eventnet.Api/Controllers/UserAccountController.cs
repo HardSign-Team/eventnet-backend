@@ -179,7 +179,7 @@ public class UserAccountController : Controller
 
         await emailService.SendEmailAsync(
             user.Email,
-            "jopa",
+            "email confirmation",
             $"Для сброса пароля пройдите по ссылке: <a href='{callbackUrl}'>link</a>");
 
         return Ok();
