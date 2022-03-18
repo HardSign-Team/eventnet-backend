@@ -3,6 +3,7 @@ using Eventnet.Config;
 using Eventnet.DataAccess;
 using Eventnet.Models;
 using Eventnet.Services;
+using Eventnet.Services.ImageServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +18,7 @@ var jwtTokenConfig = builder.Configuration.GetSection("JWT").Get<JwtTokenConfig>
 services.AddSingleton(jwtTokenConfig);
 services.AddSingleton<IJwtAuthService, JwtAuthService>();
 services.AddSingleton<IEventFilterService, EventFilterService>();
+services.AddSingleton<IPhotosToTempSaveService, PhotosToTempSaveService>();
 
 services.AddControllers();
 
