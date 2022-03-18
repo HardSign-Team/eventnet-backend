@@ -1,4 +1,4 @@
-﻿namespace Eventnet.Services.ImageServices;
+﻿namespace Eventnet.Services;
 
 public interface IPhotosToTempSaveService
 {

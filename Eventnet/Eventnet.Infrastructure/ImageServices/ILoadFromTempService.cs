@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace Eventnet.Services.ImageServices;
+namespace Eventnet.Infrastructure.ImageServices;
 
 public interface ILoadFromTempService
 {

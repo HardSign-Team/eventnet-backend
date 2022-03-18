@@ -1,9 +1,10 @@
 ﻿using System.Drawing;
 using AutoMapper;
 using Eventnet.DataAccess;
-using Eventnet.Services.ImageServices;
+using Eventnet.Infrastructure.ImageServices;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Eventnet.Services;
+namespace Eventnet.Infrastructure;
 
 public class SaveToDbService : ISaveToDbService
 {

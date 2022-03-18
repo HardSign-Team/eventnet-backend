@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json;
+using Eventnet.Infrastructure;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 

@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using System.Drawing.Imaging;
 
-namespace Eventnet.Services.ImageServices;
+namespace Eventnet.Infrastructure.ImageServices;
 
 public class ImageToDbPreparer : IImageToDbPreparer
 {

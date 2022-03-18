@@ -1,4 +1,6 @@
-﻿namespace Eventnet.Services;
+﻿using Eventnet.Infrastructure;
+
+namespace Eventnet.Services;
 
 public interface IRabbitMqMessageHandler
 {

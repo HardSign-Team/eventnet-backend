@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
+using Eventnet.Infrastructure;
 using Eventnet.Models;
-using Eventnet.Services.ImageServices;
 
 namespace Eventnet.Services;
 

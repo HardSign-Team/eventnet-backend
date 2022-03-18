@@ -21,7 +21,6 @@ public class EventController : Controller
     private readonly IEventFilterMapper filterMapper;
     private readonly ApplicationDbContext dbContext;
     private readonly IEventSaveService eventSaveService;
-    private readonly IEventFilterService filterService;
     private readonly LinkGenerator linkGenerator;
     private readonly IMapper mapper;
     private readonly UserManager<UserEntity> userManager;

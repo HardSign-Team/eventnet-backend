@@ -1,4 +1,7 @@
-﻿using Eventnet.Services.ImageServices;
+﻿
+
+using Eventnet.Infrastructure;
+using Eventnet.Infrastructure.ImageServices;
 
 namespace Eventnet.Services;
 

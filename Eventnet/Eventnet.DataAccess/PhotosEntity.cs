@@ -2,8 +2,8 @@
 
 public class PhotosEntity
 {
-    private readonly string pathToPhotos;
-    public Guid Id { get; }
+    public string pathToPhotos { get; set; }
+    public Guid Id { get; set; }
 
     public PhotosEntity(string pathToPhotos, Guid id)
     {

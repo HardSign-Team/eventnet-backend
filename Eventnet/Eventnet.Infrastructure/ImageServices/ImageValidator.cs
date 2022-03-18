@@ -1,6 +1,7 @@
 ﻿using System.Drawing;
+using Eventnet.Infrastructure.ImageServices;
 
-namespace Eventnet.Services.ImageServices;
+namespace Eventnet.Infrastructure.ImageServices;
 
 public class ImageValidator : IImageValidator
 {

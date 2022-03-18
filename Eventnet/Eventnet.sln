@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventnet.Domain", "Eventnet
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventnet.Api.TestsUtils", "Eventnet.Api.TestsUtils\Eventnet.Api.TestsUtils.csproj", "{A30B293A-C1F3-4DE5-8FCA-46964B6C7B19}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventnet.Infrastructure", "Eventnet.Infrastructure\Eventnet.Infrastructure.csproj", "{71E84C68-D9B3-4A18-AA91-E6F9052BAEBD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,5 +44,9 @@ Global
 		{A30B293A-C1F3-4DE5-8FCA-46964B6C7B19}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A30B293A-C1F3-4DE5-8FCA-46964B6C7B19}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A30B293A-C1F3-4DE5-8FCA-46964B6C7B19}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71E84C68-D9B3-4A18-AA91-E6F9052BAEBD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71E84C68-D9B3-4A18-AA91-E6F9052BAEBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71E84C68-D9B3-4A18-AA91-E6F9052BAEBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71E84C68-D9B3-4A18-AA91-E6F9052BAEBD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

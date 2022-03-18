@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace Eventnet.Services;
+namespace Eventnet.Infrastructure;
 
 public interface ISaveToDbService
 {
