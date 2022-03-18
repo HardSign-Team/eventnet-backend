@@ -24,6 +24,7 @@ services.AddSingleton<IPublishEventService, PublishEventService>();
 services.AddSingleton(new Handler());
 services.AddSingleton<IEventSaveService, EventSaveService>();
 services.AddSingleton<ILoadFromTempService, LoadFromTempService>();
+services.AddSingleton<IImageValidator, ImageValidator>();
 
 services.AddControllers();
 
