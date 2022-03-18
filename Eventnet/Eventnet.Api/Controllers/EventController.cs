@@ -44,13 +44,14 @@ public class EventController : Controller
         }
 
         var eventEntity = await dbContext.Events.FirstOrDefaultAsync(x => x.Id == eventId);
-        if (eventEntity is null) return NotFound();
+        if (eventEntity is null)
+            return NotFound();
 
         return Ok(mapper.Map<Event>(eventEntity));
     }
-    
+
     [HttpGet("search-by-name/{eventName}")]
-    public IActionResult GetEventsByName(string? eventName, [FromQuery(Name="m")] int maxCount = 10)
+    public IActionResult GetEventsByName(string? eventName, [FromQuery(Name = "m")] int maxCount = 10)
     {
         eventName = eventName?.Trim();
         switch (eventName)
@@ -76,9 +77,11 @@ public class EventController : Controller
         [FromQuery(Name = "p")] int pageNumber = 1,
         [FromQuery(Name = "ps")] int pageSize = DefaultPageSize)
     {
-        if (filterModelBase64 is null) return BadRequest($"{nameof(filterModelBase64)} was null");
+        if (filterModelBase64 is null)
+            return BadRequest($"{nameof(filterModelBase64)} was null");
         var filterModel = ParseEventsFilterModel(filterModelBase64);
-        if (filterModel is null) return BadRequest("Cannot parse filter model");
+        if (filterModel is null)
+            return BadRequest("Cannot parse filter model");
 
         TryValidateModel(filterModel);
 
@@ -118,7 +121,8 @@ public class EventController : Controller
     public async Task<IActionResult> DeleteEvent(Guid eventId)
     {
         var eventEntity = await dbContext.Events.FirstOrDefaultAsync(x => x.Id == eventId);
-        if (eventEntity is null) return NotFound();
+        if (eventEntity is null)
+            return NotFound();
 
         dbContext.Events.Remove(eventEntity);
         await dbContext.SaveChangesAsync();
