@@ -7,9 +7,9 @@ namespace Eventnet.Services;
 
 public class SaveToDbService : ISaveToDbService
 {
-    private readonly IImageToDbPreparer preparer;
-    private readonly IMapper mapper;
     private readonly ApplicationDbContext dbContext;
+    private readonly IMapper mapper;
+    private readonly IImageToDbPreparer preparer;
 
     public SaveToDbService(IImageToDbPreparer preparer, IServiceScopeFactory factory, IMapper mapper)
     {

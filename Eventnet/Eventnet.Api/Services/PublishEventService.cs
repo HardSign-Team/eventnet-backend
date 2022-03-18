@@ -11,8 +11,8 @@ public class PublishEventService : IPublishEventService
     public PublishEventService(RabbitMqConfig config)
     {
         queue = config.Queue;
-        var factory = new ConnectionFactory { HostName = config.HostName }; 
-        var connection = factory.CreateConnection(); 
+        var factory = new ConnectionFactory { HostName = config.HostName };
+        var connection = factory.CreateConnection();
         channel = connection.CreateModel();
     }
 

@@ -6,11 +6,11 @@ namespace Eventnet.Services;
 
 public class EventSaveService : IEventSaveService
 {
-    private readonly IPublishEventService publishEventService;
-    private readonly IPhotosToTempSaveService photosToTempSaveService;
     private readonly Handler handler;
+    private readonly IPhotosToTempSaveService photosToTempSaveService;
+    private readonly IPublishEventService publishEventService;
 
-    public EventSaveService(IPublishEventService publishEventService, 
+    public EventSaveService(IPublishEventService publishEventService,
         IPhotosToTempSaveService photosToTempSaveService, Handler handler)
     {
         this.publishEventService = publishEventService;

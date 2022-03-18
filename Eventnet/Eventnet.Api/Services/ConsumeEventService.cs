@@ -7,17 +7,17 @@ namespace Eventnet.Services;
 
 public class ConsumeEventService : BackgroundService
 {
-    private readonly IRabbitMqMessageHandler rabbitMqMessageHandler;
     private readonly IModel channel;
     private readonly IConnection connection;
     private readonly string queue;
+    private readonly IRabbitMqMessageHandler rabbitMqMessageHandler;
 
     public ConsumeEventService(IRabbitMqMessageHandler rabbitMqMessageHandler, RabbitMqConfig config)
     {
         this.rabbitMqMessageHandler = rabbitMqMessageHandler;
         queue = config.Queue;
-        var connectionFactory = new ConnectionFactory { HostName = config.HostName }; 
-        connection = connectionFactory.CreateConnection(); 
+        var connectionFactory = new ConnectionFactory { HostName = config.HostName };
+        connection = connectionFactory.CreateConnection();
         channel = connection.CreateModel();
     }
 

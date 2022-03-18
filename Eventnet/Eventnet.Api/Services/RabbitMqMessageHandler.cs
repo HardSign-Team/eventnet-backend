@@ -6,10 +6,11 @@ public class RabbitMqMessageHandler : IRabbitMqMessageHandler
 {
     private readonly Handler handler;
     private readonly ILoadFromTempService loadFromTempService;
-    private readonly IImageValidator validator;
     private readonly ISaveToDbService saveToDbService;
+    private readonly IImageValidator validator;
 
-    public RabbitMqMessageHandler(Handler handler, ILoadFromTempService loadFromTempService, IImageValidator validator, ISaveToDbService saveToDbService)
+    public RabbitMqMessageHandler(Handler handler, ILoadFromTempService loadFromTempService, IImageValidator validator,
+        ISaveToDbService saveToDbService)
     {
         this.handler = handler;
         this.loadFromTempService = loadFromTempService;
@@ -35,6 +36,6 @@ public class RabbitMqMessageHandler : IRabbitMqMessageHandler
             exception = "Something went wrong on server. Please try again later";
         }
 
-        handler.Update(id,  new SaveEventResult(exception.Length == 0, exception));
+        handler.Update(id, new SaveEventResult(exception.Length == 0, exception));
     }
 }

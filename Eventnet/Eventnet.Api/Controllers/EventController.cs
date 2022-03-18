@@ -15,12 +15,12 @@ public class EventController : Controller
 {
     public const int MaxPageSize = 20;
     public const int DefaultPageSize = 10;
-    private readonly IEventFilterService filterService;
     private readonly ApplicationDbContext dbContext;
-    private readonly IMapper mapper;
-    private readonly LinkGenerator linkGenerator;
-    private readonly UserManager<UserEntity> userManager;
     private readonly IEventSaveService eventSaveService;
+    private readonly IEventFilterService filterService;
+    private readonly LinkGenerator linkGenerator;
+    private readonly IMapper mapper;
+    private readonly UserManager<UserEntity> userManager;
 
     public EventController(
         IEventFilterService filterService,
@@ -98,7 +98,7 @@ public class EventController : Controller
         eventSaveService.Save(createdEvent, files);
         return Ok(new
         {
-           StatusCode = StatusCodes.Status202Accepted
+            StatusCode = StatusCodes.Status202Accepted
         });
     }
 
@@ -112,10 +112,8 @@ public class EventController : Controller
 
     // TODO use format https://datatracker.ietf.org/doc/html/rfc6902
     [HttpPatch("{eventId:guid}")]
-    public IActionResult UpdateEvent(Guid eventId, [FromBody] UpdateEventModel updateModel)
-    {
+    public IActionResult UpdateEvent(Guid eventId, [FromBody] UpdateEventModel updateModel) =>
         throw new NotImplementedException();
-    }
 
     [HttpDelete("{eventId:guid}")]
     public async Task<IActionResult> DeleteEvent(Guid eventId)
@@ -139,8 +137,6 @@ public class EventController : Controller
         return Ok(id);
     }
 
-    private string? GenerateEventsPageLink(int pageNumber, int pageSize)
-    {
-        return linkGenerator.GetUriByRouteValues(HttpContext, nameof(GetEvents), new { pageNumber, pageSize });
-    }
+    private string? GenerateEventsPageLink(int pageNumber, int pageSize) =>
+        linkGenerator.GetUriByRouteValues(HttpContext, nameof(GetEvents), new { pageNumber, pageSize });
 }

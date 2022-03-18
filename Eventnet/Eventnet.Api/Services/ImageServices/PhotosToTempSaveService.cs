@@ -11,10 +11,10 @@ public class PhotosToTempSaveService : IPhotosToTempSaveService
         Directory.CreateDirectory(eventPhotosPath);
         foreach (var file in photos)
         {
-            if (file.Length <= 0) 
+            if (file.Length <= 0)
                 continue;
-            var filePath = Path.Combine(eventPhotosPath, file.FileName); 
-            using Stream fileStream = new FileStream(filePath, FileMode.Create); 
+            var filePath = Path.Combine(eventPhotosPath, file.FileName);
+            using Stream fileStream = new FileStream(filePath, FileMode.Create);
             file.CopyTo(fileStream);
         }
 

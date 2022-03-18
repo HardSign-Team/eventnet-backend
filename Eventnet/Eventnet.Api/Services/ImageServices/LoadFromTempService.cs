@@ -3,7 +3,7 @@
 namespace Eventnet.Services.ImageServices;
 
 public class LoadFromTempService : ILoadFromTempService
-{ 
+{
     public List<Image> LoadImages(string path)
     {
         var images = new List<Image>();

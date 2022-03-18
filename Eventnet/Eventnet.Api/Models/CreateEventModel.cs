@@ -6,5 +6,5 @@ public record CreateEventModel(
     string? Description,
     DateTime StartAt,
     DateTime? EndAt,
-    Location Location, 
+    Location Location,
     IFormFile[] Files);
