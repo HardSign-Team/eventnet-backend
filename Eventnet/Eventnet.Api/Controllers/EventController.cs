@@ -1,12 +1,15 @@
-﻿using System.Text.Json;
+﻿using System.Text;
+using System.Text.Json;
 using AutoMapper;
 using Eventnet.DataAccess;
+using Eventnet.Domain.Events.Selectors;
 using Eventnet.Helpers;
 using Eventnet.Models;
 using Eventnet.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using PagedList;
+using Microsoft.EntityFrameworkCore;
+using X.PagedList;
 
 namespace Eventnet.Controllers;
 
@@ -15,6 +18,7 @@ public class EventController : Controller
 {
     public const int MaxPageSize = 20;
     public const int DefaultPageSize = 10;
+    private readonly IEventFilterMapper filterMapper;
     private readonly ApplicationDbContext dbContext;
     private readonly IEventSaveService eventSaveService;
     private readonly IEventFilterService filterService;
@@ -23,14 +27,14 @@ public class EventController : Controller
     private readonly UserManager<UserEntity> userManager;
 
     public EventController(
-        IEventFilterService filterService,
+        IEventFilterMapper filterMapper,
         ApplicationDbContext dbContext,
         IMapper mapper,
         LinkGenerator linkGenerator,
         UserManager<UserEntity> userManager,
         IEventSaveService eventSaveService)
     {
-        this.filterService = filterService;
+        this.filterMapper = filterMapper;
         this.dbContext = dbContext;
         this.mapper = mapper;
         this.linkGenerator = linkGenerator;
@@ -39,7 +43,7 @@ public class EventController : Controller
     }
 
     [HttpGet("{eventId:guid}")]
-    public IActionResult GetEventById(Guid eventId)
+    public async Task<IActionResult> GetEventById(Guid eventId)
     {
         if (Guid.Empty == eventId)
         {
@@ -47,29 +51,47 @@ public class EventController : Controller
             return UnprocessableEntity(ModelState);
         }
 
-        var eventEntity = dbContext.Events.FirstOrDefault(x => x.Id == eventId);
+        var eventEntity = await dbContext.Events.FirstOrDefaultAsync(x => x.Id == eventId);
         if (eventEntity is null)
-        {
             return NotFound();
-        }
 
         return Ok(mapper.Map<Event>(eventEntity));
     }
 
-    [HttpPost(Name = nameof(GetEvents))]
-    public IActionResult GetEvents([FromBody] FilterEventsModel? filterModel,
-        [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = DefaultPageSize)
+    [HttpGet("search-by-name/{eventName}")]
+    public IActionResult GetEventsByName(string? eventName, [FromQuery(Name = "m")] int maxCount = 10)
     {
-        if (filterModel is null)
+        eventName = eventName?.Trim();
+        switch (eventName)
         {
-            return BadRequest();
+            case null:
+                return BadRequest($"{nameof(eventName)} undefined");
+            case "":
+                return UnprocessableEntity($"Expected {nameof(eventName)} is non-empty string");
         }
 
-        if (filterModel.Radius <= 0)
-        {
-            ModelState.AddModelError(nameof(FilterEventsModel.Radius),
-                $"Radius should be positive, but was {filterModel.Radius}");
-        }
+        var selector = new EventsByNameSelector(eventName);
+        var result = selector
+            .Select(dbContext.Events.AsEnumerable(), maxCount)
+            .Select(x => mapper.Map<EventNameModel>(x))
+            .ToArray();
+
+        return Ok(new EventNameListModel(result.Length, result));
+    }
+
+    [HttpGet(Name = nameof(GetEvents))]
+    public IActionResult GetEvents(
+        [FromQuery(Name = "f")] string? filterModelBase64,
+        [FromQuery(Name = "p")] int pageNumber = 1,
+        [FromQuery(Name = "ps")] int pageSize = DefaultPageSize)
+    {
+        if (filterModelBase64 is null)
+            return BadRequest($"{nameof(filterModelBase64)} was null");
+        var filterModel = ParseEventsFilterModel(filterModelBase64);
+        if (filterModel is null)
+            return BadRequest("Cannot parse filter model");
+
+        TryValidateModel(filterModel);
 
         if (!ModelState.IsValid)
         {
@@ -79,9 +101,13 @@ public class EventController : Controller
         pageNumber = NumberHelper.Normalize(pageNumber, 1);
         pageSize = NumberHelper.Normalize(pageSize, 1, MaxPageSize);
 
-        var filteredEvents = filterService.Filter(dbContext.Events, filterModel);
+        var query = dbContext.Events.AsNoTracking().AsEnumerable();
+        var filter = filterMapper.Map(filterModel);
+        var filteredEvents = filter.Filter(query);
+
         var events = new PagedList<EventEntity>(filteredEvents, pageNumber, pageSize);
-        var paginationHeader = events.ToPaginationHeader(GenerateEventsPageLink);
+        var paginationHeader = events
+            .ToPaginationHeader((p, ps) => GenerateEventsPageLink(filterModelBase64, p, ps));
 
         Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationHeader));
 
@@ -112,24 +138,24 @@ public class EventController : Controller
 
     // TODO use format https://datatracker.ietf.org/doc/html/rfc6902
     [HttpPatch("{eventId:guid}")]
-    public IActionResult UpdateEvent(Guid eventId, [FromBody] UpdateEventModel updateModel) =>
+    public IActionResult UpdateEvent(Guid eventId, [FromBody] UpdateEventModel updateModel)
+    {
         throw new NotImplementedException();
+    }
 
     [HttpDelete("{eventId:guid}")]
     public async Task<IActionResult> DeleteEvent(Guid eventId)
     {
-        var eventEntity = dbContext.Events.FirstOrDefault(x => x.Id == eventId);
+        var eventEntity = await dbContext.Events.FirstOrDefaultAsync(x => x.Id == eventId);
         if (eventEntity is null)
-        {
             return NotFound();
-        }
 
         dbContext.Events.Remove(eventEntity);
         await dbContext.SaveChangesAsync();
 
         return Ok(new { eventId });
     }
-
+    
     [HttpGet("guid")]
     public IActionResult GenerateEventGuid()
     {
@@ -137,6 +163,23 @@ public class EventController : Controller
         return Ok(id);
     }
 
-    private string? GenerateEventsPageLink(int pageNumber, int pageSize) =>
-        linkGenerator.GetUriByRouteValues(HttpContext, nameof(GetEvents), new { pageNumber, pageSize });
+    private static EventsFilterModel? ParseEventsFilterModel(string base64Model)
+    {
+        try
+        {
+            var bytes = Convert.FromBase64String(base64Model);
+            var json = Encoding.Default.GetString(bytes);
+            return JsonSerializer.Deserialize<EventsFilterModel>(json);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
+    private string? GenerateEventsPageLink(string filterModelBase64, int pageNumber, int pageSize)
+    {
+        var values = new { f = filterModelBase64, p = pageNumber, ps = pageSize };
+        return linkGenerator.GetUriByRouteValues(HttpContext, nameof(GetEvents), values);
+    }
 }

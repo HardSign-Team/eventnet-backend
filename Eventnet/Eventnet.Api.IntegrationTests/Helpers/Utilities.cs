@@ -6,7 +6,7 @@ namespace Eventnet.Api.IntegrationTests.Helpers;
 
 public class Utilities
 {
-    public static void InitializeDbForTests(ApplicationDbContext db)
+    private static void InitializeDbForTests(ApplicationDbContext db)
     {
         db.Events.AddRange(GetSeedingMessages());
         db.SaveChanges();

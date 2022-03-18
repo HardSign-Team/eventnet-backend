@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Text;
 using System.Web;
 using Eventnet.Api.IntegrationTests.Helpers;
+using Eventnet.Models;
 using Microsoft.AspNetCore.Http.Extensions;
+using Newtonsoft.Json;
 
 namespace Eventnet.Api.IntegrationTests.EventControllerTests;
 
@@ -29,16 +32,32 @@ public abstract class EventApiTestsBase : TestsBase
         return uriBuilder.Uri;
     }
 
-    protected Uri BuildEventsPageUri(int? pageNumber, int? pageSize)
+    protected Uri BuildEventsPageUri(EventsFilterModel filterModel, int? pageNumber, int? pageSize)
     {
         var query = new QueryBuilder();
+        var filterBytes = Encoding.Default.GetBytes(JsonConvert.SerializeObject(filterModel));
+        query.Add("f", Convert.ToBase64String(filterBytes));
         if (pageNumber.HasValue)
-            query.Add("pageNumber", pageNumber.Value.ToString());
+            query.Add("p", pageNumber.Value.ToString());
         if (pageSize.HasValue)
-            query.Add("pageSize", pageSize.Value.ToString());
+            query.Add("ps", pageSize.Value.ToString());
+        
         var uriBuilder = new UriBuilder(Configuration.BaseUrl)
         {
             Path = BaseRoute,
+            Query = query.ToString()
+        };
+        return uriBuilder.Uri;
+    }
+
+    protected Uri BuildEventsByNameUri(string? name, int? maxCount)
+    {
+        var query = new QueryBuilder();
+        if (maxCount.HasValue) query.Add("m", maxCount.Value.ToString());
+
+        var uriBuilder = new UriBuilder(Configuration.BaseUrl)
+        {
+            Path = $"{BaseRoute}/search-by-name/{name}",
             Query = query.ToString()
         };
         return uriBuilder.Uri;
