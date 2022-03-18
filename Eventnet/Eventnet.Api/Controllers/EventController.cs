@@ -4,6 +4,7 @@ using Eventnet.DataAccess;
 using Eventnet.Helpers;
 using Eventnet.Models;
 using Eventnet.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using PagedList;
 
@@ -18,17 +19,23 @@ public class EventController : Controller
     private readonly ApplicationDbContext dbContext;
     private readonly IMapper mapper;
     private readonly LinkGenerator linkGenerator;
+    private readonly UserManager<UserEntity> userManager;
+    private readonly IEventSaveService eventSaveService;
 
     public EventController(
         IEventFilterService filterService,
         ApplicationDbContext dbContext,
         IMapper mapper,
-        LinkGenerator linkGenerator)
+        LinkGenerator linkGenerator,
+        UserManager<UserEntity> userManager,
+        IEventSaveService eventSaveService)
     {
         this.filterService = filterService;
         this.dbContext = dbContext;
         this.mapper = mapper;
         this.linkGenerator = linkGenerator;
+        this.userManager = userManager;
+        this.eventSaveService = eventSaveService;
     }
 
     [HttpGet("{eventId:guid}")]
@@ -81,10 +88,26 @@ public class EventController : Controller
         return Ok(mapper.Map<IEnumerable<Event>>(events));
     }
 
-    [HttpPost("create")]
+    [HttpPost]
     public IActionResult CreateEvent([FromBody] CreateEventModel createModel)
     {
-        throw new NotImplementedException();
+        if (createModel is null)
+            return BadRequest();
+        var createdEvent = mapper.Map<Event>(createModel);
+        var files = createModel.Files;
+        eventSaveService.Save(createdEvent, files);
+        return Ok(new
+        {
+           StatusCode = StatusCodes.Status202Accepted
+        });
+    }
+
+    [HttpGet("isCreated")]
+    public IActionResult IsCreated(Guid id)
+    {
+        if (!eventSaveService.IsEventSaved(id, out var exception))
+            return BadRequest(exception);
+        return Ok();
     }
 
     // TODO use format https://datatracker.ietf.org/doc/html/rfc6902
@@ -107,6 +130,13 @@ public class EventController : Controller
         await dbContext.SaveChangesAsync();
 
         return Ok(new { eventId });
+    }
+
+    [HttpGet("guid")]
+    public IActionResult GenerateEventGuid()
+    {
+        var id = Guid.NewGuid();
+        return Ok(id);
     }
 
     private string? GenerateEventsPageLink(int pageNumber, int pageSize)

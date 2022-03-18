@@ -10,5 +10,8 @@ public class ApplicationMappingProfile : Profile
     {
         CreateMap<EventEntity, Event>();
         CreateMap<LocationEntity, Location>();
+        CreateMap<Event, CreateEventModel>()
+            .ForMember(x => x.UserId,
+                opt => opt.MapFrom(model => Guid.NewGuid()));
     }
 }
