@@ -21,6 +21,7 @@ services.AddSingleton<IEventFilterService, EventFilterService>();
 services.AddSingleton<IPhotosToTempSaveService, PhotosToTempSaveService>();
 services.AddSingleton(new RabbitMqConfig());
 services.AddSingleton<IPublishEventService, PublishEventService>();
+services.AddSingleton(new Handler());
 
 services.AddControllers();
 
