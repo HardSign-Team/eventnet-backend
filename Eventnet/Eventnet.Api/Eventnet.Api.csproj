@@ -20,13 +20,14 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.2"/>
-        <PackageReference Include="PagedList" Version="1.17.0"/>
-        <PackageReference Include="PagedList.Mvc" Version="4.5.0"/>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3"/>
+        <PackageReference Include="X.PagedList" Version="8.1.0"/>
+        <PackageReference Include="X.PagedList.Mvc.Core" Version="8.1.0"/>
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Eventnet.DataAccess\Eventnet.DataAccess.csproj"/>
+        <ProjectReference Include="..\Eventnet.Domain\Eventnet.Domain.csproj"/>
     </ItemGroup>
 
 </Project>

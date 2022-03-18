@@ -9,6 +9,8 @@ public class ApplicationMappingProfile : Profile
     public ApplicationMappingProfile()
     {
         CreateMap<EventEntity, Event>();
+        CreateMap<EventEntity, EventNameModel>();
         CreateMap<LocationEntity, Location>();
+        CreateProjection<UserEntity, UserNameModel>();
     }
 }
