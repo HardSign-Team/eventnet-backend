@@ -23,7 +23,7 @@ public abstract class BaseDateFilter : IEventFilter
             DateEquality.Before  => date < borderDate,
             DateEquality.SameDay => date.Date == borderDate.Date,
             DateEquality.After   => date > borderDate,
-            _                    => throw new ArgumentOutOfRangeException()
+            _                    => throw new ArgumentOutOfRangeException(nameof(date), $"Unexpected {date}")
         };
     }
 }
