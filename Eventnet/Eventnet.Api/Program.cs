@@ -23,6 +23,7 @@ services.AddSingleton(new RabbitMqConfig());
 services.AddSingleton<IPublishEventService, PublishEventService>();
 services.AddSingleton(new Handler());
 services.AddSingleton<IEventSaveService, EventSaveService>();
+services.AddSingleton<ILoadFromTempService, LoadFromTempService>();
 
 services.AddControllers();
 
