@@ -27,6 +27,7 @@ services.AddSingleton<ILoadFromTempService, LoadFromTempService>();
 services.AddSingleton<IImageValidator, ImageValidator>();
 services.AddSingleton<IImageToDbPreparer, ImageToDbPreparer>();
 services.AddSingleton<ISaveToDbService, SaveToDbService>();
+services.AddSingleton<IRabbitMqMessageHandler, RabbitMqMessageHandler>();
 
 services.AddControllers();
 
