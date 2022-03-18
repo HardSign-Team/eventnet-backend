@@ -19,6 +19,8 @@ services.AddSingleton(jwtTokenConfig);
 services.AddSingleton<IJwtAuthService, JwtAuthService>();
 services.AddSingleton<IEventFilterService, EventFilterService>();
 services.AddSingleton<IPhotosToTempSaveService, PhotosToTempSaveService>();
+services.AddSingleton(new RabbitMqConfig());
+services.AddSingleton<IPublishEventService, PublishEventService>();
 
 services.AddControllers();
 
