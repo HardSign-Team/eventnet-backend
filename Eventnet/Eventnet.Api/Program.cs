@@ -26,6 +26,7 @@ services.AddSingleton<IEventSaveService, EventSaveService>();
 services.AddSingleton<ILoadFromTempService, LoadFromTempService>();
 services.AddSingleton<IImageValidator, ImageValidator>();
 services.AddSingleton<IImageToDbPreparer, ImageToDbPreparer>();
+services.AddSingleton<ISaveToDbService, SaveToDbService>();
 
 services.AddControllers();
 
