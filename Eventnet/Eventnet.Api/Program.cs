@@ -96,6 +96,8 @@ services.AddSwaggerGen(option =>
     });
 });
 
+services.AddHostedService<ConsumeEventService>();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
