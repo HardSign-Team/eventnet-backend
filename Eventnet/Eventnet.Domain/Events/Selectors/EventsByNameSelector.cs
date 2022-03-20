@@ -1,9 +1,8 @@
-﻿using Eventnet.DataAccess;
-using Eventnet.DataAccess.Entities;
+﻿using Eventnet.DataAccess.Entities;
 using F23.StringSimilarity;
 namespace Eventnet.Domain.Events.Selectors;
 
-public class EventsByNameSelector : IEventsByNameSelector
+public class EventsByNameSelector : ISelector<EventEntity>
 {
     private readonly string name;
     private readonly NormalizedLevenshtein algorithm;

@@ -16,7 +16,7 @@ using NUnit.Framework;
 
 namespace Eventnet.Api.IntegrationTests.EventControllerTests;
 
-public class GetEventsByName : EventApiTestsBase
+public class GetEventsByNameShould : EventApiTestsBase
 {
     [SetUp]
     public void Setup()
