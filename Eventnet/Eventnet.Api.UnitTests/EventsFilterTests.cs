@@ -12,7 +12,7 @@ using Eventnet.Services;
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace Eventnet.Domain.UnitTests;
+namespace Eventnet.Api.UnitTests;
 
 public class EventsFilterTests
 {
