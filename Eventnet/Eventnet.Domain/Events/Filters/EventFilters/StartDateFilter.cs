@@ -1,5 +1,4 @@
-﻿using Eventnet.DataAccess.Entities;
-using Eventnet.Domain.Events.Filters.Data;
+﻿using Eventnet.Domain.Events.Filters.Data;
 
 namespace Eventnet.Domain.Events.Filters.EventFilters;
 
@@ -9,5 +8,5 @@ public class StartDateFilter : BaseDateFilter
     {
     }
 
-    public override bool Filter(EventEntity entity) => Filter(entity.StartDate);
+    public override bool Filter(Event entity) => Filter(entity.StartDate);
 }

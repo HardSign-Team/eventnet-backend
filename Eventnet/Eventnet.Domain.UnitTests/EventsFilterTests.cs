@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoFixture;
 using Eventnet.Api.TestsUtils;
-using Eventnet.DataAccess.Entities;
 using Eventnet.Domain.Events;
 using Eventnet.Domain.Events.Filters;
 using Eventnet.Domain.Events.Filters.Data;
@@ -23,15 +22,15 @@ public class EventsFilterTests
         var fixture = new Fixture();
         var events = new[]
         {
-            fixture.CreateEventAt(new LocationEntity(56.840234511156446, 60.616096578611625)),
-            fixture.CreateEventAt(new LocationEntity(56.84391149402939, 60.65316741081937)),
-            fixture.CreateEventAt(new LocationEntity(56.81781873425029, 60.61238225939552)),
-            fixture.CreateEventAt(new LocationEntity(56.81787873103509, 60.54074620394152)),
-            fixture.CreateEventAt(new LocationEntity(57.15411119263984, 65.66351129051274)),
-            fixture.CreateEventAt(new LocationEntity(51.15781435465198, 71.46714484897487)),
-            fixture.CreateEventAt(new LocationEntity(55.75982632261345, 37.61909029735618)),
-            fixture.CreateEventAt(new LocationEntity(45.432157465480515, 40.55582995809704)),
-            fixture.CreateEventAt(new LocationEntity(56.114515134214784, 69.52740360680868))
+            fixture.CreateEventAt(new Location(56.840234511156446, 60.616096578611625)),
+            fixture.CreateEventAt(new Location(56.84391149402939, 60.65316741081937)),
+            fixture.CreateEventAt(new Location(56.81781873425029, 60.61238225939552)),
+            fixture.CreateEventAt(new Location(56.81787873103509, 60.54074620394152)),
+            fixture.CreateEventAt(new Location(57.15411119263984, 65.66351129051274)),
+            fixture.CreateEventAt(new Location(51.15781435465198, 71.46714484897487)),
+            fixture.CreateEventAt(new Location(55.75982632261345, 37.61909029735618)),
+            fixture.CreateEventAt(new Location(45.432157465480515, 40.55582995809704)),
+            fixture.CreateEventAt(new Location(56.114515134214784, 69.52740360680868))
         };
         var filterModel = new EventsFilterModel
         {
@@ -48,9 +47,9 @@ public class EventsFilterTests
 
     [TestCaseSource(nameof(GetFilterStartDateCases))]
     public void Filter_ShouldFilterStartDate(
-        IEnumerable<EventEntity> events,
+        IEnumerable<Event> events,
         DateFilterModel model,
-        ICollection<EventEntity> expected)
+        ICollection<Event> expected)
     {
         var filterModel = new EventsFilterModel
         {
@@ -67,9 +66,9 @@ public class EventsFilterTests
 
     [TestCaseSource(nameof(GetFilterEndDateCases))]
     public void Filter_ShouldFilterEndDate(
-        IEnumerable<EventEntity> events,
+        IEnumerable<Event> events,
         DateFilterModel model,
-        ICollection<EventEntity> expected)
+        ICollection<Event> expected)
     {
         var filterModel = new EventsFilterModel
         {

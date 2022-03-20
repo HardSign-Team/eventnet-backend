@@ -1,25 +1,24 @@
-﻿using Eventnet.DataAccess.Entities;
-using Eventnet.Domain.Events.Filters.EventFilters;
+﻿using Eventnet.Domain.Events.Filters.EventFilters;
 
 namespace Eventnet.Domain.Events.Filters;
 
 public class EventsFilter : IEventsFilter
 {
-    private readonly Func<EventEntity, bool> filter;
+    private readonly Func<Event, bool> filter;
 
     public EventsFilter(IEnumerable<IEventFilter> filters)
     {
         filter = CreateComposedFilter(filters);
     }
 
-    public IEnumerable<EventEntity> Filter(IEnumerable<EventEntity> query)
+    public IEnumerable<Event> Filter(IEnumerable<Event> query)
     {
         return query.Where(x => filter(x));
     }
 
-    private static Func<EventEntity, bool> CreateComposedFilter(IEnumerable<IEventFilter> filters)
+    private static Func<Event, bool> CreateComposedFilter(IEnumerable<IEventFilter> filters)
     {
-        var filter = (EventEntity ev) => true;
+        var filter = (Event ev) => true;
         foreach (var f in filters)
         {
             var copy = filter;

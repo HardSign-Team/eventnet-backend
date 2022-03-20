@@ -2,7 +2,6 @@
 using System.Text.Json;
 using AutoMapper;
 using Eventnet.DataAccess;
-using Eventnet.DataAccess.Entities;
 using Eventnet.Domain.Events;
 using Eventnet.Domain.Selectors;
 using Eventnet.Helpers;
@@ -92,11 +91,11 @@ public class EventController : Controller
         pageNumber = NumberHelper.Normalize(pageNumber, 1);
         pageSize = NumberHelper.Normalize(pageSize, 1, MaxPageSize);
 
-        var query = dbContext.Events.AsNoTracking().AsEnumerable();
+        var query = dbContext.Events.AsNoTracking().AsEnumerable().Select(mapper.Map<Event>);
         var filter = filterMapper.Map(filterModel);
         var filteredEvents = filter.Filter(query);
 
-        var events = new PagedList<EventEntity>(filteredEvents, pageNumber, pageSize);
+        var events = new PagedList<Event>(filteredEvents, pageNumber, pageSize);
         var paginationHeader = events
             .ToPaginationHeader((p, ps) => GenerateEventsPageLink(filterModelBase64, p, ps));
 
