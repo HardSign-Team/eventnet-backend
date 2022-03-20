@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoFixture;
 using Eventnet.Api.TestsUtils;
-using Eventnet.DataAccess;
 using Eventnet.DataAccess.Entities;
 using Eventnet.Domain.Events.Filters;
 using Eventnet.Domain.Events.Filters.Data;
@@ -13,7 +12,7 @@ using Eventnet.Services;
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace Eventnet.Api.UnitTests;
+namespace Eventnet.Domain.UnitTests;
 
 public class EventsFilterTests
 {

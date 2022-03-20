@@ -3,7 +3,7 @@ using Eventnet.Domain.Selectors;
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace Eventnet.Api.UnitTests;
+namespace Eventnet.Domain.UnitTests;
 
 public class TagsStartsWithNameSelectorTests
 {

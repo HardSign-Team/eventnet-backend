@@ -6,7 +6,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventnet.DataAccess", "Even
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventnet.Api.IntegrationTests", "Eventnet.Api.IntegrationTests\Eventnet.Api.IntegrationTests.csproj", "{397E1243-CE29-404F-8CEF-5583FE0EF3FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventnet.Api.UnitTests", "Eventnet.Api.UnitTests\Eventnet.Api.UnitTests.csproj", "{DD798911-2C24-4250-AE4F-CEB56FA307FD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventnet.Domain.UnitTests", "Eventnet.Domain.UnitTests\Eventnet.Domain.UnitTests.csproj", "{DD798911-2C24-4250-AE4F-CEB56FA307FD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventnet.Domain", "Eventnet.Domain\Eventnet.Domain.csproj", "{CE47FEF5-1A8B-419B-BE0B-1A5396E920A7}"
 EndProject
