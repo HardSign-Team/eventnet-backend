@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Eventnet.Domain.Events;
 
-namespace Eventnet.Models;
+namespace Eventnet.Api.Models;
 
 public record LocationFilterModel(
     Location Location, 

@@ -1,6 +1,6 @@
 ﻿using Eventnet.Domain.Events;
 
-namespace Eventnet.Models;
+namespace Eventnet.Api.Models;
 
 public record CreateEventModel(
     string UserId,

@@ -1,7 +1,7 @@
 ﻿using System.Security.Claims;
-using Eventnet.Models;
+using Eventnet.Api.Models;
 
-namespace Eventnet.Services;
+namespace Eventnet.Api.Services;
 
 public interface IJwtAuthService
 {

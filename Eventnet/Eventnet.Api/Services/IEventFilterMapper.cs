@@ -1,7 +1,7 @@
-﻿using Eventnet.Domain.Events.Filters;
-using Eventnet.Models;
+﻿using Eventnet.Api.Models;
+using Eventnet.Domain.Events.Filters;
 
-namespace Eventnet.Services;
+namespace Eventnet.Api.Services;
 
 public interface IEventFilterMapper
 {

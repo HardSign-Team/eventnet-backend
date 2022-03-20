@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
+using Eventnet.Api.Helpers;
 using Eventnet.DataAccess;
 using Eventnet.Domain.Selectors;
-using Eventnet.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace Eventnet.Controllers;
+namespace Eventnet.Api.Controllers;
 
 [Route("api/tags")]
 public class TagsController : Controller

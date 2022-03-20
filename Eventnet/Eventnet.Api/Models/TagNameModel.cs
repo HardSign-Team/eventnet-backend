@@ -1,3 +1,3 @@
-﻿namespace Eventnet.Models;
+﻿namespace Eventnet.Api.Models;
 
 public record TagNameModel(int Id, string Name);

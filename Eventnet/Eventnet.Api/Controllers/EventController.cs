@@ -1,17 +1,17 @@
 ﻿using System.Text;
 using System.Text.Json;
 using AutoMapper;
+using Eventnet.Api.Helpers;
+using Eventnet.Api.Models;
+using Eventnet.Api.Services;
 using Eventnet.DataAccess;
 using Eventnet.Domain.Events;
 using Eventnet.Domain.Selectors;
-using Eventnet.Helpers;
-using Eventnet.Models;
-using Eventnet.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using X.PagedList;
 
-namespace Eventnet.Controllers;
+namespace Eventnet.Api.Controllers;
 
 [Route("api/events")]
 public class EventController : Controller

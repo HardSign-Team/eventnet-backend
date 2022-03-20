@@ -1,5 +1,5 @@
 ﻿using Eventnet.Domain.Selectors;
 
-namespace Eventnet.Models;
+namespace Eventnet.Api.Models;
 
 public record EventNameListModel(int TotalCount, EventName[] Models);

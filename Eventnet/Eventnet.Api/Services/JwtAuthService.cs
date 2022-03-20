@@ -1,10 +1,10 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Eventnet.Models;
+using Eventnet.Api.Models;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Eventnet.Services;
+namespace Eventnet.Api.Services;
 
 public class JwtAuthService : IJwtAuthService
 {

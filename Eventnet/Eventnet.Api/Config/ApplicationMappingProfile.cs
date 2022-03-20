@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
+using Eventnet.Api.Models;
 using Eventnet.DataAccess.Entities;
 using Eventnet.Domain.Events;
 using Eventnet.Domain.Selectors;
-using Eventnet.Models;
 
-namespace Eventnet.Config;
+namespace Eventnet.Api.Config;
 
 public class ApplicationMappingProfile : Profile
 {
