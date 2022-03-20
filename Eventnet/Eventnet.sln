@@ -10,7 +10,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventnet.Domain.UnitTests",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventnet.Domain", "Eventnet.Domain\Eventnet.Domain.csproj", "{CE47FEF5-1A8B-419B-BE0B-1A5396E920A7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventnet.Api.TestsUtils", "Eventnet.Api.TestsUtils\Eventnet.Api.TestsUtils.csproj", "{A30B293A-C1F3-4DE5-8FCA-46964B6C7B19}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventnet.TestsUtils", "Eventnet.TestsUtils\Eventnet.TestsUtils.csproj", "{A30B293A-C1F3-4DE5-8FCA-46964B6C7B19}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventnet.Api.UnitTests", "Eventnet.Api.UnitTests\Eventnet.Api.UnitTests.csproj", "{AE628E59-C4BF-429E-BEA9-D3933D0115EC}"
 EndProject
