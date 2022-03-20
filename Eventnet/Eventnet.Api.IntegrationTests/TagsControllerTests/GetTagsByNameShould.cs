@@ -5,7 +5,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Eventnet.Api.IntegrationTests.Helpers;
 using Eventnet.DataAccess.Entities;
-using Eventnet.Domain.Events.Selectors;
+using Eventnet.Domain.Selectors;
 using FluentAssertions;
 using NUnit.Framework;
 

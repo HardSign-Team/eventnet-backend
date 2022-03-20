@@ -1,6 +1,7 @@
 ﻿using Eventnet.DataAccess.Entities;
 using F23.StringSimilarity;
-namespace Eventnet.Domain.Events.Selectors;
+
+namespace Eventnet.Domain.Selectors;
 
 public class EventsByNameSelector : ISelector<EventEntity>
 {

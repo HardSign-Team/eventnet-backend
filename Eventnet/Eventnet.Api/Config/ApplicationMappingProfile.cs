@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Eventnet.DataAccess;
 using Eventnet.DataAccess.Entities;
-using Eventnet.Domain.Events.Selectors;
+using Eventnet.Domain.Selectors;
 using Eventnet.Models;
 
 namespace Eventnet.Config;

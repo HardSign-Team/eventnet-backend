@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Eventnet.DataAccess;
-using Eventnet.Domain.Events.Selectors;
+using Eventnet.Domain.Selectors;
 using Eventnet.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

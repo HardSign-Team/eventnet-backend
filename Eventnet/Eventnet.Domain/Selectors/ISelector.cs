@@ -1,4 +1,4 @@
-﻿namespace Eventnet.Domain.Events.Selectors;
+﻿namespace Eventnet.Domain.Selectors;
 
 public interface ISelector<T>
 {
