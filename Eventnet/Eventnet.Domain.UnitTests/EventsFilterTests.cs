@@ -4,6 +4,7 @@ using System.Linq;
 using AutoFixture;
 using Eventnet.Api.TestsUtils;
 using Eventnet.DataAccess.Entities;
+using Eventnet.Domain.Events;
 using Eventnet.Domain.Events.Filters;
 using Eventnet.Domain.Events.Filters.Data;
 using Eventnet.Helpers.EventFilterFactories;

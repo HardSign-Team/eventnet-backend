@@ -1,4 +1,4 @@
-﻿namespace Eventnet.Models;
+﻿namespace Eventnet.Domain.Events;
 
 public record Event(
     Guid Id,

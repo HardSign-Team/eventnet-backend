@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Eventnet.Domain.Events;
 
 namespace Eventnet.Models;
 

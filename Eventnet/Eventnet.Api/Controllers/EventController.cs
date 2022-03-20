@@ -3,6 +3,7 @@ using System.Text.Json;
 using AutoMapper;
 using Eventnet.DataAccess;
 using Eventnet.DataAccess.Entities;
+using Eventnet.Domain.Events;
 using Eventnet.Domain.Selectors;
 using Eventnet.Helpers;
 using Eventnet.Models;
@@ -65,8 +66,7 @@ public class EventController : Controller
 
         var selector = new EventsByNameSelector(eventName);
         var result = selector
-            .Select(dbContext.Events.AsEnumerable(), maxCount)
-            .Select(x => mapper.Map<EventNameModel>(x))
+            .Select(mapper.ProjectTo<EventName>(dbContext.Events).AsNoTracking().AsEnumerable(), maxCount)
             .ToArray();
 
         return Ok(new EventNameListModel(result.Length, result));

@@ -2,7 +2,6 @@
 using System.Linq;
 using AutoFixture;
 using Eventnet.Api.TestsUtils;
-using Eventnet.DataAccess.Entities;
 using Eventnet.Domain.Selectors;
 using FluentAssertions;
 using NUnit.Framework;
@@ -15,7 +14,7 @@ public class EventsByNameSelectorTests
     public void Select_ShouldReturnEmptyCollectionWhenEmptyInput()
     {
         var sut = CreateSut("Fat cock");
-        var events = Array.Empty<EventEntity>();
+        var events = Array.Empty<EventName>();
         
         var result = sut.Select(events, 100);
 
@@ -29,10 +28,10 @@ public class EventsByNameSelectorTests
         var fixture = new Fixture();
         var events = new[]
         {
-            fixture.CreateEventWithName("Fat dick sucking"),
-            fixture.CreateEventWithName("Gay party"),
-            fixture.CreateEventWithName("Mad cock suckicng"),
-            fixture.CreateEventWithName("Master cock sucking")
+            fixture.CreateEventName("Fat dick sucking"),
+            fixture.CreateEventName("Gay party"),
+            fixture.CreateEventName("Mad cock suckicng"),
+            fixture.CreateEventName("Master cock sucking")
         };
         
         var result = sut.Select(events, 100).ToArray();
@@ -53,10 +52,10 @@ public class EventsByNameSelectorTests
         var fixture = new Fixture();
         var events = new[]
         {
-            fixture.CreateEventWithName("Ivan gay"),
-            fixture.CreateEventWithName("Bonjour gay"),
-            fixture.CreateEventWithName("Bonan gay"),
-            fixture.CreateEventWithName("Vasya gay")
+            fixture.CreateEventName("Ivan gay"),
+            fixture.CreateEventName("Bonjour gay"),
+            fixture.CreateEventName("Bonan gay"),
+            fixture.CreateEventName("Vasya gay")
         };
         
         var result = sut.Select(events, 100).ToArray();
@@ -71,12 +70,12 @@ public class EventsByNameSelectorTests
         var fixture = new Fixture();
         var events = new[]
         {
-            fixture.CreateEventWithName("AAAB"),
-            fixture.CreateEventWithName("AAAB"),
-            fixture.CreateEventWithName("AAAB"),
-            fixture.CreateEventWithName("AAAB"),
-            fixture.CreateEventWithName("AAAB"),
-            fixture.CreateEventWithName("AAAB"),
+            fixture.CreateEventName("AAAB"),
+            fixture.CreateEventName("AAAB"),
+            fixture.CreateEventName("AAAB"),
+            fixture.CreateEventName("AAAB"),
+            fixture.CreateEventName("AAAB"),
+            fixture.CreateEventName("AAAB"),
         };
         
         var result = sut.Select(events, 3).ToArray();

@@ -1,5 +1,4 @@
-﻿using Eventnet.DataAccess;
-using Eventnet.DataAccess.Entities;
+﻿using Eventnet.DataAccess.Entities;
 using GeoCoordinatePortable;
 
 namespace Eventnet.Domain.Events.Filters.EventFilters;

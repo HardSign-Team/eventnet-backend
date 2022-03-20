@@ -1,9 +1,8 @@
-﻿using Eventnet.DataAccess.Entities;
-using F23.StringSimilarity;
+﻿using F23.StringSimilarity;
 
 namespace Eventnet.Domain.Selectors;
 
-public class EventsByNameSelector : ISelector<EventEntity>
+public class EventsByNameSelector : ISelector<EventName>
 {
     private readonly string name;
     private readonly NormalizedLevenshtein algorithm;
@@ -14,7 +13,7 @@ public class EventsByNameSelector : ISelector<EventEntity>
         algorithm = new NormalizedLevenshtein();
     }
     
-    public IEnumerable<EventEntity> Select(IEnumerable<EventEntity> events, int maxCount)
+    public IEnumerable<EventName> Select(IEnumerable<EventName> events, int maxCount)
     {
         const double acceptableSimilarity = 0.7;
         var valueTuples = events

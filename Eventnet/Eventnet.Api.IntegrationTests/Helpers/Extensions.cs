@@ -58,7 +58,7 @@ public static class Extensions
 
     public static T ReadContentAs<T>(this HttpResponseMessage response)
     {
-        var content = response.Content!.ReadAsStringAsync().Result;
+        var content = response.Content.ReadAsStringAsync().Result;
         return JsonSerializer.Deserialize<T>(content) ?? throw new Exception();
     }
 
