@@ -1,4 +1,5 @@
 ﻿using Eventnet.DataAccess;
+using Eventnet.DataAccess.Entities;
 using F23.StringSimilarity;
 namespace Eventnet.Domain.Events.Selectors;
 

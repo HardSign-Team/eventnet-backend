@@ -3,6 +3,7 @@ using System.Linq;
 using AutoFixture;
 using Eventnet.Api.TestsUtils;
 using Eventnet.DataAccess;
+using Eventnet.DataAccess.Entities;
 using Eventnet.Domain.Events.Selectors;
 using FluentAssertions;
 using NUnit.Framework;

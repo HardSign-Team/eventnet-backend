@@ -1,4 +1,5 @@
 ﻿using Eventnet.DataAccess;
+using Eventnet.DataAccess.Entities;
 using Eventnet.Domain.Events.Filters.Data;
 
 namespace Eventnet.Domain.Events.Filters.EventFilters;

@@ -2,6 +2,7 @@
 using System.Text.Json;
 using AutoMapper;
 using Eventnet.DataAccess;
+using Eventnet.DataAccess.Entities;
 using Eventnet.Domain.Events.Selectors;
 using Eventnet.Helpers;
 using Eventnet.Models;

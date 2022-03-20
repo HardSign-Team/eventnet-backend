@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Eventnet.DataAccess;
+using Eventnet.DataAccess.Entities;
 using Eventnet.Models;
 
 namespace Eventnet.Config;

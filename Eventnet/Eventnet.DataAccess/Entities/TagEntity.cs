@@ -1,4 +1,4 @@
-﻿namespace Eventnet.DataAccess;
+﻿namespace Eventnet.DataAccess.Entities;
 
 public class TagEntity
 {

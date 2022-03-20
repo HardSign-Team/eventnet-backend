@@ -1,4 +1,5 @@
 ﻿using Eventnet.DataAccess.Configurations;
+using Eventnet.DataAccess.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 // Context auto init own properties

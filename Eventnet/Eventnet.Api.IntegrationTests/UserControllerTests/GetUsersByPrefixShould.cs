@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoFixture;
 using Eventnet.Api.IntegrationTests.Helpers;
 using Eventnet.DataAccess;
+using Eventnet.DataAccess.Entities;
 using Eventnet.Models;
 using FluentAssertions;
 using Newtonsoft.Json;

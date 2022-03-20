@@ -1,6 +1,7 @@
 using System.Text;
 using Eventnet.Config;
 using Eventnet.DataAccess;
+using Eventnet.DataAccess.Entities;
 using Eventnet.Helpers.EventFilterFactories;
 using Eventnet.Models;
 using Eventnet.Services;
