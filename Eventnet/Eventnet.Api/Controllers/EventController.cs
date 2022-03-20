@@ -101,7 +101,7 @@ public class EventController : Controller
 
         Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationHeader));
 
-        return Ok(mapper.Map<IEnumerable<Event>>(events));
+        return Ok(mapper.Map<IEnumerable<EventLocationModel>>(events));
     }
 
     [HttpPost("create")]

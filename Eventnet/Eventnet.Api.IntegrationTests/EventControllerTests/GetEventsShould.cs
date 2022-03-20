@@ -163,7 +163,7 @@ public class GetEventsShould : EventApiTestsBase
         pagination.PreviousPageLink.Should().BeNull();
         pagination.TotalCount.Should().Be(6);
         pagination.TotalPages.Should().Be(2);
-        var resultEvents = await response.Content.ReadFromJsonAsync<EventEntity[]>() ?? throw new Exception();
+        var resultEvents = await response.Content.ReadFromJsonAsync<EventLocationModel[]>() ?? throw new Exception();
         resultEvents.Should().NotBeEmpty();
         resultEvents.Should().HaveCount(3);
     }
@@ -199,7 +199,7 @@ public class GetEventsShould : EventApiTestsBase
         pagination.TotalPages.Should().Be(2);
         pagination.NextPageLink.Should().BeNull();
         pagination.PreviousPageLink.Should().Be(CreateDefaultRequestMessage(requestModel, 1, 3).RequestUri!.ToString());
-        var resultEvents = await response.Content.ReadFromJsonAsync<EventEntity[]>() ?? throw new Exception();
+        var resultEvents = await response.Content.ReadFromJsonAsync<EventLocationModel[]>() ?? throw new Exception();
         resultEvents.Should().NotBeEmpty();
         resultEvents.Should().HaveCount(3);
     }
