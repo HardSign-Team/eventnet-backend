@@ -1,3 +1,7 @@
-﻿namespace Eventnet.Models;
+﻿using System.ComponentModel.DataAnnotations;
 
-public record LocationFilterModel(Location Location, double Radius);
+namespace Eventnet.Models;
+
+public record LocationFilterModel(
+    Location Location, 
+    [Range(double.Epsilon, double.MaxValue, ErrorMessage = "Radius should be positive.")] double Radius);

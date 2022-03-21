@@ -1,6 +1,7 @@
 ﻿using Eventnet.DataAccess;
+using Eventnet.Domain.Events.Filters.Data;
 
-namespace Eventnet.Helpers.EventFilters;
+namespace Eventnet.Domain.Events.Filters.EventFilters;
 
 public abstract class BaseDateFilter : IEventFilter
 {
@@ -22,7 +23,7 @@ public abstract class BaseDateFilter : IEventFilter
             DateEquality.Before  => date < borderDate,
             DateEquality.SameDay => date.Date == borderDate.Date,
             DateEquality.After   => date > borderDate,
-            _                    => throw new ArgumentOutOfRangeException()
+            _                    => throw new ArgumentOutOfRangeException(nameof(date), $"Unexpected {date}")
         };
     }
 }

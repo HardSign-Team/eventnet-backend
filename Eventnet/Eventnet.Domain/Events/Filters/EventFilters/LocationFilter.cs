@@ -1,19 +1,17 @@
 ﻿using Eventnet.DataAccess;
-using Eventnet.Models;
 using GeoCoordinatePortable;
 
-namespace Eventnet.Helpers.EventFilters;
+namespace Eventnet.Domain.Events.Filters.EventFilters;
 
 public class LocationFilter : IEventFilter
 {
     private readonly GeoCoordinate coordinate;
     private readonly double radius;
 
-    public LocationFilter(LocationFilterModel locationFilterModel)
+    public LocationFilter(GeoCoordinate coordinate, double radius)
     {
-        var ((latitude, longitude), r) = locationFilterModel;
-        coordinate = new GeoCoordinate(latitude, longitude);
-        radius = r;
+        this.coordinate = coordinate;
+        this.radius = radius;
     }
 
     public bool Filter(EventEntity entity)

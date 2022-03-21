@@ -1,6 +1,6 @@
 ﻿using Eventnet.DataAccess;
 
-namespace Eventnet.Helpers.EventFilters;
+namespace Eventnet.Domain.Events.Filters.EventFilters;
 
 public class OwnerFilter : IEventFilter
 {

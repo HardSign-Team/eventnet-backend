@@ -1,6 +1,6 @@
 ﻿namespace Eventnet.Models;
 
-public class FilterEventsModel
+public class EventsFilterModel
 {
     public DateFilterModel? EndDate { get; init; }
     public OwnerFilterModel? Owner { get; init; }

@@ -28,14 +28,13 @@ public class GetEventsShould : EventApiTestsBase
     }
 
     [TestCaseSource(nameof(GetIncorrectFilterRequests))]
-    public async Task ResponseCode400_WhenIncorrectFilterParameters(FilterEventsModel filterModel)
+    public async Task ResponseCode400_WhenIncorrectFilterParameters(EventsFilterModel eventsFilterModel)
     {
-        var request = CreateDefaultRequestMessage(filterModel);
+        var request = CreateDefaultRequestMessage(eventsFilterModel);
 
         var response = await HttpClient.SendAsync(request);
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        response.ShouldNotHaveHeader("Content-Type");
     }
 
     [TestCase(null)]
@@ -95,9 +94,9 @@ public class GetEventsShould : EventApiTestsBase
 
 
     [TestCaseSource(nameof(GetInconsistentFilterRequests))]
-    public async Task ResponseCode422_WhenInconsistentFilterParameters(FilterEventsModel filterModel)
+    public async Task ResponseCode422_WhenInconsistentFilterParameters(EventsFilterModel eventsFilterModel)
     {
-        var request = CreateDefaultRequestMessage(filterModel);
+        var request = CreateDefaultRequestMessage(eventsFilterModel);
 
         var response = await HttpClient.SendAsync(request);
 
@@ -108,7 +107,7 @@ public class GetEventsShould : EventApiTestsBase
     [Test]
     public async Task ResponseCode200_WhenNoEvents()
     {
-        var filterModel = new FilterEventsModel
+        var filterModel = new EventsFilterModel
         {
             RadiusLocation = new LocationFilterModel(new Location(0, 0), 5)
         };
@@ -135,7 +134,7 @@ public class GetEventsShould : EventApiTestsBase
     [Test]
     public async Task ResponseCode200_WhenHasEvents_FirstPage()
     {
-        var requestModel = new FilterEventsModel
+        var requestModel = new EventsFilterModel
         {
             RadiusLocation = new LocationFilterModel(new Location(0, 0), 500)
         };
@@ -171,7 +170,7 @@ public class GetEventsShould : EventApiTestsBase
     [Test]
     public async Task ResponseCode200_WhenHasEvents_SecondPage()
     {
-        var requestModel = new FilterEventsModel
+        var requestModel = new EventsFilterModel
         {
             RadiusLocation = new LocationFilterModel(new Location(0, 0), 500)
         };
@@ -212,7 +211,7 @@ public class GetEventsShould : EventApiTestsBase
 
     public static IEnumerable<TestCaseData> GetInconsistentFilterRequests()
     {
-        yield return new TestCaseData(new FilterEventsModel
+        yield return new TestCaseData(new EventsFilterModel
             {
 #pragma warning disable CS8625
                 RadiusLocation = new LocationFilterModel(null, 1)
@@ -220,13 +219,13 @@ public class GetEventsShould : EventApiTestsBase
             })
             .SetName("Location is null");
 
-        yield return new TestCaseData(new FilterEventsModel
+        yield return new TestCaseData(new EventsFilterModel
             {
                 RadiusLocation = new LocationFilterModel(new Location(0, 0), -1)
             })
             .SetName("Radius is negative");
 
-        yield return new TestCaseData(new FilterEventsModel
+        yield return new TestCaseData(new EventsFilterModel
             {
                 RadiusLocation = new LocationFilterModel(new Location(0, 0), 0)
             })
@@ -257,24 +256,20 @@ public class GetEventsShould : EventApiTestsBase
 
     private HttpRequestMessage CreateDefaultRequestMessage(int? pageNumber, int? pageSize)
     {
-        var request = new HttpRequestMessage();
-        request.Method = HttpMethod.Post;
-        request.RequestUri = BuildEventsPageUri(pageNumber, pageSize);
-        request.Content = new FilterEventsModel
+        var filterModel = new EventsFilterModel
         {
             RadiusLocation = new LocationFilterModel(new Location(0, 0), 1)
-        }.SerializeToJsonContent();
-        request.Headers.Add("Accept", "application/json");
-        return request;
+        };
+        return CreateDefaultRequestMessage(filterModel, pageNumber, pageSize);
     }
 
-    private HttpRequestMessage CreateDefaultRequestMessage(FilterEventsModel filterModel,
-        int pageNumber = 1, int pageSize = DefaultPageSize)
+    private HttpRequestMessage CreateDefaultRequestMessage(EventsFilterModel eventsFilterModel,
+        int? pageNumber = 1, int? pageSize = DefaultPageSize)
     {
         var request = new HttpRequestMessage();
-        request.Method = HttpMethod.Post;
-        request.RequestUri = BuildEventsPageUri(pageNumber, pageSize);
-        request.Content = filterModel.SerializeToJsonContent();
+        request.Method = HttpMethod.Get;
+        request.RequestUri = BuildEventsPageUri(eventsFilterModel, pageNumber, pageSize);
+        request.Content = eventsFilterModel.SerializeToJsonContent();
         request.Headers.Add("Accept", "application/json");
         return request;
     }

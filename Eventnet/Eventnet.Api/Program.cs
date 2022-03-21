@@ -23,11 +23,11 @@ services.AddSingleton(jwtTokenConfig);
 services.AddSingleton<IJwtAuthService, JwtAuthService>();
 services.AddScoped<CurrentUserService>();
 
-services.AddSingleton<IEventFilterService, EventFilterService>();
 services.AddSingleton<IEventFilterFactory, LocationFilterFactory>();
 services.AddSingleton<IEventFilterFactory, StartDateFilterFactory>();
 services.AddSingleton<IEventFilterFactory, EndDateFilterFactory>();
 services.AddSingleton<IEventFilterFactory, OwnerFilterFactory>();
+services.AddSingleton<IEventFilterMapper, EventFilterMapper>();
 
 services.AddScoped<IEmailService, EmailService>();
 
