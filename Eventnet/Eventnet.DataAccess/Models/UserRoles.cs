@@ -1,4 +1,4 @@
-﻿namespace Eventnet.Models;
+﻿namespace Eventnet.DataAccess.Models;
 
 public static class UserRoles
 {

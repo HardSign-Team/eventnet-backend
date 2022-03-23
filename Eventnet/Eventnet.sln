@@ -6,9 +6,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventnet.DataAccess", "Even
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventnet.Api.IntegrationTests", "Eventnet.Api.IntegrationTests\Eventnet.Api.IntegrationTests.csproj", "{397E1243-CE29-404F-8CEF-5583FE0EF3FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventnet.Api.UnitTests", "Eventnet.Api.UnitTests\Eventnet.Api.UnitTests.csproj", "{DD798911-2C24-4250-AE4F-CEB56FA307FD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventnet.Infrastructure", "Eventnet.Infrastructure\Eventnet.Infrastructure.csproj", "{BDF89BD0-9549-438C-B1CD-E38E401F12CF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventnet.Domain", "Eventnet.Domain\Eventnet.Domain.csproj", "{CE47FEF5-1A8B-419B-BE0B-1A5396E920A7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventnet.Domain", "Eventnet.Domain\Eventnet.Domain.csproj", "{A16B0492-77D4-44CE-8E26-7A98A9C088E2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventnet.Api.UnitTests", "Eventnet.Api.UnitTests\Eventnet.Api.UnitTests.csproj", "{DD798911-2C24-4250-AE4F-CEB56FA307FD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventnet.Api.TestsUtils", "Eventnet.Api.TestsUtils\Eventnet.Api.TestsUtils.csproj", "{A30B293A-C1F3-4DE5-8FCA-46964B6C7B19}"
 EndProject
@@ -26,6 +28,14 @@ Global
 		{9C39B16D-BF9B-4FC3-B13F-259BDD3965FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C39B16D-BF9B-4FC3-B13F-259BDD3965FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C39B16D-BF9B-4FC3-B13F-259BDD3965FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BDF89BD0-9549-438C-B1CD-E38E401F12CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BDF89BD0-9549-438C-B1CD-E38E401F12CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BDF89BD0-9549-438C-B1CD-E38E401F12CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BDF89BD0-9549-438C-B1CD-E38E401F12CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A16B0492-77D4-44CE-8E26-7A98A9C088E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A16B0492-77D4-44CE-8E26-7A98A9C088E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A16B0492-77D4-44CE-8E26-7A98A9C088E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A16B0492-77D4-44CE-8E26-7A98A9C088E2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{397E1243-CE29-404F-8CEF-5583FE0EF3FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{397E1243-CE29-404F-8CEF-5583FE0EF3FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{397E1243-CE29-404F-8CEF-5583FE0EF3FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -34,10 +44,6 @@ Global
 		{DD798911-2C24-4250-AE4F-CEB56FA307FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DD798911-2C24-4250-AE4F-CEB56FA307FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DD798911-2C24-4250-AE4F-CEB56FA307FD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CE47FEF5-1A8B-419B-BE0B-1A5396E920A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CE47FEF5-1A8B-419B-BE0B-1A5396E920A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CE47FEF5-1A8B-419B-BE0B-1A5396E920A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CE47FEF5-1A8B-419B-BE0B-1A5396E920A7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A30B293A-C1F3-4DE5-8FCA-46964B6C7B19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A30B293A-C1F3-4DE5-8FCA-46964B6C7B19}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A30B293A-C1F3-4DE5-8FCA-46964B6C7B19}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -1,8 +1,10 @@
 using System.Text;
 using Eventnet.Config;
 using Eventnet.DataAccess;
+using Eventnet.Domain;
 using Eventnet.Helpers.EventFilterFactories;
-using Eventnet.Models;
+using Eventnet.Infrastructure;
+using Eventnet.Models.Authentication.Tokens;
 using Eventnet.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -14,15 +16,22 @@ var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var jwtTokenConfig = builder.Configuration.GetSection("JWT").Get<JwtTokenConfig>();
+var emailConfig = builder.Configuration.GetSection("Email").Get<EmailConfiguration>();
 
+services.AddSingleton(emailConfig);
 services.AddSingleton(jwtTokenConfig);
 services.AddSingleton<IJwtAuthService, JwtAuthService>();
+services.AddScoped<CurrentUserService>();
 
 services.AddSingleton<IEventFilterFactory, LocationFilterFactory>();
 services.AddSingleton<IEventFilterFactory, StartDateFilterFactory>();
 services.AddSingleton<IEventFilterFactory, EndDateFilterFactory>();
 services.AddSingleton<IEventFilterFactory, OwnerFilterFactory>();
 services.AddSingleton<IEventFilterMapper, EventFilterMapper>();
+
+services.AddScoped<IEmailService, EmailService>();
+
+services.AddHttpContextAccessor();
 
 services.AddControllers();
 
@@ -59,6 +68,7 @@ services.AddAuthentication(options =>
             ValidateAudience = true,
             ValidAudience = jwtTokenConfig.Audience,
             ValidIssuer = jwtTokenConfig.Issuer,
+            ValidateLifetime = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtTokenConfig.Secret))
         };
     });
@@ -111,6 +121,9 @@ app.Run();
 
 // ReSharper disable once UnusedType.Global Use for integration tests
 // https://docs.microsoft.com/ru-ru/aspnet/core/test/integration-tests?view=aspnetcore-6.0#basic-tests-with-the-default-webapplicationfactory
-public partial class Program
+namespace Eventnet
 {
+    public class Program
+    {
+    }
 }
