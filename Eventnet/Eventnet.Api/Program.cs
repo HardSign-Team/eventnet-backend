@@ -17,6 +17,7 @@ var services = builder.Services;
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var jwtTokenConfig = builder.Configuration.GetSection("JWT").Get<JwtTokenConfig>();
 var emailConfig = builder.Configuration.GetSection("Email").Get<EmailConfiguration>();
+var corsName = "_myAllowSpecificOrigins";
 
 services.AddSingleton(emailConfig);
 services.AddSingleton(jwtTokenConfig);
@@ -41,6 +42,18 @@ services.AddDbContext<ApplicationDbContext>(
     opt => opt.UseNpgsql(connectionString));
 
 services.AddAutoMapper(opt => opt.AddProfile<ApplicationMappingProfile>());
+
+services.AddCors(options =>
+{
+    options.AddPolicy(name: corsName,
+        policyBuilder =>
+        {
+            policyBuilder
+                .WithOrigins("*")
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        });
+});
 
 services.AddIdentity<UserEntity, IdentityRole>(options =>
     {
@@ -108,6 +121,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors(corsName);
 
 app.UseHttpsRedirection();
 
