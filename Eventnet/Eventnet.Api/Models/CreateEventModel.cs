@@ -1,10 +1,11 @@
 ﻿namespace Eventnet.Models;
 
 public record CreateEventModel(
-    string UserId,
+    Guid Id,
+    string OwnerId,
+    DateTime StartDate,
+    DateTime? EndDate,
     string Name,
     string? Description,
-    DateTime StartAt,
-    DateTime? EndAt,
     Location Location,
-    IFormFile[] Files);
+    IFormFile[] Photos);

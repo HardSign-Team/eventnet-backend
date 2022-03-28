@@ -119,8 +119,8 @@ public class EventController : Controller
     public async Task<IActionResult> CreateEvent([FromBody] CreateEventModel createModel)
     {
         var createdEvent = mapper.Map<Event>(createModel);
-        var files = createModel.Files;
-        await eventSaveService.SaveAsync(createdEvent, files);
+        var photos = createModel.Photos;
+        await eventSaveService.SaveAsync(createdEvent, photos);
         return Accepted();
     }
 
