@@ -18,7 +18,7 @@ public class EventSaveService : IEventSaveService
         this.handler = handler;
     }
 
-    public async void Save(Event savedEvent, IFormFile[] photos)
+    public async Task SaveAsync(Event savedEvent, IFormFile[] photos)
     {
         var path = photosToTempSaveService.SaveToTemp(savedEvent.Id, photos);
         var message = JsonSerializer.Serialize(new RabbitMqMessage(savedEvent, path));

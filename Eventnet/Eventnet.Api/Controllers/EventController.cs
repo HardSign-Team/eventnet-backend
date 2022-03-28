@@ -114,13 +114,13 @@ public class EventController : Controller
     }
 
     [HttpPost]
-    public IActionResult CreateEvent([FromBody] CreateEventModel createModel)
+    public async Task<IActionResult> CreateEvent([FromBody] CreateEventModel createModel)
     {
         if (createModel is null)
             return BadRequest();
         var createdEvent = mapper.Map<Event>(createModel);
         var files = createModel.Files;
-        eventSaveService.Save(createdEvent, files);
+        await eventSaveService.SaveAsync(createdEvent, files);
         return Accepted();
     }
 
