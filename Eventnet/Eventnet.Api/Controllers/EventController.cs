@@ -121,10 +121,7 @@ public class EventController : Controller
         var createdEvent = mapper.Map<Event>(createModel);
         var files = createModel.Files;
         eventSaveService.Save(createdEvent, files);
-        return Ok(new
-        {
-            StatusCode = StatusCodes.Status202Accepted
-        });
+        return Accepted();
     }
 
     [HttpGet("is-created")]
