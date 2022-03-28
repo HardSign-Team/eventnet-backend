@@ -127,7 +127,7 @@ public class EventController : Controller
         });
     }
 
-    [HttpGet("isCreated")]
+    [HttpGet("is-created")]
     public IActionResult IsCreated(Guid id)
     {
         if (!eventSaveService.IsEventSaved(id, out var exception))
