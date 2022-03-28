@@ -6,6 +6,7 @@ using Eventnet.Domain.Events.Selectors;
 using Eventnet.Helpers;
 using Eventnet.Models;
 using Eventnet.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -114,10 +115,9 @@ public class EventController : Controller
     }
 
     [HttpPost]
+    [Authorize]
     public async Task<IActionResult> CreateEvent([FromBody] CreateEventModel createModel)
     {
-        if (createModel is null)
-            return BadRequest();
         var createdEvent = mapper.Map<Event>(createModel);
         var files = createModel.Files;
         await eventSaveService.SaveAsync(createdEvent, files);
@@ -153,6 +153,7 @@ public class EventController : Controller
     }
     
     [HttpGet("guid")]
+    [Authorize]
     public IActionResult GenerateEventGuid()
     {
         var id = Guid.NewGuid();
