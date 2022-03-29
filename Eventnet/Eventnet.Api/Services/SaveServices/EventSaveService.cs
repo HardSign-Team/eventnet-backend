@@ -2,7 +2,7 @@
 using Eventnet.Infrastructure;
 using Eventnet.Models;
 
-namespace Eventnet.Services;
+namespace Eventnet.Services.SaveServices;
 
 public class EventSaveService : IEventSaveService
 {
@@ -20,7 +20,8 @@ public class EventSaveService : IEventSaveService
 
     public async Task SaveAsync(Event savedEvent, IFormFile[] photos)
     {
-        var path = photosToTempSaveService.SaveToTemp(savedEvent.Id, photos);
+        var streams = GetStreams(photos);
+        var path = photosToTempSaveService.SaveToTemp(savedEvent.Id, streams);
         var message = JsonSerializer.Serialize(new RabbitMqMessage(savedEvent, path));
         handler.Update(savedEvent.Id, new SaveEventResult(false, string.Empty));
         await publishEventService.SendAsync(message);
@@ -35,4 +36,6 @@ public class EventSaveService : IEventSaveService
         exceptionValue = exceptionInformation;
         return isSaved;
     }
+    
+    private Stream[] GetStreams(IFormFile[] photos) => photos.Select(photo => photo.OpenReadStream()).ToArray();
 }

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 
-namespace Eventnet.Services;
+namespace Eventnet.Infrastructure;
 
 public class Handler
 {

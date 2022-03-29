@@ -1,9 +1,6 @@
-﻿
+﻿using Eventnet.Infrastructure.ImageServices;
 
-using Eventnet.Infrastructure;
-using Eventnet.Infrastructure.ImageServices;
-
-namespace Eventnet.Services;
+namespace Eventnet.Infrastructure;
 
 public class RabbitMqMessageHandler : IRabbitMqMessageHandler
 {

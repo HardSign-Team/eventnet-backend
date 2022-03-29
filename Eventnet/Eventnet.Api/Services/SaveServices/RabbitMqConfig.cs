@@ -1,4 +1,4 @@
-﻿namespace Eventnet.Services;
+﻿namespace Eventnet.Services.SaveServices;
 
 public class RabbitMqConfig
 {
