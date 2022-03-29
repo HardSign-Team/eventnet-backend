@@ -1,8 +1,8 @@
 ﻿namespace Eventnet.Infrastructure;
 
-public class PhotosToTempSaveService : IPhotosToTempSaveService
+public class PhotosToTempFolderSaveService : IPhotosToTempFolderSaveService
 {
-    public string SaveToTemp(Guid id, Stream[] streams)
+    public string SaveToTempFolder(Guid id, Stream[] streams)
     {
         var pathToPhotos = "temp"; // TODO: вынести в кофниг, когда он повяится
         if (!Directory.Exists(pathToPhotos))

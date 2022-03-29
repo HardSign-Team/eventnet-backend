@@ -2,7 +2,7 @@
 
 namespace Eventnet.Infrastructure.ImageServices;
 
-public class LoadFromTempService : ILoadFromTempService
+public class LoadFromTempFolderService : ILoadFromTempService
 {
     public List<Image> LoadImages(string path)
     {

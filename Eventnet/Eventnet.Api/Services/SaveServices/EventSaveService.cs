@@ -7,21 +7,21 @@ namespace Eventnet.Services.SaveServices;
 public class EventSaveService : IEventSaveService
 {
     private readonly Handler handler;
-    private readonly IPhotosToTempSaveService photosToTempSaveService;
+    private readonly IPhotosToTempFolderSaveService photosToTempFolderSaveService;
     private readonly IPublishEventService publishEventService;
 
     public EventSaveService(IPublishEventService publishEventService,
-        IPhotosToTempSaveService photosToTempSaveService, Handler handler)
+        IPhotosToTempFolderSaveService photosToTempFolderSaveService, Handler handler)
     {
         this.publishEventService = publishEventService;
-        this.photosToTempSaveService = photosToTempSaveService;
+        this.photosToTempFolderSaveService = photosToTempFolderSaveService;
         this.handler = handler;
     }
 
     public async Task SaveAsync(Event savedEvent, IFormFile[] photos)
     {
         var streams = GetStreams(photos);
-        var path = photosToTempSaveService.SaveToTemp(savedEvent.Id, streams);
+        var path = photosToTempFolderSaveService.SaveToTempFolder(savedEvent.Id, streams);
         var message = JsonSerializer.Serialize(new RabbitMqMessage(savedEvent, path));
         handler.Update(savedEvent.Id, new SaveEventResult(false, string.Empty));
         await publishEventService.SendAsync(message);
