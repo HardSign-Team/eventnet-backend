@@ -7,15 +7,17 @@ public class RabbitMqMessageHandler : IRabbitMqMessageHandler
     private readonly Handler handler;
     private readonly ILoadFromTempService loadFromTempService;
     private readonly ISaveToDbService saveToDbService;
+    private readonly IDeleteFromTempFolderService deleteFromTempFolderService;
     private readonly IImageValidator validator;
 
     public RabbitMqMessageHandler(Handler handler, ILoadFromTempService loadFromTempService, IImageValidator validator,
-        ISaveToDbService saveToDbService)
+        ISaveToDbService saveToDbService, IDeleteFromTempFolderService deleteFromTempFolderService)
     {
         this.handler = handler;
         this.loadFromTempService = loadFromTempService;
         this.validator = validator;
         this.saveToDbService = saveToDbService;
+        this.deleteFromTempFolderService = deleteFromTempFolderService;
     }
 
     public void Handle(RabbitMqMessage rabbitMqMessage)
@@ -29,11 +31,13 @@ public class RabbitMqMessageHandler : IRabbitMqMessageHandler
             {
                 saveToDbService.SaveImages(photos, id);
                 saveToDbService.SaveEvent(rabbitMqMessage);
-            }
+            } 
+            deleteFromTempFolderService.Delete(rabbitMqMessage.PathToPhotos);
         }
-        catch (Exception)
+        catch (Exception e)
         {
             exception = "Something went wrong on server. Please try again later";
+            Console.WriteLine(e);
         }
 
         handler.Update(id, new SaveEventResult(exception.Length == 0, exception));

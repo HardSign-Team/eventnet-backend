@@ -6,6 +6,7 @@ using Eventnet.Infrastructure;
 using Eventnet.Infrastructure.ImageServices;
 using Eventnet.Models;
 using Eventnet.Services;
+using Eventnet.Services.SaveServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -35,6 +36,7 @@ services.AddSingleton<IImageValidator, ImageValidator>();
 services.AddSingleton<IImageToDbPreparer, ImageToDbPreparer>();
 services.AddSingleton<ISaveToDbService, SaveToDbService>();
 services.AddSingleton<IRabbitMqMessageHandler, RabbitMqMessageHandler>();
+services.AddSingleton<IDeleteFromTempFolderService, DeleteFromTempFolderService>();
 
 services.AddControllers();
 

@@ -24,6 +24,10 @@ public class SaveToDbService : ISaveToDbService
         var path = preparer.Save(images, id);
         var photosEntity = new PhotosEntity(path, id);
         dbContext.Photos.Add(photosEntity);
+        foreach (var image in images)
+        {
+            image.Dispose();
+        }
     }
 
     public void SaveEvent(RabbitMqMessage message)

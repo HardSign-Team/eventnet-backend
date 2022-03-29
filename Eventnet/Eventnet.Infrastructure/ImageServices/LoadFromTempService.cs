@@ -6,14 +6,11 @@ public class LoadFromTempService : ILoadFromTempService
 {
     public List<Image> LoadImages(string path)
     {
-        var images = new List<Image>();
-        var filenames = Directory.GetFiles(path);
-        foreach (var filename in filenames)
-        {
-            images.Add(Image.FromFile(filename));
-            File.Delete(filename); // возможно, их стоит удалять в другой момент
-        }
-
-        return images;
+        if (!Directory.Exists(path))
+            throw new Exception($"Can't load images. No such directory {path}");
+        return Directory
+            .GetFiles(path)
+            .Select(Image.FromFile)
+            .ToList();
     }
 }
