@@ -30,7 +30,7 @@ public class RabbitMqMessageHandler : IRabbitMqMessageHandler
             if (validator.Validate(photos, out exception))
             {
                 saveToDbService.SaveImages(photos, id);
-                saveToDbService.SaveEvent(rabbitMqMessage);
+                saveToDbService.SaveEvent(rabbitMqMessage.Event);
             } 
             deleteFromTempFolderService.Delete(rabbitMqMessage.PathToPhotos);
         }

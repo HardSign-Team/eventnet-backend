@@ -1,9 +1,10 @@
 ﻿using System.Drawing;
+using Eventnet.Models;
 
 namespace Eventnet.Infrastructure;
 
 public interface ISaveToDbService
 {
     void SaveImages(List<Image> images, Guid id);
-    void SaveEvent(RabbitMqMessage message);
+    void SaveEvent(Event eventForSave);
 }

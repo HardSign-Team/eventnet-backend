@@ -2,6 +2,7 @@
 using AutoMapper;
 using Eventnet.DataAccess;
 using Eventnet.Infrastructure.ImageServices;
+using Eventnet.Models;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Eventnet.Infrastructure;
@@ -30,9 +31,9 @@ public class SaveToDbService : ISaveToDbService
         }
     }
 
-    public void SaveEvent(RabbitMqMessage message)
+    public void SaveEvent(Event eventForSave)
     {
-        var eventEntity = mapper.Map<EventEntity>(message.Event);
+        var eventEntity = mapper.Map<EventEntity>(eventForSave);
         dbContext.Events.Add(eventEntity);
     }
 }
