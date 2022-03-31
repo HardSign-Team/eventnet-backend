@@ -24,7 +24,7 @@ public class TagsController : Controller
     {
         maxCount = NumberHelper.Normalize(maxCount, 1, 30);
 
-        if (string.IsNullOrEmpty(name) || string.IsNullOrWhiteSpace(name))
+        if (string.IsNullOrWhiteSpace(name))
             return UnprocessableEntity("Expected name is non empty string");
 
         var selector = new TagsStartsWithNameSelector(name);
@@ -33,6 +33,4 @@ public class TagsController : Controller
 
         return Ok(result);
     }
-
-
 }
