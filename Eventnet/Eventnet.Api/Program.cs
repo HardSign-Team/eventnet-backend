@@ -1,10 +1,12 @@
 using System.Text;
 using Eventnet.Api.Config;
 using Eventnet.Api.Helpers.EventFilterFactories;
-using Eventnet.Api.Models;
 using Eventnet.Api.Services;
 using Eventnet.DataAccess;
 using Eventnet.DataAccess.Entities;
+using Eventnet.Domain;
+using Eventnet.Infrastructure;
+using Eventnet.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -15,15 +17,23 @@ var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var jwtTokenConfig = builder.Configuration.GetSection("JWT").Get<JwtTokenConfig>();
+var emailConfig = builder.Configuration.GetSection("Email").Get<EmailConfiguration>();
+var corsName = "_myAllowSpecificOrigins";
 
+services.AddSingleton(emailConfig);
 services.AddSingleton(jwtTokenConfig);
 services.AddSingleton<IJwtAuthService, JwtAuthService>();
+services.AddScoped<CurrentUserService>();
 
 services.AddSingleton<IEventFilterFactory, LocationFilterFactory>();
 services.AddSingleton<IEventFilterFactory, StartDateFilterFactory>();
 services.AddSingleton<IEventFilterFactory, EndDateFilterFactory>();
 services.AddSingleton<IEventFilterFactory, OwnerFilterFactory>();
 services.AddSingleton<IEventFilterMapper, EventFilterMapper>();
+
+services.AddScoped<IEmailService, EmailService>();
+
+services.AddHttpContextAccessor();
 
 services.AddControllers();
 
@@ -33,6 +43,18 @@ services.AddDbContext<ApplicationDbContext>(
     opt => opt.UseNpgsql(connectionString));
 
 services.AddAutoMapper(opt => opt.AddProfile<ApplicationMappingProfile>());
+
+services.AddCors(options =>
+{
+    options.AddPolicy(name: corsName,
+        policyBuilder =>
+        {
+            policyBuilder
+                .WithOrigins("*")
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        });
+});
 
 services.AddIdentity<UserEntity, IdentityRole>(options =>
     {
@@ -60,6 +82,7 @@ services.AddAuthentication(options =>
             ValidateAudience = true,
             ValidAudience = jwtTokenConfig.Audience,
             ValidIssuer = jwtTokenConfig.Issuer,
+            ValidateLifetime = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtTokenConfig.Secret))
         };
     });
@@ -99,6 +122,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors(corsName);
 
 app.UseHttpsRedirection();
 

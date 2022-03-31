@@ -1,10 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Eventnet.Api.Models;
+namespace Eventnet.Models.Authentication;
 
-public record UpdateEventModel(
-    string Username,
+public record RegisterModel(
+    string UserName,
     [EmailAddress] string Email,
     [DataType(DataType.Password)] string Password,
-    [Phone] string? Phone
-);
+    [Phone] string? Phone);
