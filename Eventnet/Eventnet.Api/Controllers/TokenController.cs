@@ -1,15 +1,15 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
-using Eventnet.DataAccess;
-using Eventnet.Models.Authentication;
-using Eventnet.Models.Authentication.Tokens;
-using Eventnet.Services;
+using Eventnet.Api.Models.Authentication;
+using Eventnet.Api.Models.Authentication.Tokens;
+using Eventnet.Api.Services;
+using Eventnet.DataAccess.Entities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Eventnet.Controllers;
+namespace Eventnet.Api.Controllers;
 
 [Route("api/token")]
 public class TokenController : Controller

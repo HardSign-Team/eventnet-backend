@@ -2,11 +2,12 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
-using Eventnet.Models.Authentication.Tokens;
-using Eventnet.Services;
+using Eventnet.Api.Models.Authentication.Tokens;
+using Eventnet.Api.Services;
 using FluentAssertions;
 using Microsoft.IdentityModel.Tokens;
 using NUnit.Framework;
+#pragma warning disable CS8618 TESTS
 
 namespace Eventnet.Api.UnitTests;
 

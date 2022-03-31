@@ -1,15 +1,15 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Eventnet.DataAccess;
+using Eventnet.Api.Models.Authentication;
+using Eventnet.Api.Services;
+using Eventnet.DataAccess.Entities;
 using Eventnet.DataAccess.Models;
 using Eventnet.Domain;
-using Eventnet.Models.Authentication;
-using Eventnet.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Eventnet.Controllers;
+namespace Eventnet.Api.Controllers;
 
 [Route("api/auth")]
 public class UserAccountController : Controller
