@@ -57,7 +57,7 @@ public abstract class EventApiTestsBase : TestsBase
 
         var uriBuilder = new UriBuilder(Configuration.BaseUrl)
         {
-            Path = $"{BaseRoute}/search-by-name/{name}",
+            Path = $"{BaseRoute}/search/name/{name}",
             Query = query.ToString()
         };
         return uriBuilder.Uri;

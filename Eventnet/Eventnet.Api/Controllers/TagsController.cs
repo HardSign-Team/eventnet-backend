@@ -19,16 +19,14 @@ public class TagsController : Controller
         this.mapper = mapper;
     }
     
-    [HttpGet("search-by-name/{name}")]
+    [HttpGet("search/name/{name}")]
     public IActionResult GetTagsByName(string name, [FromQuery(Name = "mc")] int maxCount = 30)
     {
         maxCount = NumberHelper.Normalize(maxCount, 1, 30);
 
         if (string.IsNullOrEmpty(name) || string.IsNullOrWhiteSpace(name))
-        {
             return UnprocessableEntity("Expected name is non empty string");
-        }
-        
+
         var selector = new TagsStartsWithNameSelector(name);
         var tagNames = mapper.ProjectTo<TagName>(context.Tags.AsNoTracking());
         var result = selector.Select(tagNames, maxCount);

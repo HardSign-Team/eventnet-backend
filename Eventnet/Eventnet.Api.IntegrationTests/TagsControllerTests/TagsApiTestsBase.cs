@@ -12,7 +12,7 @@ public class TagsApiTestsBase : TestsBase
         var qb = new QueryBuilder { { "mc", maxCount.ToString() } };
         var builder = new UriBuilder()
         {
-            Path = $"{BaseUrl}/search-by-name/{name}",
+            Path = $"{BaseUrl}/search/name/{name}",
             Query = qb.ToString()
         };
         return builder.Uri;
