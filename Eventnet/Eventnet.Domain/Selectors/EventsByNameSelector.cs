@@ -9,7 +9,9 @@ public class EventsByNameSelector : ISelector<EventName>
 
     public EventsByNameSelector(string name)
     {
-        this.name = name.ToLowerInvariant();
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException($"Expected non empty and non-nullable {nameof(name)}, but actually {name}");
+        this.name = name.Trim().ToLowerInvariant();
         algorithm = new NormalizedLevenshtein();
     }
     

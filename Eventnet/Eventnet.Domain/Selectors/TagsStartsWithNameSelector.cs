@@ -6,16 +6,15 @@ public class TagsStartsWithNameSelector : ISelector<TagName>
 
     public TagsStartsWithNameSelector(string? name)
     {
-        name = name?.Trim();
-        if (string.IsNullOrEmpty(name))
+        if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException($"Expected non empty and non-nullable {nameof(name)}, but actually {name}");
-        this.name = name.ToLower();
+        this.name = name.Trim();
     }
 
     public IEnumerable<TagName> Select(IEnumerable<TagName> query, int maxCount)
     {
         return query
-            .Where(x => x.Name.ToLower().StartsWith(name))
+            .Where(x => x.Name.StartsWith(name, StringComparison.InvariantCultureIgnoreCase))
             .Take(maxCount);
     }
 }
