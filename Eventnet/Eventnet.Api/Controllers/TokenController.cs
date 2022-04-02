@@ -47,7 +47,7 @@ public class TokenController : Controller
         var user = await currentUserService.GetCurrentUser();
 
         if (user == null)
-            return Unauthorized();
+            return NotFound();
 
         var userRoles = await userManager.GetRolesAsync(user);
 

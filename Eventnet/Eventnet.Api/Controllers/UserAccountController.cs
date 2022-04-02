@@ -41,10 +41,10 @@ public class UserAccountController : Controller
             ?? await userManager.FindByEmailAsync(loginModel.Login);
 
         if (user == null || !await userManager.CheckPasswordAsync(user, loginModel.Password))
-            return Unauthorized();
+            return NotFound();
 
         if (!user.EmailConfirmed)
-            return BadRequest(new { Status = "please confirm your email" });
+            return Unauthorized(new { Messge = "Email not confirmed" });
 
         var roles = await userManager.GetRolesAsync(user);
         var authClaims = new List<Claim>
@@ -89,7 +89,7 @@ public class UserAccountController : Controller
         var userExists = await userManager.FindByNameAsync(registerModel.UserName);
 
         if (userExists != null)
-            return BadRequest("User already exists");
+            return Conflict("User already exists");
 
         var user = new UserEntity
         {
@@ -117,7 +117,7 @@ public class UserAccountController : Controller
     public async Task<IActionResult> ChangePassword([FromBody] RestorePasswordModel restorePasswordModel)
     {
         if (restorePasswordModel.OldPassword == restorePasswordModel.NewPassword)
-            return BadRequest("Passwords should be different");
+            return UnprocessableEntity("Passwords should be different");
 
         var user = await currentUserService.GetCurrentUser();
 
@@ -154,14 +154,15 @@ public class UserAccountController : Controller
     {
         var user = await userManager.FindByIdAsync(userId);
         if (user == null)
-            return BadRequest();
+            return NotFound();
 
         var result = await userManager.ConfirmEmailAsync(user, code);
 
         if (result.Succeeded)
             return Ok("Email confirmed");
-
-        return BadRequest();
+        
+        var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+        return BadRequest(errors);
     }
 
     [HttpPost("forgot-password")]
