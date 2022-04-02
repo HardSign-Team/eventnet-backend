@@ -68,8 +68,8 @@ public class UserAccountController : Controller
         ));
     }
 
-    [HttpPost("logout")]
     [Authorize]
+    [HttpPost("logout")]
     public ActionResult Logout()
     {
         var userName = currentUserService.GetCurrentUserName();
@@ -106,8 +106,8 @@ public class UserAccountController : Controller
         return Ok();
     }
 
-    [HttpPost("change-password")]
     [Authorize]
+    [HttpPost("change-password")]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordModel changePasswordModel)
     {
         if (changePasswordModel.OldPassword == changePasswordModel.NewPassword)

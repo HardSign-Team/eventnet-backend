@@ -2,7 +2,6 @@
 using AutoMapper;
 using Eventnet.DataAccess;
 using Eventnet.Models;
-using Eventnet.Models.Authentication;
 using Eventnet.Models.Authentication.Tokens;
 using Eventnet.Services;
 using Microsoft.AspNetCore.Authentication;
@@ -18,15 +17,12 @@ public class TokenController : Controller
 {
     private readonly IJwtAuthService jwtAuthService;
     private readonly IMapper mapper;
-    private readonly UserManager<UserEntity> userManager;
     private readonly CurrentUserService currentUserService;
 
-    public TokenController(UserManager<UserEntity> userManager,
-        CurrentUserService currentUserService,
+    public TokenController(CurrentUserService currentUserService,
         IJwtAuthService jwtAuthService,
         IMapper mapper)
     {
-        this.userManager = userManager;
         this.currentUserService = currentUserService;
         this.jwtAuthService = jwtAuthService;
         this.mapper = mapper;
@@ -45,17 +41,15 @@ public class TokenController : Controller
         return Ok(mapper.Map<UserViewModel>(user));
     }
 
+    [Authorize]
     [HttpPost("refresh-token")]
     [Produces(typeof(TokensViewModel))]
-    [Authorize]
     public async Task<ActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
     {
         var user = await currentUserService.GetCurrentUser();
 
         if (user == null)
             return NotFound();
-
-        var userRoles = await userManager.GetRolesAsync(user);
 
         if (string.IsNullOrWhiteSpace(request.RefreshToken))
             return Unauthorized();
