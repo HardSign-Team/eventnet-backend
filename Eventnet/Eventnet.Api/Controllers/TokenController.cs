@@ -1,5 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using AutoMapper;
 using Eventnet.DataAccess;
+using Eventnet.Models;
 using Eventnet.Models.Authentication;
 using Eventnet.Models.Authentication.Tokens;
 using Eventnet.Services;
@@ -15,20 +17,24 @@ namespace Eventnet.Controllers;
 public class TokenController : Controller
 {
     private readonly IJwtAuthService jwtAuthService;
+    private readonly IMapper mapper;
     private readonly UserManager<UserEntity> userManager;
     private readonly CurrentUserService currentUserService;
 
     public TokenController(UserManager<UserEntity> userManager,
         CurrentUserService currentUserService,
-        IJwtAuthService jwtAuthService)
+        IJwtAuthService jwtAuthService,
+        IMapper mapper)
     {
         this.userManager = userManager;
         this.currentUserService = currentUserService;
         this.jwtAuthService = jwtAuthService;
+        this.mapper = mapper;
     }
 
     [Authorize]
     [HttpGet("me")]
+    [Produces(typeof(UserViewModel))]
     public async Task<IActionResult> GetCurrentUser()
     {
         var user = await currentUserService.GetCurrentUser();
@@ -36,11 +42,11 @@ public class TokenController : Controller
         if (user == null)
             return NotFound();
 
-        return Ok(user); // TODO: return business model 
+        return Ok(mapper.Map<UserViewModel>(user));
     }
 
     [HttpPost("refresh-token")]
-    [Produces(typeof(LoginResult))]
+    [Produces(typeof(TokensViewModel))]
     [Authorize]
     public async Task<ActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
     {
@@ -63,13 +69,10 @@ public class TokenController : Controller
             var (jwtSecurityToken, (_, tokenString, _)) =
                 jwtAuthService.Refresh(request.RefreshToken, accessToken, DateTime.Now);
 
-            return Ok(new LoginResult(
+            return Ok(new TokensViewModel(
                 new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
                 jwtSecurityToken.ValidTo,
-                tokenString,
-                user,
-                userRoles
-            ));
+                tokenString));
         }
         catch (SecurityTokenException e)
         {

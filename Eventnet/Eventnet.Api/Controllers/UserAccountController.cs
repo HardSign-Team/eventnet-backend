@@ -1,9 +1,12 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using AutoMapper;
 using Eventnet.DataAccess;
 using Eventnet.DataAccess.Models;
 using Eventnet.Domain;
+using Eventnet.Models;
 using Eventnet.Models.Authentication;
+using Eventnet.Models.Authentication.Tokens;
 using Eventnet.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -18,16 +21,19 @@ public class UserAccountController : Controller
     private readonly CurrentUserService currentUserService;
     private readonly IJwtAuthService jwtAuthService;
     private readonly IEmailService emailService;
+    private readonly IMapper mapper;
 
     public UserAccountController(UserManager<UserEntity> userManager,
         CurrentUserService currentUserService,
         IJwtAuthService jwtAuthService,
-        IEmailService emailService)
+        IEmailService emailService,
+        IMapper mapper)
     {
         this.userManager = userManager;
         this.currentUserService = currentUserService;
         this.jwtAuthService = jwtAuthService;
         this.emailService = emailService;
+        this.mapper = mapper;
     }
 
     [HttpPost("login")]
@@ -51,11 +57,13 @@ public class UserAccountController : Controller
 
         var (jwtSecurityToken, refreshToken) = jwtAuthService.GenerateTokens(user.UserName, claims, DateTime.Now);
 
+        var userView = mapper.Map<UserViewModel>(user);
+        var tokens = new TokensViewModel(new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
+            jwtSecurityToken.ValidTo, refreshToken.TokenString);
+        
         return Ok(new LoginResult(
-            new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
-            jwtSecurityToken.ValidTo,
-            refreshToken.TokenString,
-            user, //TODO add mappping
+            tokens,
+            userView,
             roles
         ));
     }
@@ -84,14 +92,8 @@ public class UserAccountController : Controller
         if (userExists != null)
             return Conflict("User already exists");
 
-        var user = new UserEntity // TODO add mapping
-        {
-            Email = registerModel.Email,
-            SecurityStamp = Guid.NewGuid().ToString(),
-            UserName = registerModel.UserName,
-            PhoneNumber = registerModel.Phone
-        };
-
+        var user = mapper.Map<UserEntity>(registerModel);
+        
         var result = await userManager.CreateAsync(user, registerModel.Password);
 
         await userManager.AddToRoleAsync(user, UserRoles.User);

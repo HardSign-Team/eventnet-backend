@@ -1,6 +1,6 @@
 ﻿using Eventnet.DataAccess;
+using Eventnet.Models.Authentication.Tokens;
 
 namespace Eventnet.Models.Authentication;
 
-public record LoginResult(string AccessToken, DateTime ExpiredAt,
-    string RefreshToken, UserEntity User, IList<string> UserRoles);
+public record LoginResult(TokensViewModel Tokens, UserViewModel User, IList<string> UserRoles);
