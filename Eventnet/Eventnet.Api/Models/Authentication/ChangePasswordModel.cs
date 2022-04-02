@@ -2,6 +2,6 @@
 
 namespace Eventnet.Models.Authentication;
 
-public record RestorePasswordModel(
+public record ChangePasswordModel(
     [DataType(DataType.Password)] string OldPassword,
     [DataType(DataType.Password)] string NewPassword);

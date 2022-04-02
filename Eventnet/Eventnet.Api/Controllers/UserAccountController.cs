@@ -47,22 +47,15 @@ public class UserAccountController : Controller
             return Unauthorized(new { Messge = "Email not confirmed" });
 
         var roles = await userManager.GetRolesAsync(user);
-        var authClaims = new List<Claim>
-        {
-            new(ClaimTypes.Name, user.UserName),
-            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
+        var claims = CreateClaims(user.UserName, roles);
 
-        authClaims.AddRange(roles
-            .Select(userRole => new Claim(ClaimTypes.Role, userRole)));
-
-        var (jwtSecurityToken, refreshToken) = jwtAuthService.GenerateTokens(user.UserName, authClaims, DateTime.Now);
+        var (jwtSecurityToken, refreshToken) = jwtAuthService.GenerateTokens(user.UserName, claims, DateTime.Now);
 
         return Ok(new LoginResult(
             new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
             jwtSecurityToken.ValidTo,
             refreshToken.TokenString,
-            user,
+            user, //TODO add mappping
             roles
         ));
     }
@@ -91,7 +84,7 @@ public class UserAccountController : Controller
         if (userExists != null)
             return Conflict("User already exists");
 
-        var user = new UserEntity
+        var user = new UserEntity // TODO add mapping
         {
             Email = registerModel.Email,
             SecurityStamp = Guid.NewGuid().ToString(),
@@ -108,15 +101,14 @@ public class UserAccountController : Controller
 
         await SendEmailConfirmationMessageAsync(user);
 
-        // TODO: replace with CreatedAtAction when implement UserController 
-        return Ok(new RegisterResult("User created successfully. Please check your email", user));
+        return Ok();
     }
 
     [HttpPost("change-password")]
     [Authorize]
-    public async Task<IActionResult> ChangePassword([FromBody] RestorePasswordModel restorePasswordModel)
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordModel changePasswordModel)
     {
-        if (restorePasswordModel.OldPassword == restorePasswordModel.NewPassword)
+        if (changePasswordModel.OldPassword == changePasswordModel.NewPassword)
             return UnprocessableEntity("Passwords should be different");
 
         var user = await currentUserService.GetCurrentUser();
@@ -125,18 +117,15 @@ public class UserAccountController : Controller
             return NotFound();
 
         var changePasswordResult = await userManager.ChangePasswordAsync(user,
-            restorePasswordModel.OldPassword, restorePasswordModel.NewPassword);
+            changePasswordModel.OldPassword, changePasswordModel.NewPassword);
 
         if (!changePasswordResult.Succeeded)
-        {
-            var errors = string.Join(", ", changePasswordResult.Errors.Select(e => e.Description));
-            return BadRequest(errors);
-        }
+            return BadRequest(changePasswordResult.ToString());
 
         return Ok();
     }
 
-    [HttpGet("email-confirmation-message")]
+    [HttpPost("email-confirmation-message")]
     public async Task<IActionResult> SendEmailConfirmation(string userName)
     {
         var user = await userManager.FindByNameAsync(userName);
@@ -161,8 +150,7 @@ public class UserAccountController : Controller
         if (result.Succeeded)
             return Ok("Email confirmed");
         
-        var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-        return BadRequest(errors);
+        return BadRequest(result.ToString());
     }
 
     [HttpPost("forgot-password")]
@@ -176,11 +164,9 @@ public class UserAccountController : Controller
         var code = await userManager.GeneratePasswordResetTokenAsync(user);
         var callbackUrl = Url.Link(nameof(ResetPassword), new { userId = user.Id, code });
 
-        // TODO: вместо resetPassword по идее должен быть линк на фронтовую страницу, где юзер будет вводить пароль
-
         await emailService.SendEmailAsync(
             user.Email,
-            "email confirmation",
+            "Restore password",
             $"Для сброса пароля пройдите по ссылке: <a href='{callbackUrl}'>link</a>");
 
         return Ok();
@@ -191,24 +177,50 @@ public class UserAccountController : Controller
     {
         var user = await userManager.FindByIdAsync(userId);
         if (user == null)
-            return BadRequest();
+            return NotFound();
 
         var result = await userManager.ResetPasswordAsync(user, code, newPassword);
-        if (result.Succeeded)
-            return Ok();
+        if (!result.Succeeded)
+            return BadRequest(result.ToString());
 
-        var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-        return BadRequest(errors);
+        return Ok();
+    }
+    
+    private static IEnumerable<Claim> CreateClaims(string userName, IEnumerable<string> roles)
+    {
+        var authClaims = new List<Claim>
+        {
+            new(ClaimTypes.Name, userName),
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+        };
+
+        authClaims.AddRange(roles
+            .Select(userRole => new Claim(ClaimTypes.Role, userRole)));
+
+        return authClaims;
     }
 
     private async Task SendEmailConfirmationMessageAsync(UserEntity user)
     {
         var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
-        var callbackUrl = Url.Link(nameof(ConfirmEmail), new { userId = user.Id, code });
+        var clientAddress = GetClientAddress();
+        
+        if (clientAddress is null)
+            return;
+
+        var callbackUrl = Url.Link(clientAddress + "/confirm", new { userId = user.Id, code });
 
         await emailService.SendEmailAsync(
             user.Email,
-            "jopa",
+            "Подтверждение регистрации",
             $"Подтвердите регистрацию, перейдя по ссылке: <a href='{callbackUrl}'>link</a>");
+    }
+
+    private string? GetClientAddress()
+    {
+        var origin = HttpContext.Request.Headers.Origin;
+        var referer = HttpContext.Request.Headers.Referer;
+
+        return origin.FirstOrDefault() ?? referer.FirstOrDefault();
     }
 }
