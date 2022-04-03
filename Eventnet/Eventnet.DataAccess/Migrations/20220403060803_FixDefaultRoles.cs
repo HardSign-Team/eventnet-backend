@@ -24,7 +24,7 @@ namespace Eventnet.DataAccess.Migrations
                 values: new object[,]
                 {
                     { "22427488-0f6b-414f-9595-113da4a2a0e5", "7fe26813-7ffb-45c6-86d5-6cd1d5b7085d", "Admin", "ADMIN" },
-                    { "55cba6ee-fee7-4908-8ed9-f31a0f434885", "00000000-0000-0000-0000-000000000000", "User", "USER" }
+                    { "55cba6ee-fee7-4908-8ed9-f31a0f434885", "a3780143-07c2-48d9-bee4-8683737b229d", "User", "USER" }
                 });
         }
 
