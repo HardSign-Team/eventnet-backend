@@ -13,13 +13,13 @@ public class ForgotPasswordService : IForgotPasswordService
         this.emailService = emailService;
         this.cache = cache;
     }
-    
+
     public Task SendCodeAsync(string email)
     {
         var code = GenerateCode();
 
         cache.Set(email, code, TimeSpan.FromMinutes(2));
-        
+
         return emailService.SendEmailAsync(
             email,
             "Restore password",
@@ -30,7 +30,7 @@ public class ForgotPasswordService : IForgotPasswordService
     {
         if (!cache.TryGetValue(email, out string cachedCode))
             return false;
-        
+
         cache.Remove(email);
         return cachedCode == code;
     }

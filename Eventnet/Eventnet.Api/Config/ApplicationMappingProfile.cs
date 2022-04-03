@@ -15,7 +15,7 @@ public class ApplicationMappingProfile : Profile
         CreateProjection<UserEntity, UserNameModel>();
         CreateMap<UserEntity, UserViewModel>();
         CreateMap<RegisterModel, UserEntity>()
-            .ForSourceMember(x => x.Password, 
+            .ForSourceMember(x => x.Password,
                 opt => opt.DoNotValidate());
     }
 }

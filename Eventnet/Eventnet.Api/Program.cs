@@ -48,7 +48,7 @@ services.AddAutoMapper(opt => opt.AddProfile<ApplicationMappingProfile>());
 
 services.AddCors(options =>
 {
-    options.AddPolicy(name: corsName,
+    options.AddPolicy(corsName,
         policyBuilder =>
         {
             policyBuilder

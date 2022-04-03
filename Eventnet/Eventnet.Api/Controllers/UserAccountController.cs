@@ -174,10 +174,8 @@ public class UserAccountController : Controller
 
     [HttpGet("password/forgot/code")]
     [Produces(typeof(bool))]
-    public IActionResult AcceptUserCode(string email, string code)
-    {
-        return Ok(new { Status = forgotPasswordService.VerifyCode(email, code) });
-    }
+    public IActionResult AcceptUserCode(string email, string code) =>
+        Ok(new { Status = forgotPasswordService.VerifyCode(email, code) });
 
     [HttpPost("password/reset")]
     public async Task<IActionResult> ResetPassword(RestorePasswordModel restorePasswordModel)
@@ -221,10 +219,10 @@ public class UserAccountController : Controller
 
         if (clientAddress is null)
             throw new BadHttpRequestException("Origin header in request is required");
-        
+
         var query = new Dictionary<string, string> { { "userId", user.Id }, { "code", code } };
         var uri = new Uri(QueryHelpers.AddQueryString(clientAddress + "/confirm", query!));
-        
+
         await emailService.SendEmailAsync(
             user.Email,
             "Подтверждение регистрации",

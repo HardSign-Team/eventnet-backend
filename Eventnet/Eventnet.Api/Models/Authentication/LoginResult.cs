@@ -1,5 +1,4 @@
-﻿using Eventnet.DataAccess;
-using Eventnet.Models.Authentication.Tokens;
+﻿using Eventnet.Models.Authentication.Tokens;
 
 namespace Eventnet.Models.Authentication;
 
