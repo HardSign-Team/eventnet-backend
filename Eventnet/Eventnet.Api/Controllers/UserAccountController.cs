@@ -102,10 +102,15 @@ public class UserAccountController : Controller
         if (!ModelState.IsValid)
             return UnprocessableEntity(ModelState);
 
-        var userExists = await userManager.FindByNameAsync(registerModel.UserName);
+        var userNameExists = await userManager.FindByNameAsync(registerModel.UserName);
 
-        if (userExists is not null)
-            return Conflict("User already exists");
+        if (userNameExists is not null)
+            return Conflict(nameof(registerModel.UserName));
+
+        var emailExists = await userManager.FindByEmailAsync(registerModel.Email);
+
+        if (emailExists is not null)
+            return Conflict(nameof(registerModel.Email));
 
         var user = mapper.Map<UserEntity>(registerModel);
 
