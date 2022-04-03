@@ -55,7 +55,8 @@ public class UserAccountController : Controller
         var user = await userManager.FindByNameAsync(loginModel.Login)
             ?? await userManager.FindByEmailAsync(loginModel.Login);
 
-        if (user is null || !await userManager.CheckPasswordAsync(user, loginModel.Password))
+        var passwordCorrect = await userManager.CheckPasswordAsync(user, loginModel.Password);
+        if (user is null || !passwordCorrect)
             return NotFound();
 
         if (!user.EmailConfirmed)
@@ -203,7 +204,8 @@ public class UserAccountController : Controller
     {
         var user = await userManager.FindByEmailAsync(model.Email);
 
-        if (user is null || !await userManager.IsEmailConfirmedAsync(user))
+        var emailConfirmed = await userManager.IsEmailConfirmedAsync(user);
+        if (user is null || !emailConfirmed)
             return NotFound(); // return NotFound to don't discover is email exists or not
 
         await forgotPasswordService.SendCodeAsync(user.Email);
@@ -244,6 +246,7 @@ public class UserAccountController : Controller
 
         await userManager.RemovePasswordAsync(user);
         var result = await userManager.AddPasswordAsync(user, restorePasswordModel.NewPassword);
+        
         if (!result.Succeeded)
             return BadRequest(result.ToString());
 
