@@ -1,11 +1,12 @@
 using System.Text;
-using Eventnet.Config;
+using Eventnet.Api.Config;
+using Eventnet.Api.Helpers.EventFilterFactories;
+using Eventnet.Api.Models.Authentication.Tokens;
+using Eventnet.Api.Services;
 using Eventnet.DataAccess;
+using Eventnet.DataAccess.Entities;
 using Eventnet.Domain;
-using Eventnet.Helpers.EventFilterFactories;
 using Eventnet.Infrastructure;
-using Eventnet.Models.Authentication.Tokens;
-using Eventnet.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -136,9 +137,10 @@ app.Run();
 
 // ReSharper disable once UnusedType.Global Use for integration tests
 // https://docs.microsoft.com/ru-ru/aspnet/core/test/integration-tests?view=aspnetcore-6.0#basic-tests-with-the-default-webapplicationfactory
-namespace Eventnet
+// ReSharper disable once PartialTypeWithSinglePart Use for integration tests
+namespace Eventnet.Api
 {
-    public class Program
+    public partial class Program
     {
     }
 }

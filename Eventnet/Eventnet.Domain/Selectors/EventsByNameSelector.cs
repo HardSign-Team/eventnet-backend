@@ -1,19 +1,21 @@
-﻿using Eventnet.DataAccess;
-using F23.StringSimilarity;
-namespace Eventnet.Domain.Events.Selectors;
+﻿using F23.StringSimilarity;
 
-public class EventsByNameSelector : IEventsByNameSelector
+namespace Eventnet.Domain.Selectors;
+
+public class EventsByNameSelector : ISelector<EventName>
 {
     private readonly string name;
     private readonly NormalizedLevenshtein algorithm;
 
     public EventsByNameSelector(string name)
     {
-        this.name = name.ToLowerInvariant();
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException($"Expected non empty and non-nullable {nameof(name)}, but actually {name}");
+        this.name = name.Trim().ToLowerInvariant();
         algorithm = new NormalizedLevenshtein();
     }
     
-    public IEnumerable<EventEntity> Select(IEnumerable<EventEntity> events, int maxCount)
+    public IEnumerable<EventName> Select(IEnumerable<EventName> events, int maxCount)
     {
         const double acceptableSimilarity = 0.7;
         var valueTuples = events

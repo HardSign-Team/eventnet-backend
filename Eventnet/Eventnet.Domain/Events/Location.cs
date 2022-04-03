@@ -1,6 +1,6 @@
 ﻿using GeoCoordinatePortable;
 
-namespace Eventnet.Models;
+namespace Eventnet.Domain.Events;
 
 public record Location(double Latitude, double Longitude)
 {

@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
+using Eventnet.Api.Helpers;
+using Eventnet.Api.Models;
 using Eventnet.DataAccess;
-using Eventnet.Helpers;
-using Eventnet.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace Eventnet.Controllers;
+namespace Eventnet.Api.Controllers;
 
 [Route("api/users")]
 public class UserController : Controller

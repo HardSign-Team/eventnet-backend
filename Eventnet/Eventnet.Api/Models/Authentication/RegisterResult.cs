@@ -1,5 +1,5 @@
-﻿using Eventnet.DataAccess;
+﻿using Eventnet.DataAccess.Entities;
 
-namespace Eventnet.Models.Authentication;
+namespace Eventnet.Api.Models.Authentication;
 
 public record RegisterResult(string Status, UserEntity User);

@@ -1,3 +1,5 @@
-﻿namespace Eventnet.Models;
+﻿using Eventnet.Domain.Selectors;
 
-public record EventNameListModel(int TotalCount, EventNameModel[] Models);
+namespace Eventnet.Api.Models;
+
+public record EventNameListModel(int TotalCount, EventName[] Models);

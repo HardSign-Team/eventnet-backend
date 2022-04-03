@@ -3,10 +3,10 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using Eventnet.Models.Authentication.Tokens;
+using Eventnet.Api.Models.Authentication.Tokens;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Eventnet.Services;
+namespace Eventnet.Api.Services;
 
 public record RefreshToken(string UserName, string TokenString, DateTime ExpireAt);
 

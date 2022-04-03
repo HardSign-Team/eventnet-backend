@@ -1,5 +1,4 @@
-﻿using Eventnet.DataAccess;
-using GeoCoordinatePortable;
+﻿using GeoCoordinatePortable;
 
 namespace Eventnet.Domain.Events.Filters.EventFilters;
 
@@ -14,7 +13,7 @@ public class LocationFilter : IEventFilter
         this.radius = radius;
     }
 
-    public bool Filter(EventEntity entity)
+    public bool Filter(Event entity)
     {
         var otherCoordinate = new GeoCoordinate(entity.Location.Latitude, entity.Location.Longitude);
         var distanceTo = coordinate.GetDistanceTo(otherCoordinate);

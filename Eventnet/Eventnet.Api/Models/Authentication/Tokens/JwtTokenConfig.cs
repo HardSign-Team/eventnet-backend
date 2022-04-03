@@ -1,6 +1,6 @@
 ﻿#pragma warning disable CS8618
 // Used for Configuration
-namespace Eventnet.Models.Authentication.Tokens;
+namespace Eventnet.Api.Models.Authentication.Tokens;
 
 public class JwtTokenConfig
 {

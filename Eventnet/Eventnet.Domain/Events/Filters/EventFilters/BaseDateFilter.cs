@@ -1,5 +1,4 @@
-﻿using Eventnet.DataAccess;
-using Eventnet.Domain.Events.Filters.Data;
+﻿using Eventnet.Domain.Events.Filters.Data;
 
 namespace Eventnet.Domain.Events.Filters.EventFilters;
 
@@ -14,7 +13,7 @@ public abstract class BaseDateFilter : IEventFilter
         this.dateEquality = dateEquality;
     }
 
-    public abstract bool Filter(EventEntity entity);
+    public abstract bool Filter(Event entity);
 
     protected bool Filter(DateTime date)
     {

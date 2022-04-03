@@ -1,7 +1,7 @@
 ﻿using System.Security.Claims;
-using Eventnet.Models.Authentication.Tokens;
+using Eventnet.Api.Models.Authentication.Tokens;
 
-namespace Eventnet.Services;
+namespace Eventnet.Api.Services;
 
 public interface IJwtAuthService
 {

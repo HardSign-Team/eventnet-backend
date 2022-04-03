@@ -1,5 +1,6 @@
 ﻿using AutoFixture;
-using Eventnet.DataAccess;
+using Eventnet.DataAccess.Entities;
+using Eventnet.Domain.Events;
 
 namespace Eventnet.Api.TestsUtils;
 
@@ -10,33 +11,33 @@ public static class FixtureExtensions
         return fixture.Build<EventEntity>().With(x => x.Name, name).Create();
     }
     
-    public static EventEntity CreateEventAt(this Fixture fixture, LocationEntity location)
+    public static Event CreateEventAt(this Fixture fixture, Location location)
     {
         return fixture
-            .Build<EventEntity>()
+            .Build<Event>()
             .With(x => x.Location, location)
             .Create();
     }
 
-    public static EventEntity CreateEventStartedAt(this Fixture fixture, DateTime startDate)
+    public static Event CreateEventStartedAt(this Fixture fixture, DateTime startDate)
     {
-        return fixture.Build<EventEntity>().With(x => x.StartDate, startDate).Create();
+        return fixture.Build<Event>().With(x => x.StartDate, startDate).Create();
     }
 
-    public static EventEntity CreateEventEndedAt(this Fixture fixture, DateTime? endDate)
+    public static Event CreateEventEndedAt(this Fixture fixture, DateTime? endDate)
     {
-        return fixture.Build<EventEntity>().With(x => x.EndDate, endDate).Create();
+        return fixture.Build<Event>().With(x => x.EndDate, endDate).Create();
     }
 
-    public static EventEntity CreateEventWithOwner(this Fixture fixture, string ownerId)
+    public static Event CreateEventWithOwner(this Fixture fixture, string ownerId)
     {
-        return new EventEntity(Guid.NewGuid(),
+        return new Event(Guid.NewGuid(),
             ownerId,
             fixture.Create<DateTime>(),
             fixture.Create<DateTime?>(),
             fixture.Create<string>(),
             fixture.Create<string>(),
-            fixture.Create<LocationEntity>()
+            fixture.Create<Location>()
         );
     }
 }
