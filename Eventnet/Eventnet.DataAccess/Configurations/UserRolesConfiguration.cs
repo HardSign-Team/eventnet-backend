@@ -11,8 +11,14 @@ public class UserRolesConfiguration : IEntityTypeConfiguration<IdentityRole>
     {
         builder.HasData(
             new IdentityRole(UserRoles.Admin)
-                { NormalizedName = UserRoles.Admin.ToUpper(), ConcurrencyStamp = Guid.NewGuid().ToString() },
+            {
+                NormalizedName = UserRoles.Admin.ToUpper(),
+                ConcurrencyStamp = Guid.NewGuid().ToString()
+            },
             new IdentityRole(UserRoles.User)
-                { NormalizedName = UserRoles.User.ToUpper(), ConcurrencyStamp = Guid.NewGuid().ToString() });
+            {
+                NormalizedName = UserRoles.User.ToUpper(),
+                ConcurrencyStamp = Guid.NewGuid().ToString()
+            });
     }
 }
