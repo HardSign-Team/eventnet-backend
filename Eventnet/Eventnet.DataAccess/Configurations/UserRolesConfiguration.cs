@@ -10,7 +10,9 @@ public class UserRolesConfiguration : IEntityTypeConfiguration<IdentityRole>
     public void Configure(EntityTypeBuilder<IdentityRole> builder)
     {
         builder.HasData(
-            new IdentityRole(UserRoles.Admin),
-            new IdentityRole(UserRoles.User));
+            new IdentityRole(UserRoles.Admin)
+                { NormalizedName = UserRoles.Admin.ToUpper(), ConcurrencyStamp = Guid.NewGuid().ToString() },
+            new IdentityRole(UserRoles.User)
+                { NormalizedName = UserRoles.User.ToUpper(), ConcurrencyStamp = new Guid().ToString() });
     }
 }
