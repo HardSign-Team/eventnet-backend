@@ -11,6 +11,7 @@ using Eventnet.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace Eventnet.Controllers;
 
@@ -22,18 +23,21 @@ public class UserAccountController : Controller
     private readonly IJwtAuthService jwtAuthService;
     private readonly IEmailService emailService;
     private readonly IMapper mapper;
+    private readonly IForgotPasswordService forgotPasswordService;
 
     public UserAccountController(UserManager<UserEntity> userManager,
         CurrentUserService currentUserService,
         IJwtAuthService jwtAuthService,
         IEmailService emailService,
-        IMapper mapper)
+        IMapper mapper,
+        IForgotPasswordService forgotPasswordService)
     {
         this.userManager = userManager;
         this.currentUserService = currentUserService;
         this.jwtAuthService = jwtAuthService;
         this.emailService = emailService;
         this.mapper = mapper;
+        this.forgotPasswordService = forgotPasswordService;
     }
 
     [HttpPost("login")]
@@ -46,7 +50,7 @@ public class UserAccountController : Controller
         var user = await userManager.FindByNameAsync(loginModel.Login)
             ?? await userManager.FindByEmailAsync(loginModel.Login);
 
-        if (user == null || !await userManager.CheckPasswordAsync(user, loginModel.Password))
+        if (user is null || !await userManager.CheckPasswordAsync(user, loginModel.Password))
             return NotFound();
 
         if (!user.EmailConfirmed)
@@ -60,7 +64,7 @@ public class UserAccountController : Controller
         var userView = mapper.Map<UserViewModel>(user);
         var tokens = new TokensViewModel(new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
             jwtSecurityToken.ValidTo, refreshToken.TokenString);
-        
+
         return Ok(new LoginResult(
             tokens,
             userView,
@@ -74,7 +78,7 @@ public class UserAccountController : Controller
     {
         var userName = currentUserService.GetCurrentUserName();
 
-        if (userName == null)
+        if (userName is null)
             return Unauthorized();
 
         jwtAuthService.RemoveRefreshTokenByUserName(userName);
@@ -89,11 +93,11 @@ public class UserAccountController : Controller
 
         var userExists = await userManager.FindByNameAsync(registerModel.UserName);
 
-        if (userExists != null)
+        if (userExists is not null)
             return Conflict("User already exists");
 
         var user = mapper.Map<UserEntity>(registerModel);
-        
+
         var result = await userManager.CreateAsync(user, registerModel.Password);
 
         await userManager.AddToRoleAsync(user, UserRoles.User);
@@ -115,7 +119,7 @@ public class UserAccountController : Controller
 
         var user = await currentUserService.GetCurrentUser();
 
-        if (user == null)
+        if (user is null)
             return NotFound();
 
         var changePasswordResult = await userManager.ChangePasswordAsync(user,
@@ -132,7 +136,7 @@ public class UserAccountController : Controller
     {
         var user = await userManager.FindByNameAsync(userName);
 
-        if (user == null)
+        if (user is null)
             return NotFound();
 
         await SendEmailConfirmationMessageAsync(user);
@@ -144,50 +148,58 @@ public class UserAccountController : Controller
     public async Task<IActionResult> ConfirmEmail(string userId, string code)
     {
         var user = await userManager.FindByIdAsync(userId);
-        if (user == null)
+        if (user is null)
             return NotFound();
 
         var result = await userManager.ConfirmEmailAsync(user, code);
 
         if (result.Succeeded)
             return Ok("Email confirmed");
-        
+
         return BadRequest(result.ToString());
     }
 
-    [HttpPost("forgot-password")]
-    public async Task<IActionResult> ForgotPassword(ForgotPasswordModel model)
+    [HttpPost("password/forgot")]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordModel model)
     {
         var user = await userManager.FindByEmailAsync(model.Email);
 
-        if (user == null || !await userManager.IsEmailConfirmedAsync(user))
+        if (user is null || !await userManager.IsEmailConfirmedAsync(user))
             return NotFound(); // return NotFound to don't discover is email exists or not
 
-        var code = await userManager.GeneratePasswordResetTokenAsync(user);
-        var callbackUrl = Url.Link(nameof(ResetPassword), new { userId = user.Id, code });
-
-        await emailService.SendEmailAsync(
-            user.Email,
-            "Restore password",
-            $"Для сброса пароля пройдите по ссылке: <a href='{callbackUrl}'>link</a>");
+        await forgotPasswordService.SendCodeAsync(user.Email);
 
         return Ok();
     }
 
-    [HttpPost("reset-password", Name = nameof(ResetPassword))]
-    public async Task<IActionResult> ResetPassword(string userId, string code, string newPassword)
+    [HttpGet("password/forgot/code")]
+    [Produces(typeof(bool))]
+    public IActionResult AcceptUserCode(string email, string code)
     {
-        var user = await userManager.FindByIdAsync(userId);
-        if (user == null)
+        return Ok(new { Status = forgotPasswordService.VerifyCode(email, code) });
+    }
+
+    [HttpPost("password/reset")]
+    public async Task<IActionResult> ResetPassword(RestorePasswordModel restorePasswordModel)
+    {
+        if (!ModelState.IsValid)
+            return UnprocessableEntity(ModelState);
+
+        var user = await userManager.FindByEmailAsync(restorePasswordModel.Email);
+        if (user is null)
             return NotFound();
 
-        var result = await userManager.ResetPasswordAsync(user, code, newPassword);
+        if (!forgotPasswordService.VerifyCode(restorePasswordModel.Email, restorePasswordModel.Code))
+            return BadRequest();
+
+        await userManager.RemovePasswordAsync(user);
+        var result = await userManager.AddPasswordAsync(user, restorePasswordModel.NewPassword);
         if (!result.Succeeded)
             return BadRequest(result.ToString());
 
         return Ok();
     }
-    
+
     private static IEnumerable<Claim> CreateClaims(string userName, IEnumerable<string> roles)
     {
         var authClaims = new List<Claim>
@@ -206,16 +218,17 @@ public class UserAccountController : Controller
     {
         var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
         var clientAddress = GetClientAddress();
-        
+
         if (clientAddress is null)
-            return;
-
-        var callbackUrl = Url.Link(clientAddress + "/confirm", new { userId = user.Id, code });
-
+            throw new BadHttpRequestException("Origin header in request is required");
+        
+        var query = new Dictionary<string, string> { { "userId", user.Id }, { "code", code } };
+        var uri = new Uri(QueryHelpers.AddQueryString(clientAddress + "/confirm", query!));
+        
         await emailService.SendEmailAsync(
             user.Email,
             "Подтверждение регистрации",
-            $"Подтвердите регистрацию, перейдя по ссылке: <a href='{callbackUrl}'>link</a>");
+            $"Подтвердите регистрацию, перейдя по ссылке: <a href='{uri}'>{uri}</a>");
     }
 
     private string? GetClientAddress()

@@ -31,6 +31,9 @@ services.AddSingleton<IEventFilterFactory, OwnerFilterFactory>();
 services.AddSingleton<IEventFilterMapper, EventFilterMapper>();
 
 services.AddScoped<IEmailService, EmailService>();
+services.AddScoped<IForgotPasswordService, ForgotPasswordService>();
+
+services.AddMemoryCache();
 
 services.AddHttpContextAccessor();
 
