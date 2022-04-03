@@ -40,6 +40,11 @@ public class UserAccountController : Controller
         this.forgotPasswordService = forgotPasswordService;
     }
 
+    /// <summary>
+    /// Logins user
+    /// </summary>
+    /// <param name="loginModel">Login may be a userName or an email</param>
+    /// <returns></returns>
     [HttpPost("login")]
     [Produces(typeof(LoginResult))]
     public async Task<IActionResult> Login([FromBody] LoginModel loginModel)
@@ -85,6 +90,12 @@ public class UserAccountController : Controller
         return Ok();
     }
 
+    /// <summary>
+    /// Register user and send message with confirmation link to an email.
+    /// Link is "OriginHeader" + "/confirm"
+    /// </summary>
+    /// <param name="registerModel"></param>
+    /// <returns></returns>
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterModel registerModel)
     {
@@ -110,6 +121,12 @@ public class UserAccountController : Controller
         return Ok();
     }
 
+    /// <summary>
+    /// Changes user password.
+    /// Password mustn't match
+    /// </summary>
+    /// <param name="changePasswordModel"></param>
+    /// <returns></returns>
     [Authorize]
     [HttpPost("change-password")]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordModel changePasswordModel)
@@ -131,6 +148,12 @@ public class UserAccountController : Controller
         return Ok();
     }
 
+    /// <summary>
+    /// Just sends email confirmation message.
+    /// Link is "OriginHeader" + "/confirm"
+    /// </summary>
+    /// <param name="userName"></param>
+    /// <returns></returns>
     [HttpPost("email-confirmation-message")]
     public async Task<IActionResult> SendEmailConfirmation(string userName)
     {
@@ -144,6 +167,12 @@ public class UserAccountController : Controller
         return Ok();
     }
 
+    /// <summary>
+    /// Verify that code is right and confirm email
+    /// </summary>
+    /// <param name="userId">Id from email redirect link</param>
+    /// <param name="code">Code from email redirect link</param>
+    /// <returns></returns>
     [HttpPost("confirm-email", Name = nameof(ConfirmEmail))]
     public async Task<IActionResult> ConfirmEmail(string userId, string code)
     {
@@ -159,6 +188,11 @@ public class UserAccountController : Controller
         return BadRequest(result.ToString());
     }
 
+    /// <summary>
+    /// Sends email message with code to user's mail
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
     [HttpPost("password/forgot")]
     public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordModel model)
     {
@@ -172,11 +206,22 @@ public class UserAccountController : Controller
         return Ok();
     }
 
+    /// <summary>
+    /// Verify that code is exists and belongs to user
+    /// </summary>
+    /// <param name="email"></param>
+    /// <param name="code"></param>
+    /// <returns></returns>
     [HttpGet("password/forgot/code")]
     [Produces(typeof(bool))]
-    public IActionResult AcceptUserCode(string email, string code) =>
+    public IActionResult VerifyUserCode(string email, string code) =>
         Ok(new { Status = forgotPasswordService.VerifyCode(email, code) });
 
+    /// <summary>
+    /// Remove user's password and set a new one
+    /// </summary>
+    /// <param name="restorePasswordModel"></param>
+    /// <returns></returns>
     [HttpPost("password/reset")]
     public async Task<IActionResult> ResetPassword(RestorePasswordModel restorePasswordModel)
     {

@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text;
 using Eventnet.Config;
 using Eventnet.DataAccess;
@@ -115,6 +116,8 @@ services.AddSwaggerGen(option =>
             new string[] { }
         }
     });
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    option.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 });
 
 var app = builder.Build();

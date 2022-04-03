@@ -31,4 +31,9 @@
         <ProjectReference Include="..\Eventnet.Infrastructure\Eventnet.Infrastructure.csproj"/>
     </ItemGroup>
 
+    <PropertyGroup>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>$(NoWarn);1591</NoWarn>
+    </PropertyGroup>
+
 </Project>
