@@ -187,10 +187,10 @@ public class UserAccountController : Controller
 
         var result = await userManager.ConfirmEmailAsync(user, code);
 
-        if (result.Succeeded)
-            return Ok("Email confirmed");
+        if (!result.Succeeded)
+            return BadRequest(result.ToString());
 
-        return BadRequest(result.ToString());
+        return Ok("Email Confirmed");
     }
 
     /// <summary>
@@ -219,8 +219,10 @@ public class UserAccountController : Controller
     /// <returns></returns>
     [HttpGet("password/forgot/code")]
     [Produces(typeof(bool))]
-    public IActionResult VerifyUserCode(string email, string code) =>
-        Ok(new { Status = forgotPasswordService.VerifyCode(email, code) });
+    public IActionResult VerifyUserCode(string email, string code)
+    {
+        return Ok(new { Status = forgotPasswordService.VerifyCode(email, code) });
+    }
 
     /// <summary>
     /// Remove user's password and set a new one

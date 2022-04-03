@@ -12,7 +12,7 @@ public class RestorePasswordModel
     public string NewPassword { get; init; } = null!;
 
     [DataType(DataType.Password)]
-    [Compare("NewPassword", ErrorMessage = "Password and Confirmation Password must match.")]
+    [Compare(nameof(NewPassword), ErrorMessage = "Password and Confirmation Password must match.")]
     [Required]
     public string NewPasswordConfirm { get; init; } = null!;
 }
