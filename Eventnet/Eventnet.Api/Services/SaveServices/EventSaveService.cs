@@ -30,12 +30,14 @@ public class EventSaveService : IEventSaveService
     public bool IsEventSaved(Guid id, out string exceptionValue)
     {
         exceptionValue = "";
-        if (!handler.ContainsInformationAbout(id))
-            return false;
-        var (isSaved, exceptionInformation) = handler.GetValue(id);
-        exceptionValue = exceptionInformation;
-        return isSaved;
+        if (handler.TryGetValue(id, out var saveEventResult))
+        {
+            exceptionValue = saveEventResult.ExceptionInformation;
+            return saveEventResult.IsSaved;
+        }
+
+        return false;
     }
-    
+
     private Stream[] GetStreams(IFormFile[] photos) => photos.Select(photo => photo.OpenReadStream()).ToArray();
 }
