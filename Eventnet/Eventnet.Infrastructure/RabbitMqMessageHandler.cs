@@ -1,5 +1,5 @@
 ﻿using System.Drawing;
-using Eventnet.Infrastructure.PhotoServices;
+using Eventnet.Infrastructure.Validators;
 
 namespace Eventnet.Infrastructure;
 
@@ -7,9 +7,9 @@ public class RabbitMqMessageHandler : IRabbitMqMessageHandler
 {
     private readonly Handler handler;
     private readonly ISaveToDbService saveToDbService;
-    private readonly IPhotoValidator validator;
+    private readonly IEventCreationValidator validator;
 
-    public RabbitMqMessageHandler(Handler handler, IPhotoValidator validator,
+    public RabbitMqMessageHandler(Handler handler, IEventCreationValidator validator,
         ISaveToDbService saveToDbService)
     {
         this.handler = handler;
@@ -25,7 +25,9 @@ public class RabbitMqMessageHandler : IRabbitMqMessageHandler
         try
         {
             var photos = GetPhotos(binaryPhotos);
-            if (validator.Validate(photos, out exception))
+            var result = validator.Validate(photos, eventForSave);
+            exception = result.Exception;
+            if (result.IsOk)
             {
                 saveToDbService.SaveEvent(eventForSave);
                 saveToDbService.SavePhotos(photos, id);
@@ -33,7 +35,7 @@ public class RabbitMqMessageHandler : IRabbitMqMessageHandler
         }
         catch (Exception e)
         {
-            exception = "Something went wrong on server. Please try again later";
+            exception = "Something went wrong on server. Please try again later" + "\n" + exception;
             Console.WriteLine(e);
         }
 

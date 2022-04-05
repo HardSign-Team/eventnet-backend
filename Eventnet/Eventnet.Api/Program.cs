@@ -4,6 +4,7 @@ using Eventnet.DataAccess;
 using Eventnet.Helpers.EventFilterFactories;
 using Eventnet.Infrastructure;
 using Eventnet.Infrastructure.PhotoServices;
+using Eventnet.Infrastructure.Validators;
 using Eventnet.Models;
 using Eventnet.Services;
 using Eventnet.Services.SaveServices;
@@ -33,6 +34,9 @@ services.AddSingleton<IEventSaveService, EventSaveService>();
 services.AddSingleton<IPhotoValidator, PhotoValidator>();
 services.AddSingleton<IPhotoToStorageSaveService, PhotoToStorageSaveService>();
 services.AddSingleton<ISaveToDbService, SaveToDbService>();
+services.AddSingleton<IEventValidator, EventValidator>();
+services.AddSingleton<IPhotoValidator, PhotoValidator>();
+services.AddSingleton<IEventCreationValidator, EventCreationValidator>();
 services.AddSingleton<IRabbitMqMessageHandler, RabbitMqMessageHandler>();
 
 services.AddControllers();
