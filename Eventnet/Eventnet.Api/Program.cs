@@ -26,17 +26,14 @@ services.AddSingleton<IEventFilterFactory, StartDateFilterFactory>();
 services.AddSingleton<IEventFilterFactory, EndDateFilterFactory>();
 services.AddSingleton<IEventFilterFactory, OwnerFilterFactory>();
 services.AddSingleton<IEventFilterMapper, EventFilterMapper>();
-services.AddSingleton<IPhotosToTempFolderSaveService, PhotosToTempFolderSaveService>();
 services.AddSingleton(new RabbitMqConfig());
 services.AddSingleton<IPublishEventService, PublishEventService>();
 services.AddSingleton(new Handler());
 services.AddSingleton<IEventSaveService, EventSaveService>();
-services.AddSingleton<ILoadFromTempService, LoadFromTempFolderService>();
 services.AddSingleton<IImageValidator, ImageValidator>();
 services.AddSingleton<IImageToDbPreparer, ImageToDbPreparer>();
 services.AddSingleton<ISaveToDbService, SaveToDbService>();
 services.AddSingleton<IRabbitMqMessageHandler, RabbitMqMessageHandler>();
-services.AddSingleton<IDeleteFromTempFolderService, DeleteFromTempFolderService>();
 
 services.AddControllers();
 
