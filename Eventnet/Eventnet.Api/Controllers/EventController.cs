@@ -6,8 +6,8 @@ using Eventnet.Domain.Events.Selectors;
 using Eventnet.Helpers;
 using Eventnet.Models;
 using Eventnet.Services;
+using Eventnet.Services.SaveServices;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using X.PagedList;
@@ -24,21 +24,18 @@ public class EventController : Controller
     private readonly IEventSaveService eventSaveService;
     private readonly LinkGenerator linkGenerator;
     private readonly IMapper mapper;
-    private readonly UserManager<UserEntity> userManager;
 
     public EventController(
         IEventFilterMapper filterMapper,
         ApplicationDbContext dbContext,
         IMapper mapper,
         LinkGenerator linkGenerator,
-        UserManager<UserEntity> userManager,
         IEventSaveService eventSaveService)
     {
         this.filterMapper = filterMapper;
         this.dbContext = dbContext;
         this.mapper = mapper;
         this.linkGenerator = linkGenerator;
-        this.userManager = userManager;
         this.eventSaveService = eventSaveService;
     }
 
@@ -125,6 +122,7 @@ public class EventController : Controller
     }
 
     [HttpGet("is-created")]
+    [Authorize]
     public IActionResult IsCreated(Guid id)
     {
         if (!eventSaveService.IsEventSaved(id, out var exception))
