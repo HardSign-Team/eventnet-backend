@@ -1,6 +1,6 @@
 ﻿using Eventnet.Models;
 
-namespace Eventnet.Services;
+namespace Eventnet.Services.SaveServices;
 
 public interface IEventSaveService
 {
