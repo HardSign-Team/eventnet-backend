@@ -31,7 +31,7 @@ services.AddSingleton<IPublishEventService, PublishEventService>();
 services.AddSingleton(new Handler());
 services.AddSingleton<IEventSaveService, EventSaveService>();
 services.AddSingleton<IImageValidator, ImageValidator>();
-services.AddSingleton<IImageToDbPreparer, ImageToDbPreparer>();
+services.AddSingleton<IPhotoToStorageSaveService, PhotoToStorageSaveService>();
 services.AddSingleton<ISaveToDbService, SaveToDbService>();
 services.AddSingleton<IRabbitMqMessageHandler, RabbitMqMessageHandler>();
 

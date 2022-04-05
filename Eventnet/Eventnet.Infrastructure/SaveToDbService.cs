@@ -9,31 +9,40 @@ namespace Eventnet.Infrastructure;
 
 public class SaveToDbService : ISaveToDbService
 {
-    private readonly ApplicationDbContext dbContext;
     private readonly IMapper mapper;
-    private readonly IImageToDbPreparer preparer;
+    private readonly IPhotoToStorageSaveService storageSaveService;
+    private readonly IServiceScopeFactory factory;
 
-    public SaveToDbService(IImageToDbPreparer preparer, IServiceScopeFactory factory, IMapper mapper)
+    public SaveToDbService(IPhotoToStorageSaveService storageSaveService, IServiceScopeFactory factory, IMapper mapper)
     {
-        this.preparer = preparer;
+        this.storageSaveService = storageSaveService;
+        this.factory = factory;
         this.mapper = mapper;
-        dbContext = factory.CreateScope().ServiceProvider.GetRequiredService<ApplicationDbContext>();
     }
 
-    public void SaveImages(List<Image> images, Guid id)
+    public async Task SavePhotos(List<Image> photos, Guid eventId)
     {
-        var path = preparer.Save(images, id);
-        var photosEntity = new PhotosEntity(path, id);
-        dbContext.Photos.Add(photosEntity);
-        foreach (var image in images)
+        foreach (var photo in photos)
         {
-            image.Dispose();
+            var photoId = Guid.NewGuid();
+            storageSaveService.Save(photo, photoId);
+            var photoEntity = new PhotoEntity(photoId, eventId);
+            await SavePhotoToDbAsync(photoEntity);
         }
     }
 
-    public void SaveEvent(Event eventForSave)
+    private async Task SavePhotoToDbAsync(PhotoEntity photoEntity)
     {
+        await using var dbContext = factory.CreateScope().ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        dbContext.Photos.Add(photoEntity);
+        await dbContext.SaveChangesAsync();
+    }
+
+    public async Task SaveEvent(Event eventForSave)
+    {
+        await using var dbContext = factory.CreateScope().ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var eventEntity = mapper.Map<EventEntity>(eventForSave);
         dbContext.Events.Add(eventEntity);
+        await dbContext.SaveChangesAsync();
     }
 }
