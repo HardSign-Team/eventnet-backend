@@ -3,16 +3,17 @@ using RabbitMQ.Client;
 
 namespace Eventnet.Services.SaveServices;
 
-public class PublishEventService : IPublishEventService
+public class PublishEventService : IPublishEventService, IDisposable
 {
     private readonly IModel channel;
     private readonly string queue;
+    private readonly IConnection connection;
 
     public PublishEventService(RabbitMqConfig config)
     {
         queue = config.Queue;
         var factory = new ConnectionFactory { HostName = config.HostName };
-        var connection = factory.CreateConnection();
+        connection = factory.CreateConnection();
         channel = connection.CreateModel();
     }
 
@@ -25,5 +26,11 @@ public class PublishEventService : IPublishEventService
             properties.Persistent = false;
             channel.BasicPublish(string.Empty, queue, null, Encoding.UTF8.GetBytes(message));
         });
+    }
+
+    public void Dispose()
+    {
+        channel.Dispose();
+        connection.Dispose();
     }
 }
