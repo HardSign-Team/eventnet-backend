@@ -30,7 +30,7 @@ public class ConsumeEventService : BackgroundService
         {
             var content = Encoding.UTF8.GetString(ea.Body.ToArray());
             var message = JsonSerializer.Deserialize<RabbitMqMessage>(content);
-            rabbitMqMessageHandler.Handle(message);
+            rabbitMqMessageHandler.Handle(message!);
             channel.BasicAck(ea.DeliveryTag, false);
         };
 

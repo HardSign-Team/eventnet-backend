@@ -1,38 +1,35 @@
-﻿using Eventnet.Infrastructure.ImageServices;
+﻿using System.Drawing;
+using Eventnet.Infrastructure.ImageServices;
 
 namespace Eventnet.Infrastructure;
 
 public class RabbitMqMessageHandler : IRabbitMqMessageHandler
 {
     private readonly Handler handler;
-    private readonly ILoadFromTempService loadFromTempService;
     private readonly ISaveToDbService saveToDbService;
-    private readonly IDeleteFromTempFolderService deleteFromTempFolderService;
     private readonly IImageValidator validator;
 
-    public RabbitMqMessageHandler(Handler handler, ILoadFromTempService loadFromTempService, IImageValidator validator,
-        ISaveToDbService saveToDbService, IDeleteFromTempFolderService deleteFromTempFolderService)
+    public RabbitMqMessageHandler(Handler handler, IImageValidator validator,
+        ISaveToDbService saveToDbService)
     {
         this.handler = handler;
-        this.loadFromTempService = loadFromTempService;
         this.validator = validator;
         this.saveToDbService = saveToDbService;
-        this.deleteFromTempFolderService = deleteFromTempFolderService;
     }
 
     public void Handle(RabbitMqMessage rabbitMqMessage)
     {
-        var id = rabbitMqMessage.Event.Id;
+        var (eventForSave, binaryPhotos) = rabbitMqMessage;
+        var id = eventForSave.Id;
         var exception = "";
         try
         {
-            var photos = loadFromTempService.LoadImages(rabbitMqMessage.PathToPhotos);
+            var photos = GetPhotos(binaryPhotos);
             if (validator.Validate(photos, out exception))
             {
-                saveToDbService.SaveImages(photos, id);
-                saveToDbService.SaveEvent(rabbitMqMessage.Event);
-            } 
-            deleteFromTempFolderService.Delete(rabbitMqMessage.PathToPhotos);
+                saveToDbService.SaveEvent(eventForSave);
+                saveToDbService.SavePhotos(photos, id);
+            }
         }
         catch (Exception e)
         {
@@ -42,4 +39,10 @@ public class RabbitMqMessageHandler : IRabbitMqMessageHandler
 
         handler.Update(id, new SaveEventResult(exception.Length == 0, exception));
     }
+    
+    private List<Image> GetPhotos(List<byte[]> binaryPhotos) 
+        => binaryPhotos
+            .Select(binaryPhoto => new MemoryStream(binaryPhoto))
+            .Select(Image.FromStream)
+            .ToList();
 }

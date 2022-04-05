@@ -2,4 +2,4 @@
 
 namespace Eventnet.Infrastructure;
 
-public record RabbitMqMessage(Event Event, string PathToPhotos);
+public record RabbitMqMessage(Event Event, List<byte[]> Photos);

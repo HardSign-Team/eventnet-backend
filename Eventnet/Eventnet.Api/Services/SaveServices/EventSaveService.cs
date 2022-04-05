@@ -7,22 +7,18 @@ namespace Eventnet.Services.SaveServices;
 public class EventSaveService : IEventSaveService
 {
     private readonly Handler handler;
-    private readonly IPhotosToTempFolderSaveService photosToTempFolderSaveService;
     private readonly IPublishEventService publishEventService;
 
-    public EventSaveService(IPublishEventService publishEventService,
-        IPhotosToTempFolderSaveService photosToTempFolderSaveService, Handler handler)
+    public EventSaveService(IPublishEventService publishEventService, Handler handler)
     {
         this.publishEventService = publishEventService;
-        this.photosToTempFolderSaveService = photosToTempFolderSaveService;
         this.handler = handler;
     }
 
     public async Task SaveAsync(Event savedEvent, IFormFile[] photos)
     {
-        var streams = GetStreams(photos);
-        var path = photosToTempFolderSaveService.SaveToTempFolder(savedEvent.Id, streams);
-        var message = JsonSerializer.Serialize(new RabbitMqMessage(savedEvent, path));
+        var streams = await GetStreamsAsync(photos);
+        var message = JsonSerializer.Serialize(new RabbitMqMessage(savedEvent, streams));
         handler.Update(savedEvent.Id, new SaveEventResult(false, string.Empty));
         await publishEventService.SendAsync(message);
     }
@@ -30,14 +26,22 @@ public class EventSaveService : IEventSaveService
     public bool IsEventSaved(Guid id, out string exceptionValue)
     {
         exceptionValue = "";
-        if (handler.TryGetValue(id, out var saveEventResult))
-        {
-            exceptionValue = saveEventResult.ExceptionInformation;
-            return saveEventResult.IsSaved;
-        }
-
-        return false;
+        if (!handler.TryGetValue(id, out var saveEventResult))
+            return false;
+        exceptionValue = saveEventResult.ExceptionInformation;
+        return saveEventResult.IsSaved;
     }
 
-    private Stream[] GetStreams(IFormFile[] photos) => photos.Select(photo => photo.OpenReadStream()).ToArray();
+    private async Task<List<byte[]>> GetStreamsAsync(IFormFile[] photos)
+    {
+        var bytes = new List<byte[]>();
+        foreach (var photo in photos)
+        {
+            await using var memoryStream = new MemoryStream();
+            await photo.CopyToAsync(memoryStream);
+            bytes.Add(memoryStream.ToArray());
+        }
+
+        return bytes;
+    }
 }
