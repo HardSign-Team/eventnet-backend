@@ -1,11 +1,12 @@
 ﻿using System.Drawing;
 using System.Drawing.Imaging;
 
-namespace Eventnet.Infrastructure.ImageServices;
+namespace Eventnet.Infrastructure.PhotoServices;
 
 public class PhotoToStorageSaveService : IPhotoToStorageSaveService
 {
     private const string DirToSave = "storage";
+
     public PhotoToStorageSaveService()
     {
         if (!Directory.Exists(DirToSave))

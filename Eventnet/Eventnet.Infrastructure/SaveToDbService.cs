@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using AutoMapper;
 using Eventnet.DataAccess;
-using Eventnet.Infrastructure.ImageServices;
+using Eventnet.Infrastructure.PhotoServices;
 using Eventnet.Models;
 using Microsoft.Extensions.DependencyInjection;
 

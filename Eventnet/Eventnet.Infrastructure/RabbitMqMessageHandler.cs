@@ -1,5 +1,5 @@
 ﻿using System.Drawing;
-using Eventnet.Infrastructure.ImageServices;
+using Eventnet.Infrastructure.PhotoServices;
 
 namespace Eventnet.Infrastructure;
 
@@ -7,9 +7,9 @@ public class RabbitMqMessageHandler : IRabbitMqMessageHandler
 {
     private readonly Handler handler;
     private readonly ISaveToDbService saveToDbService;
-    private readonly IImageValidator validator;
+    private readonly IPhotoValidator validator;
 
-    public RabbitMqMessageHandler(Handler handler, IImageValidator validator,
+    public RabbitMqMessageHandler(Handler handler, IPhotoValidator validator,
         ISaveToDbService saveToDbService)
     {
         this.handler = handler;
