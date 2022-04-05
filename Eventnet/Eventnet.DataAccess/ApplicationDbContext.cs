@@ -9,7 +9,7 @@ namespace Eventnet.DataAccess;
 public class ApplicationDbContext : IdentityDbContext<UserEntity>
 {
     public DbSet<EventEntity> Events { get; set; }
-    public DbSet<PhotosEntity> Photos { get; set; }
+    public DbSet<PhotoEntity> Photos { get; set; }
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {

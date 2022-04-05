@@ -102,6 +102,8 @@ services.AddSwaggerGen(option =>
     });
 });
 
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 services.AddHostedService<ConsumeEventService>();
 
 var app = builder.Build();
