@@ -1,9 +1,10 @@
-﻿using Eventnet.Models;
+﻿using Eventnet.Infrastructure;
+using Eventnet.Models;
 
 namespace Eventnet.Services.SaveServices;
 
 public interface IEventSaveService
 {
-    Task SaveAsync(Event savedEvent, IFormFile[] photos);
-    bool IsEventSaved(Guid id, out string exceptionValue);
+    Task SaveAsync(Event eventForSave, IFormFile[] photos);
+    SaveEventResult GetSaveEventResult(Guid id);
 }

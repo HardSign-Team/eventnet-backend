@@ -1,3 +1,3 @@
 namespace Eventnet.Infrastructure;
 
-public record SaveEventResult(bool IsSaved, string ExceptionInformation);
+public record SaveEventResult(EventSaveStatus Status, string ExceptionInformation);

@@ -4,6 +4,7 @@ using AutoMapper;
 using Eventnet.DataAccess;
 using Eventnet.Domain.Events.Selectors;
 using Eventnet.Helpers;
+using Eventnet.Infrastructure;
 using Eventnet.Models;
 using Eventnet.Services;
 using Eventnet.Services.SaveServices;
@@ -19,6 +20,7 @@ public class EventController : Controller
 {
     public const int MaxPageSize = 20;
     public const int DefaultPageSize = 10;
+    private const int Timeout = 20;
     private readonly IEventFilterMapper filterMapper;
     private readonly ApplicationDbContext dbContext;
     private readonly IEventSaveService eventSaveService;
@@ -125,9 +127,15 @@ public class EventController : Controller
     [Authorize]
     public IActionResult IsCreated(Guid id)
     {
-        if (!eventSaveService.IsEventSaved(id, out var exception))
-            return BadRequest(exception);
-        return Ok();
+        var (saveStatus, exception) = eventSaveService.GetSaveEventResult(id);
+        return saveStatus switch
+        {
+            EventSaveStatus.Saved                    => Ok(),
+            EventSaveStatus.NotSavedDueToUserError   => BadRequest(exception),
+            EventSaveStatus.NotSavedDueToServerError => BadRequest(exception),
+            EventSaveStatus.InProgress               => Accepted(Timeout),
+            _                                        => throw new ArgumentOutOfRangeException($"Unknown SaveState {saveStatus}")
+        };
     }
 
     // TODO use format https://datatracker.ietf.org/doc/html/rfc6902
@@ -149,7 +157,7 @@ public class EventController : Controller
 
         return Ok(new { eventId });
     }
-    
+
     [HttpGet("guid")]
     [Authorize]
     public IActionResult GenerateEventGuid()
