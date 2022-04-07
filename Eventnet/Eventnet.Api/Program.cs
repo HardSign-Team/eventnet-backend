@@ -33,6 +33,7 @@ services.AddSingleton<IEventFilterFactory, OwnerFilterFactory>();
 services.AddSingleton<IEventFilterMapper, EventFilterMapper>();
 services.AddSingleton<IPublishEventService, PublishEventService>();
 services.AddSingleton(new Handler());
+services.AddSingleton<IConsumeEventService, RabbitMqConsumeEventService>();
 services.AddSingleton<IEventSaveService, EventSaveService>();
 services.AddSingleton<IPhotoValidator, PhotoValidator>();
 services.AddSingleton<IPhotoToStorageSaveService, PhotoToStorageSaveService>();
@@ -111,7 +112,7 @@ services.AddSwaggerGen(option =>
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
-services.AddHostedService<ConsumeEventService>();
+services.AddHostedService<BackgroundConsumeEventService>();
 
 var app = builder.Build();
 

@@ -6,43 +6,37 @@ using RabbitMQ.Client.Events;
 
 namespace Eventnet.Services.SaveServices;
 
-public class ConsumeEventService : BackgroundService
+public class RabbitMqConsumeEventService : IConsumeEventService
 {
     private readonly IModel channel;
     private readonly IConnection connection;
     private readonly string queue;
-    private readonly IRabbitMqMessageHandler rabbitMqMessageHandler;
-
-    public ConsumeEventService(IRabbitMqMessageHandler rabbitMqMessageHandler, RabbitMqConfig config)
+    
+    public RabbitMqConsumeEventService(RabbitMqConfig config)
     {
-        this.rabbitMqMessageHandler = rabbitMqMessageHandler;
         queue = config.Queue;
         var connectionFactory = new ConnectionFactory { HostName = config.HostName };
         connection = connectionFactory.CreateConnection();
         channel = connection.CreateModel();
     }
 
-    protected override Task ExecuteAsync(CancellationToken stoppingToken)
+    public void ConsumeAndHandle(Action<RabbitMqMessage> handle)
     {
-        stoppingToken.ThrowIfCancellationRequested();
         var consumer = new EventingBasicConsumer(channel);
         consumer.Received += (ch, ea) =>
         {
             var content = Encoding.UTF8.GetString(ea.Body.ToArray());
             var message = JsonSerializer.Deserialize<RabbitMqMessage>(content);
-            rabbitMqMessageHandler.Handle(message!);
+            handle(message!);
             channel.BasicAck(ea.DeliveryTag, false);
         };
 
         channel.BasicConsume(queue, false, consumer);
-
-        return Task.CompletedTask;
     }
-
-    public override void Dispose()
+    
+    public void Dispose()
     {
         channel.Close();
         connection.Close();
-        base.Dispose();
     }
 }
