@@ -5,17 +5,18 @@ namespace Eventnet.Infrastructure.PhotoServices;
 
 public class PhotoToStorageSaveService : IPhotoToStorageSaveService
 {
-    private const string DirToSave = "storage";
+    private readonly string dirToSave;
 
-    public PhotoToStorageSaveService()
+    public PhotoToStorageSaveService(PhotoStorageConfig config)
     {
-        if (!Directory.Exists(DirToSave))
-            Directory.CreateDirectory(DirToSave);
+        dirToSave = config.Path;
+        if (!Directory.Exists(dirToSave))
+            Directory.CreateDirectory(dirToSave);
     }
 
     public void Save(Image photo, Guid photoId)
     {
-        var path = Path.Combine(DirToSave, photoId + ".jpeg");
+        var path = Path.Combine(dirToSave, photoId + ".jpeg");
         photo.Save(path, ImageFormat.Jpeg);
     }
 }

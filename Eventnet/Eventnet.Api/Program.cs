@@ -19,9 +19,11 @@ var services = builder.Services;
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var jwtTokenConfig = builder.Configuration.GetSection("JWT").Get<JwtTokenConfig>();
 var rabbitMqConfig = builder.Configuration.GetSection("RabbitMq").Get<RabbitMqConfig>();
+var photoStorageConfig = builder.Configuration.GetSection("PhotoStorage").Get<PhotoStorageConfig>();
 
 services.AddSingleton(jwtTokenConfig);
 services.AddSingleton(rabbitMqConfig);
+services.AddSingleton(photoStorageConfig);
 services.AddSingleton<IJwtAuthService, JwtAuthService>();
 
 services.AddSingleton<IEventFilterFactory, LocationFilterFactory>();
