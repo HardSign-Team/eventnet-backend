@@ -18,8 +18,10 @@ var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var jwtTokenConfig = builder.Configuration.GetSection("JWT").Get<JwtTokenConfig>();
+var rabbitMqConfig = builder.Configuration.GetSection("RabbitMq").Get<RabbitMqConfig>();
 
 services.AddSingleton(jwtTokenConfig);
+services.AddSingleton(rabbitMqConfig);
 services.AddSingleton<IJwtAuthService, JwtAuthService>();
 
 services.AddSingleton<IEventFilterFactory, LocationFilterFactory>();
@@ -27,7 +29,6 @@ services.AddSingleton<IEventFilterFactory, StartDateFilterFactory>();
 services.AddSingleton<IEventFilterFactory, EndDateFilterFactory>();
 services.AddSingleton<IEventFilterFactory, OwnerFilterFactory>();
 services.AddSingleton<IEventFilterMapper, EventFilterMapper>();
-services.AddSingleton(new RabbitMqConfig());
 services.AddSingleton<IPublishEventService, PublishEventService>();
 services.AddSingleton(new Handler());
 services.AddSingleton<IEventSaveService, EventSaveService>();

@@ -2,6 +2,7 @@
 
 public class RabbitMqConfig
 {
-    public string Queue => "MyQueue";
-    public string HostName => "localhost";
+    public string Queue { get; set; }
+    public string HostName { get; set; }
+    public int RecommendedMessageSize { get; set; }
 }
