@@ -3,7 +3,7 @@ using RabbitMQ.Client;
 
 namespace Eventnet.Services.SaveServices;
 
-public class PublishEventService : IPublishEventService, IDisposable
+public class PublishEventService : IPublishEventService
 {
     private readonly IModel channel;
     private readonly string queue;
