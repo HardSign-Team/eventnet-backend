@@ -11,5 +11,6 @@ public class Handler
         saveEventInformation[id] = value;
     }
 
-    public bool TryGetValue(Guid id, out SaveEventResult result) => saveEventInformation.TryGetValue(id, out result);
+    public bool TryGetValue(Guid id, out SaveEventResult result) => 
+        saveEventInformation.TryGetValue(id, out result) && saveEventInformation.Remove(id, out result);
 }
