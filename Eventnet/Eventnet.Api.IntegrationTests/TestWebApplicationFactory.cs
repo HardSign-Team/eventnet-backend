@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
 using Eventnet.Api.IntegrationTests.Helpers;
+using Eventnet.Api.IntegrationTests.Mocks;
 using Eventnet.DataAccess;
+using Eventnet.Services.SaveServices;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +27,16 @@ public class TestWebApplicationFactory<TStartup> : WebApplicationFactory<TStartu
             {
                 options.UseInMemoryDatabase("InMemoryDbForTesting");
             });
+
+            var consumer = services.SingleOrDefault(
+                d => d.ServiceType == typeof(IConsumeEventService));
+            services.Remove(consumer!);
+            services.AddSingleton<IConsumeEventService, ConsumeEventMock>();
+            
+            var publisher = services.SingleOrDefault(
+                d => d.ServiceType == typeof(IPublishEventService));
+            services.Remove(publisher!);
+            services.AddSingleton<IPublishEventService, PublishEventMock>();
 
             var sp = services.BuildServiceProvider();
 
