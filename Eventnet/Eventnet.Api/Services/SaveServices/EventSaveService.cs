@@ -31,7 +31,7 @@ public class EventSaveService : IEventSaveService
         return saveEventResult;
     }
 
-    private async Task<List<byte[]>> GetStreamsAsync(IFormFile[] photos)
+    private static async Task<List<byte[]>> GetStreamsAsync(IFormFile[] photos)
     {
         var bytes = new List<byte[]>();
         foreach (var photo in photos)

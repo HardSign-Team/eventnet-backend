@@ -23,5 +23,5 @@ public class EventCreationValidator : IEventCreationValidator
             );
     }
 
-    private string FormatException(string photoErrorMessage, string eventErrorMessage) => (photoErrorMessage + " " + eventErrorMessage).Trim();
+    private static string FormatException(string photoErrorMessage, string eventErrorMessage) => (photoErrorMessage + " " + eventErrorMessage).Trim();
 }
