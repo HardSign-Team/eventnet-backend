@@ -21,13 +21,13 @@ public class RabbitMqMessageHandler : IRabbitMqMessageHandler
     {
         var (eventForSave, binaryPhotos) = rabbitMqMessage;
         var id = eventForSave.Id;
-        var exception = string.Empty;
+        var errorMessage = string.Empty;
         EventSaveStatus status;
         try
         {
             var photos = GetPhotos(binaryPhotos);
             var result = validator.Validate(photos, eventForSave);
-            exception = result.Exception;
+            errorMessage = result.ErrorMessage;
             if (result.IsOk)
             {
                 saveToDbService.SaveEvent(eventForSave);
@@ -38,11 +38,11 @@ public class RabbitMqMessageHandler : IRabbitMqMessageHandler
         }
         catch (Exception e)
         {
-            exception = "Something went wrong on server. Please try again later" + "\n" + exception;
+            errorMessage = "Something went wrong on server. Please try again later" + "\n" + errorMessage;
             status = EventSaveStatus.NotSavedDueToServerError;
             Console.WriteLine(e);
         }
-        handler.Update(id, new SaveEventResult(status, exception));
+        handler.Update(id, new SaveEventResult(status, errorMessage));
     }
     
     private List<Image> GetPhotos(List<byte[]> binaryPhotos) 

@@ -16,12 +16,12 @@ public class EventCreationValidator : IEventCreationValidator
 
     public EventCreationValidationResult Validate(List<Image> photos, Event eventForValidation)
     {
-        var (photoValidationException, photoValidationResult) = photoValidator.Validate(photos);
-        var (eventValidationException, eventValidationResult) = eventValidator.Validate(eventForValidation);
-        return new EventCreationValidationResult(
-            FormatException(photoValidationException, eventValidationException),
-            photoValidationResult && eventValidationResult);
+        var (photoValidationResult, photoValidationErrorMessage) = photoValidator.Validate(photos);
+        var (eventValidationResult, eventValidationErrorMessage) = eventValidator.Validate(eventForValidation);
+        return new EventCreationValidationResult(photoValidationResult && eventValidationResult,
+            FormatException(photoValidationErrorMessage, eventValidationErrorMessage)
+            );
     }
 
-    private string FormatException(string photoException, string eventException) => (photoException + " " + eventException).Trim();
+    private string FormatException(string photoErrorMessage, string eventErrorMessage) => (photoErrorMessage + " " + eventErrorMessage).Trim();
 }
