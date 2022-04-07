@@ -24,6 +24,7 @@ public class EventController : Controller
     private readonly IEventFilterMapper filterMapper;
     private readonly ApplicationDbContext dbContext;
     private readonly IEventSaveService eventSaveService;
+    private readonly RabbitMqConfig rabbitMqConfig;
     private readonly LinkGenerator linkGenerator;
     private readonly IMapper mapper;
 
@@ -32,13 +33,15 @@ public class EventController : Controller
         ApplicationDbContext dbContext,
         IMapper mapper,
         LinkGenerator linkGenerator,
-        IEventSaveService eventSaveService)
+        IEventSaveService eventSaveService,
+        RabbitMqConfig rabbitMqConfig)
     {
         this.filterMapper = filterMapper;
         this.dbContext = dbContext;
         this.mapper = mapper;
         this.linkGenerator = linkGenerator;
         this.eventSaveService = eventSaveService;
+        this.rabbitMqConfig = rabbitMqConfig;
     }
 
     [HttpGet("{eventId:guid}")]
@@ -119,6 +122,10 @@ public class EventController : Controller
     {
         var createdEvent = mapper.Map<Event>(createModel);
         var photos = createModel.Photos;
+        if (photos.Sum(photo => photo.Length) >= rabbitMqConfig.RecommendedMessageSize)
+        {
+            return BadRequest("Too large images. Recommended size of all images is 128Mb.");
+        }
         await eventSaveService.SaveAsync(createdEvent, photos);
         return Accepted();
     }
