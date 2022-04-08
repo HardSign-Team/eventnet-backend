@@ -122,9 +122,10 @@ public class EventController : Controller
     {
         var createdEvent = mapper.Map<Event>(createModel);
         var photos = createModel.Photos;
-        if (photos.Sum(photo => photo.Length) >= rabbitMqConfig.RecommendedMessageSize)
+        if (photos.Sum(photo => photo.Length) >= rabbitMqConfig.RecommendedMessageSizeInBytes)
         {
-            return BadRequest("Too large images. Recommended size of all images is 128Mb.");
+            var recommendedSizeInMb = rabbitMqConfig.RecommendedMessageSizeInBytes / 1024 / 1024;
+            return BadRequest($"Too large images. Recommended size of all images is {recommendedSizeInMb}Mb.");
         }
         await eventSaveService.SaveAsync(createdEvent, photos);
         return Accepted();
