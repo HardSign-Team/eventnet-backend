@@ -1,16 +1,26 @@
-﻿using System.Collections.Concurrent;
+﻿using Microsoft.Extensions.Caching.Memory;
 
 namespace Eventnet.Infrastructure;
 
 public class Handler
 {
-    private readonly ConcurrentDictionary<Guid, SaveEventResult> saveEventInformation = new();
+    private readonly IMemoryCache cache;
+
+    public Handler(IMemoryCache cache)
+    {
+        this.cache = cache;
+    }
 
     public void Update(Guid id, SaveEventResult value)
     {
-        saveEventInformation[id] = value;
+        cache.Set(id, value, TimeSpan.FromMinutes(2));
     }
-
-    public bool TryGetValue(Guid id, out SaveEventResult result) => 
-        saveEventInformation.TryGetValue(id, out result) && saveEventInformation.Remove(id, out result);
+    
+    public bool TryGetValue(Guid id, out SaveEventResult result)
+    {
+        if (!cache.TryGetValue(id, out result))
+            return false;
+        cache.Remove(id);
+        return true;
+    }
 }
