@@ -1,0 +1,27 @@
+version: '3.7'
+
+services:
+  web:
+    image: 'api'
+    build:
+      context: ./Eventnet/
+      dockerfile: Eventnet.Api/Dockerfile
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=db;Port=5432;Database=eventnet;User Id=postgres;Password=1234;
+    ports:
+     - 5203:80
+    depends_on:
+     - db
+
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_DB=eventnet
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_PORT=5432
+    volumes:
+      - pg_data=/var/lib/postgresql/data
+    
+volumes:
+  pg_data:

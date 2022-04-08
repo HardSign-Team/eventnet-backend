@@ -22,7 +22,7 @@ public class JwtAuthServiceShould
         Secret = "I see a red door and I want it painted black"
     };
 
-    private JwtAuthService sut;
+    private JwtAuthService sut = null!;
     private DateTime now;
 
     [SetUp]
