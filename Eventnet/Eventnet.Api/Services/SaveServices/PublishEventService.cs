@@ -17,7 +17,7 @@ public class PublishEventService : IPublishEventService
         channel = connection.CreateModel();
     }
 
-    public async Task SendAsync(string message)
+    public async Task PublishAsync(string message)
     {
         await Task.Run(() =>
         {

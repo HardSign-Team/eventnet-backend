@@ -2,5 +2,5 @@
 
 public interface IPublishEventService : IDisposable
 {
-    Task SendAsync(string message);
+    Task PublishAsync(string message);
 }

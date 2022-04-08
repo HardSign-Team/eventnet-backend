@@ -21,7 +21,7 @@ public class EventSaveService : IEventSaveService
         var message = JsonSerializer.Serialize(new RabbitMqMessage(eventForSave, streams));
         var saveEventResult = new SaveEventResult(EventSaveStatus.InProgress, string.Empty);
         handler.Update(eventForSave.Id, saveEventResult);
-        await publishEventService.SendAsync(message);
+        await publishEventService.PublishAsync(message);
     }
 
     public SaveEventResult GetSaveEventResult(Guid id)
