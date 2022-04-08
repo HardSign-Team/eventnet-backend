@@ -120,13 +120,20 @@ public class EventController : Controller
     [Authorize]
     public async Task<IActionResult> CreateEvent([FromBody] CreateEventModel createModel)
     {
-        var createdEvent = mapper.Map<Event>(createModel);
         var photos = createModel.Photos;
-        if (photos.Sum(photo => photo.Length) >= rabbitMqConfig.RecommendedMessageSizeInBytes)
+
+        if (!IsContentTypesSupported(photos))
+        {
+            return BadRequest("Not supported ContentType");
+        }
+
+        if (!IsPhotosSizeLessThanRecommended(photos))
         {
             var recommendedSizeInMb = rabbitMqConfig.RecommendedMessageSizeInBytes / 1024 / 1024;
             return BadRequest($"Too large images. Recommended size of all images is {recommendedSizeInMb}Mb.");
         }
+        
+        var createdEvent = mapper.Map<Event>(createModel);
         await eventSaveService.SaveAsync(createdEvent, photos);
         return Accepted();
     }
@@ -172,6 +179,19 @@ public class EventController : Controller
     {
         var id = Guid.NewGuid();
         return Ok(id);
+    }
+
+    private static bool IsContentTypesSupported(IFormFile[] files)
+    {
+        var supportedContentTypes = new [] { "image/bmp", "image/png", "image/jpeg" };
+        var contentTypes = files.Select(photo => photo.ContentType);
+        return contentTypes.All(supportedContentTypes.Contains);
+    }
+
+    private bool IsPhotosSizeLessThanRecommended(IFormFile[] photos)
+    {
+        var photosSize = photos.Sum(photo => photo.Length);
+        return photosSize >= rabbitMqConfig.RecommendedMessageSizeInBytes;
     }
 
     private static EventsFilterModel? ParseEventsFilterModel(string base64Model)
