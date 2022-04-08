@@ -8,10 +8,7 @@ public class EventFilterMapper : IEventFilterMapper
 {
     private readonly IEnumerable<IEventFilterFactory> factories;
 
-    public EventFilterMapper(IEnumerable<IEventFilterFactory> factories)
-    {
-        this.factories = factories;
-    }
+    public EventFilterMapper(IEnumerable<IEventFilterFactory> factories) => this.factories = factories;
 
     public EventsFilter Map(EventsFilterModel eventsFilterModel)
     {

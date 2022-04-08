@@ -105,17 +105,12 @@ public class EventController : Controller
     }
 
     [HttpPost("create")]
-    public IActionResult CreateEvent([FromBody] CreateEventModel createModel)
-    {
-        throw new NotImplementedException();
-    }
+    public IActionResult CreateEvent([FromBody] CreateEventModel createModel) => throw new NotImplementedException();
 
     // TODO use format https://datatracker.ietf.org/doc/html/rfc6902
     [HttpPatch("{eventId:guid}")]
-    public IActionResult UpdateEvent(Guid eventId, [FromBody] UpdateEventModel updateModel)
-    {
+    public IActionResult UpdateEvent(Guid eventId, [FromBody] UpdateEventModel updateModel) =>
         throw new NotImplementedException();
-    }
 
     [HttpDelete("{eventId:guid}")]
     public async Task<IActionResult> DeleteEvent(Guid eventId)

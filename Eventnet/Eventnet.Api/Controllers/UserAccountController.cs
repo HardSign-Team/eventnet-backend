@@ -3,11 +3,17 @@ using System.Security.Claims;
 using Eventnet.Api.Models.Authentication;
 using Eventnet.Api.Services;
 using Eventnet.DataAccess.Entities;
+using AutoMapper;
 using Eventnet.DataAccess.Models;
 using Eventnet.Domain;
+using Eventnet.Models;
+using Eventnet.Models.Authentication;
+using Eventnet.Models.Authentication.Tokens;
+using Eventnet.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace Eventnet.Api.Controllers;
 
@@ -18,18 +24,29 @@ public class UserAccountController : Controller
     private readonly CurrentUserService currentUserService;
     private readonly IJwtAuthService jwtAuthService;
     private readonly IEmailService emailService;
+    private readonly IMapper mapper;
+    private readonly IForgotPasswordService forgotPasswordService;
 
     public UserAccountController(UserManager<UserEntity> userManager,
         CurrentUserService currentUserService,
         IJwtAuthService jwtAuthService,
-        IEmailService emailService)
+        IEmailService emailService,
+        IMapper mapper,
+        IForgotPasswordService forgotPasswordService)
     {
         this.userManager = userManager;
         this.currentUserService = currentUserService;
         this.jwtAuthService = jwtAuthService;
         this.emailService = emailService;
+        this.mapper = mapper;
+        this.forgotPasswordService = forgotPasswordService;
     }
 
+    /// <summary>
+    /// Logins user
+    /// </summary>
+    /// <param name="loginModel">Login may be a userName or an email</param>
+    /// <returns></returns>
     [HttpPost("login")]
     [Produces(typeof(LoginResult))]
     public async Task<IActionResult> Login([FromBody] LoginModel loginModel)
@@ -40,64 +57,65 @@ public class UserAccountController : Controller
         var user = await userManager.FindByNameAsync(loginModel.Login)
             ?? await userManager.FindByEmailAsync(loginModel.Login);
 
-        if (user == null || !await userManager.CheckPasswordAsync(user, loginModel.Password))
-            return Unauthorized();
+        var passwordCorrect = await userManager.CheckPasswordAsync(user, loginModel.Password);
+        if (user is null || !passwordCorrect)
+            return NotFound();
 
         if (!user.EmailConfirmed)
-            return BadRequest(new { Status = "please confirm your email" });
+            return Unauthorized(new { Messge = "Email not confirmed" });
 
         var roles = await userManager.GetRolesAsync(user);
-        var authClaims = new List<Claim>
-        {
-            new(ClaimTypes.Name, user.UserName),
-            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
+        var claims = CreateClaims(user.UserName, roles);
 
-        authClaims.AddRange(roles
-            .Select(userRole => new Claim(ClaimTypes.Role, userRole)));
+        var (jwtSecurityToken, refreshToken) = jwtAuthService.GenerateTokens(user.UserName, claims, DateTime.Now);
 
-        var (jwtSecurityToken, refreshToken) = jwtAuthService.GenerateTokens(user.UserName, authClaims, DateTime.Now);
+        var userView = mapper.Map<UserViewModel>(user);
+        var tokens = new TokensViewModel(new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
+            jwtSecurityToken.ValidTo, refreshToken.TokenString);
 
         return Ok(new LoginResult(
-            new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
-            jwtSecurityToken.ValidTo,
-            refreshToken.TokenString,
-            user,
+            tokens,
+            userView,
             roles
         ));
     }
 
-    [HttpPost("logout")]
     [Authorize]
+    [HttpPost("logout")]
     public ActionResult Logout()
     {
         var userName = currentUserService.GetCurrentUserName();
 
-        if (userName == null)
+        if (userName is null)
             return Unauthorized();
 
         jwtAuthService.RemoveRefreshTokenByUserName(userName);
         return Ok();
     }
 
+    /// <summary>
+    /// Register user and send message with confirmation link to an email.
+    /// Link is "OriginHeader" + "/confirm"
+    /// </summary>
+    /// <param name="registerModel"></param>
+    /// <returns></returns>
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterModel registerModel)
     {
         if (!ModelState.IsValid)
             return UnprocessableEntity(ModelState);
 
-        var userExists = await userManager.FindByNameAsync(registerModel.UserName);
+        var userNameExists = await userManager.FindByNameAsync(registerModel.UserName);
 
-        if (userExists != null)
-            return BadRequest("User already exists");
+        if (userNameExists is not null)
+            return Conflict(nameof(registerModel.UserName));
 
-        var user = new UserEntity
-        {
-            Email = registerModel.Email,
-            SecurityStamp = Guid.NewGuid().ToString(),
-            UserName = registerModel.UserName,
-            PhoneNumber = registerModel.Phone
-        };
+        var emailExists = await userManager.FindByEmailAsync(registerModel.Email);
+
+        if (emailExists is not null)
+            return Conflict(nameof(registerModel.Email));
+
+        var user = mapper.Map<UserEntity>(registerModel);
 
         var result = await userManager.CreateAsync(user, registerModel.Password);
 
@@ -108,40 +126,48 @@ public class UserAccountController : Controller
 
         await SendEmailConfirmationMessageAsync(user);
 
-        // TODO: replace with CreatedAtAction when implement UserController 
-        return Ok(new RegisterResult("User created successfully. Please check your email", user));
+        return Ok();
     }
 
-    [HttpPost("change-password")]
+    /// <summary>
+    /// Changes user password.
+    /// Password mustn't match
+    /// </summary>
+    /// <param name="changePasswordModel"></param>
+    /// <returns></returns>
     [Authorize]
-    public async Task<IActionResult> ChangePassword([FromBody] RestorePasswordModel restorePasswordModel)
+    [HttpPost("change-password")]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordModel changePasswordModel)
     {
-        if (restorePasswordModel.OldPassword == restorePasswordModel.NewPassword)
-            return BadRequest("Passwords should be different");
+        if (changePasswordModel.OldPassword == changePasswordModel.NewPassword)
+            return UnprocessableEntity("Passwords should be different");
 
         var user = await currentUserService.GetCurrentUser();
 
-        if (user == null)
+        if (user is null)
             return NotFound();
 
         var changePasswordResult = await userManager.ChangePasswordAsync(user,
-            restorePasswordModel.OldPassword, restorePasswordModel.NewPassword);
+            changePasswordModel.OldPassword, changePasswordModel.NewPassword);
 
         if (!changePasswordResult.Succeeded)
-        {
-            var errors = string.Join(", ", changePasswordResult.Errors.Select(e => e.Description));
-            return BadRequest(errors);
-        }
+            return BadRequest(changePasswordResult.ToString());
 
         return Ok();
     }
 
-    [HttpGet("email-confirmation-message")]
+    /// <summary>
+    /// Just sends email confirmation message.
+    /// Link is "OriginHeader" + "/confirm"
+    /// </summary>
+    /// <param name="userName"></param>
+    /// <returns></returns>
+    [HttpPost("email-confirmation-message")]
     public async Task<IActionResult> SendEmailConfirmation(string userName)
     {
         var user = await userManager.FindByNameAsync(userName);
 
-        if (user == null)
+        if (user is null)
             return NotFound();
 
         await SendEmailConfirmationMessageAsync(user);
@@ -149,65 +175,122 @@ public class UserAccountController : Controller
         return Ok();
     }
 
+    /// <summary>
+    /// Verify that code is right and confirm email
+    /// </summary>
+    /// <param name="userId">Id from email redirect link</param>
+    /// <param name="code">Code from email redirect link</param>
+    /// <returns></returns>
     [HttpPost("confirm-email", Name = nameof(ConfirmEmail))]
     public async Task<IActionResult> ConfirmEmail(string userId, string code)
     {
         var user = await userManager.FindByIdAsync(userId);
-        if (user == null)
-            return BadRequest();
+        if (user is null)
+            return NotFound();
 
         var result = await userManager.ConfirmEmailAsync(user, code);
 
-        if (result.Succeeded)
-            return Ok("Email confirmed");
+        if (!result.Succeeded)
+            return BadRequest(result.ToString());
 
-        return BadRequest();
+        return Ok("Email Confirmed");
     }
 
-    [HttpPost("forgot-password")]
-    public async Task<IActionResult> ForgotPassword(ForgotPasswordModel model)
+    /// <summary>
+    /// Sends email message with code to user's mail
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    [HttpPost("password/forgot")]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordModel model)
     {
         var user = await userManager.FindByEmailAsync(model.Email);
 
-        if (user == null || !await userManager.IsEmailConfirmedAsync(user))
+        var emailConfirmed = await userManager.IsEmailConfirmedAsync(user);
+        if (user is null || !emailConfirmed)
             return NotFound(); // return NotFound to don't discover is email exists or not
 
-        var code = await userManager.GeneratePasswordResetTokenAsync(user);
-        var callbackUrl = Url.Link(nameof(ResetPassword), new { userId = user.Id, code });
-
-        // TODO: вместо resetPassword по идее должен быть линк на фронтовую страницу, где юзер будет вводить пароль
-
-        await emailService.SendEmailAsync(
-            user.Email,
-            "email confirmation",
-            $"Для сброса пароля пройдите по ссылке: <a href='{callbackUrl}'>link</a>");
+        await forgotPasswordService.SendCodeAsync(user.Email);
 
         return Ok();
     }
 
-    [HttpPost("reset-password", Name = nameof(ResetPassword))]
-    public async Task<IActionResult> ResetPassword(string userId, string code, string newPassword)
+    /// <summary>
+    /// Verify that code is exists and belongs to user
+    /// </summary>
+    /// <param name="email"></param>
+    /// <param name="code"></param>
+    /// <returns></returns>
+    [HttpGet("password/forgot/code")]
+    [Produces(typeof(bool))]
+    public IActionResult VerifyUserCode(string email, string code)
     {
-        var user = await userManager.FindByIdAsync(userId);
-        if (user == null)
+        return Ok(new { Status = forgotPasswordService.VerifyCode(email, code) });
+    }
+
+    /// <summary>
+    /// Remove user's password and set a new one
+    /// </summary>
+    /// <param name="restorePasswordModel"></param>
+    /// <returns></returns>
+    [HttpPost("password/reset")]
+    public async Task<IActionResult> ResetPassword(RestorePasswordModel restorePasswordModel)
+    {
+        if (!ModelState.IsValid)
+            return UnprocessableEntity(ModelState);
+
+        var user = await userManager.FindByEmailAsync(restorePasswordModel.Email);
+        if (user is null)
+            return NotFound();
+
+        if (!forgotPasswordService.VerifyCode(restorePasswordModel.Email, restorePasswordModel.Code))
             return BadRequest();
 
-        var result = await userManager.ResetPasswordAsync(user, code, newPassword);
-        if (result.Succeeded)
-            return Ok();
+        await userManager.RemovePasswordAsync(user);
+        var result = await userManager.AddPasswordAsync(user, restorePasswordModel.NewPassword);
+        
+        if (!result.Succeeded)
+            return BadRequest(result.ToString());
 
-        var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-        return BadRequest(errors);
+        return Ok();
+    }
+
+    private static IEnumerable<Claim> CreateClaims(string userName, IEnumerable<string> roles)
+    {
+        var authClaims = new List<Claim>
+        {
+            new(ClaimTypes.Name, userName),
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+        };
+
+        authClaims.AddRange(roles
+            .Select(userRole => new Claim(ClaimTypes.Role, userRole)));
+
+        return authClaims;
     }
 
     private async Task SendEmailConfirmationMessageAsync(UserEntity user)
     {
         var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
-        var callbackUrl = Url.Link(nameof(ConfirmEmail), new { userId = user.Id, code });
+        var clientAddress = GetClientAddress();
+
+        if (clientAddress is null)
+            throw new BadHttpRequestException("Origin header in request is required");
+
+        var query = new Dictionary<string, string> { { "userId", user.Id }, { "code", code } };
+        var uri = new Uri(QueryHelpers.AddQueryString(clientAddress + "/confirm", query!));
 
         await emailService.SendEmailAsync(
             user.Email,
-            "jopa",
-            $"Подтвердите регистрацию, перейдя по ссылке: <a href='{callbackUrl}'>link</a>");
+            "Подтверждение регистрации",
+            $"Подтвердите регистрацию, перейдя по ссылке: <a href='{uri}'>{uri}</a>");
+    }
+
+    private string? GetClientAddress()
+    {
+        var origin = HttpContext.Request.Headers.Origin;
+        var referer = HttpContext.Request.Headers.Referer;
+
+        return origin.FirstOrDefault() ?? referer.FirstOrDefault();
     }
 }

@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text;
 using Eventnet.Api.Config;
 using Eventnet.Api.Helpers.EventFilterFactories;
@@ -7,6 +8,7 @@ using Eventnet.DataAccess;
 using Eventnet.DataAccess.Entities;
 using Eventnet.Domain;
 using Eventnet.Infrastructure;
+using Eventnet.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +20,7 @@ var services = builder.Services;
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var jwtTokenConfig = builder.Configuration.GetSection("JWT").Get<JwtTokenConfig>();
 var emailConfig = builder.Configuration.GetSection("Email").Get<EmailConfiguration>();
-var corsName = "_myAllowSpecificOrigins";
+const string corsName = "_myAllowSpecificOrigins";
 
 services.AddSingleton(emailConfig);
 services.AddSingleton(jwtTokenConfig);
@@ -32,6 +34,9 @@ services.AddSingleton<IEventFilterFactory, OwnerFilterFactory>();
 services.AddSingleton<IEventFilterMapper, EventFilterMapper>();
 
 services.AddScoped<IEmailService, EmailService>();
+services.AddScoped<IForgotPasswordService, ForgotPasswordService>();
+
+services.AddMemoryCache();
 
 services.AddHttpContextAccessor();
 
@@ -46,7 +51,7 @@ services.AddAutoMapper(opt => opt.AddProfile<ApplicationMappingProfile>());
 
 services.AddCors(options =>
 {
-    options.AddPolicy(name: corsName,
+    options.AddPolicy(corsName,
         policyBuilder =>
         {
             policyBuilder
@@ -113,6 +118,8 @@ services.AddSwaggerGen(option =>
             new string[] { }
         }
     });
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    option.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 });
 
 var app = builder.Build();
