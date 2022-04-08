@@ -1,16 +1,17 @@
 ﻿using System.Text;
 using System.Text.Json;
 using AutoMapper;
+using Eventnet.Api.Helpers;
+using Eventnet.Api.Models;
+using Eventnet.Api.Services;
 using Eventnet.DataAccess;
-using Eventnet.Domain.Events.Selectors;
-using Eventnet.Helpers;
-using Eventnet.Models;
-using Eventnet.Services;
+using Eventnet.Domain.Events;
+using Eventnet.Domain.Selectors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using X.PagedList;
 
-namespace Eventnet.Controllers;
+namespace Eventnet.Api.Controllers;
 
 [Route("api/events")]
 public class EventController : Controller
@@ -50,7 +51,7 @@ public class EventController : Controller
         return Ok(mapper.Map<Event>(eventEntity));
     }
 
-    [HttpGet("search-by-name/{eventName}")]
+    [HttpGet("search/name/{eventName}")]
     public IActionResult GetEventsByName(string? eventName, [FromQuery(Name = "m")] int maxCount = 10)
     {
         eventName = eventName?.Trim();
@@ -64,8 +65,7 @@ public class EventController : Controller
 
         var selector = new EventsByNameSelector(eventName);
         var result = selector
-            .Select(dbContext.Events.AsEnumerable(), maxCount)
-            .Select(x => mapper.Map<EventNameModel>(x))
+            .Select(mapper.ProjectTo<EventName>(dbContext.Events).AsNoTracking().AsEnumerable(), maxCount)
             .ToArray();
 
         return Ok(new EventNameListModel(result.Length, result));
@@ -91,17 +91,17 @@ public class EventController : Controller
         pageNumber = NumberHelper.Normalize(pageNumber, 1);
         pageSize = NumberHelper.Normalize(pageSize, 1, MaxPageSize);
 
-        var query = dbContext.Events.AsNoTracking().AsEnumerable();
+        var query = dbContext.Events.AsNoTracking().AsEnumerable().Select(mapper.Map<Event>);
         var filter = filterMapper.Map(filterModel);
         var filteredEvents = filter.Filter(query);
 
-        var events = new PagedList<EventEntity>(filteredEvents, pageNumber, pageSize);
+        var events = new PagedList<Event>(filteredEvents, pageNumber, pageSize);
         var paginationHeader = events
             .ToPaginationHeader((p, ps) => GenerateEventsPageLink(filterModelBase64, p, ps));
 
         Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationHeader));
 
-        return Ok(mapper.Map<IEnumerable<Event>>(events));
+        return Ok(mapper.Map<IEnumerable<EventLocationModel>>(events));
     }
 
     [HttpPost("create")]

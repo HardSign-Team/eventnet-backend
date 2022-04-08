@@ -1,6 +1,4 @@
-﻿using Eventnet.DataAccess;
-
-namespace Eventnet.Domain.Events.Filters.EventFilters;
+﻿namespace Eventnet.Domain.Events.Filters.EventFilters;
 
 public class OwnerFilter : IEventFilter
 {
@@ -11,5 +9,5 @@ public class OwnerFilter : IEventFilter
         this.ownerId = ownerId;
     }
 
-    public bool Filter(EventEntity entity) => entity.OwnerId == ownerId;
+    public bool Filter(Event entity) => entity.OwnerId == ownerId;
 }

@@ -7,15 +7,15 @@ using System.Net.Http.Json;
 using System.Threading.Tasks;
 using AutoFixture;
 using Eventnet.Api.IntegrationTests.Helpers;
+using Eventnet.Api.Models;
 using Eventnet.Api.TestsUtils;
-using Eventnet.DataAccess;
-using Eventnet.Models;
+using Eventnet.DataAccess.Entities;
 using FluentAssertions;
 using NUnit.Framework;
 
 namespace Eventnet.Api.IntegrationTests.EventControllerTests;
 
-public class GetEventsByName : EventApiTestsBase
+public class GetEventsByNameShould : EventApiTestsBase
 {
     [SetUp]
     public void Setup()

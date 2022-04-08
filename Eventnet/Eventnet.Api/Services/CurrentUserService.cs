@@ -1,8 +1,8 @@
 ﻿using System.Security.Claims;
-using Eventnet.DataAccess;
+using Eventnet.DataAccess.Entities;
 using Microsoft.AspNetCore.Identity;
 
-namespace Eventnet.Services;
+namespace Eventnet.Api.Services;
 
 public class CurrentUserService
 {

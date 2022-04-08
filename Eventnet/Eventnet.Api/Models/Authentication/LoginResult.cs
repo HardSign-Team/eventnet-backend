@@ -1,5 +1,6 @@
-﻿using Eventnet.Models.Authentication.Tokens;
+﻿using Eventnet.Models;
+using Eventnet.Models.Authentication.Tokens;
 
-namespace Eventnet.Models.Authentication;
+namespace Eventnet.Api.Models.Authentication;
 
 public record LoginResult(TokensViewModel Tokens, UserViewModel User, IList<string> UserRoles);

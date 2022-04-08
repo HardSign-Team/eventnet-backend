@@ -2,13 +2,14 @@
 using AutoMapper;
 using Eventnet.Models;
 using Eventnet.Models.Authentication.Tokens;
-using Eventnet.Services;
+using Eventnet.Api.Models.Authentication.Tokens;
+using Eventnet.Api.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Eventnet.Controllers;
+namespace Eventnet.Api.Controllers;
 
 [Route("api/token")]
 public class TokenController : Controller
