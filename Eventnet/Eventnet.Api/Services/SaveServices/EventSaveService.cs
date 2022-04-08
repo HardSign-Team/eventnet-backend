@@ -17,11 +17,19 @@ public class EventSaveService : IEventSaveService
 
     public async Task SaveAsync(Event eventForSave, IFormFile[] photos)
     {
-        var streams = await GetStreamsAsync(photos);
-        var message = JsonSerializer.Serialize(new RabbitMqMessage(eventForSave, streams));
-        var saveEventResult = new SaveEventResult(EventSaveStatus.InProgress, string.Empty);
-        handler.Update(eventForSave.Id, saveEventResult);
-        await publishEventService.PublishAsync(message);
+        try
+        {
+            var streams = await GetRabbitMqPhotosAsync(photos);
+            var message = JsonSerializer.Serialize(new RabbitMqMessage(eventForSave, streams));
+            var saveEventResult = new SaveEventResult(EventSaveStatus.InProgress, string.Empty);
+            handler.Update(eventForSave.Id, saveEventResult);
+            await publishEventService.PublishAsync(message);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
     public SaveEventResult GetSaveEventResult(Guid id)
@@ -31,16 +39,16 @@ public class EventSaveService : IEventSaveService
         return saveEventResult;
     }
 
-    private static async Task<List<byte[]>> GetStreamsAsync(IFormFile[] photos)
+    private static async Task<List<RabbitMqPhoto>> GetRabbitMqPhotosAsync(IFormFile[] photos)
     {
-        var bytes = new List<byte[]>();
+        var rabbitMqPhoto = new List<RabbitMqPhoto>();
         foreach (var photo in photos)
         {
             await using var memoryStream = new MemoryStream();
             await photo.CopyToAsync(memoryStream);
-            bytes.Add(memoryStream.ToArray());
+            rabbitMqPhoto.Add(new RabbitMqPhoto(memoryStream.ToArray(), photo.ContentType));
         }
 
-        return bytes;
+        return rabbitMqPhoto;
     }
 }

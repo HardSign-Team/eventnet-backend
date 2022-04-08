@@ -1,6 +1,6 @@
-﻿using System.Drawing;
-using AutoMapper;
+﻿using AutoMapper;
 using Eventnet.DataAccess;
+using Eventnet.Domain;
 using Eventnet.Infrastructure.PhotoServices;
 using Eventnet.Models;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,7 +20,7 @@ public class SaveToDbService : ISaveToDbService
         this.mapper = mapper;
     }
 
-    public async Task SavePhotos(List<Image> photos, Guid eventId)
+    public async Task SavePhotos(List<Photo> photos, Guid eventId)
     {
         foreach (var photo in photos)
         {

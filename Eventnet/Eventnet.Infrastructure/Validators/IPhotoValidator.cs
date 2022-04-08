@@ -1,8 +1,8 @@
-﻿using System.Drawing;
+﻿using Eventnet.Domain;
 
 namespace Eventnet.Infrastructure.Validators;
 
 public interface IPhotoValidator
 {
-    EventCreationValidationResult Validate(List<Image> photos);
+    EventCreationValidationResult Validate(List<Photo> photos);
 }

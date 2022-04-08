@@ -1,8 +1,8 @@
-﻿using System.Drawing;
+﻿using Eventnet.Domain;
 
 namespace Eventnet.Infrastructure.PhotoServices;
 
 public interface IPhotoToStorageSaveService
 {
-    void Save(Image photo, Guid photoId);
+    void Save(Photo photo, Guid photoId);
 }

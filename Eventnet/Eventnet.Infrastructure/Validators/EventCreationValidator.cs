@@ -1,4 +1,4 @@
-﻿using System.Drawing;
+﻿using Eventnet.Domain;
 using Eventnet.Models;
 
 namespace Eventnet.Infrastructure.Validators;
@@ -14,14 +14,15 @@ public class EventCreationValidator : IEventCreationValidator
         this.eventValidator = eventValidator;
     }
 
-    public EventCreationValidationResult Validate(List<Image> photos, Event eventForValidation)
+    public EventCreationValidationResult Validate(List<Photo> photos, Event eventForValidation)
     {
         var (photoValidationResult, photoValidationErrorMessage) = photoValidator.Validate(photos);
         var (eventValidationResult, eventValidationErrorMessage) = eventValidator.Validate(eventForValidation);
         return new EventCreationValidationResult(photoValidationResult && eventValidationResult,
             FormatException(photoValidationErrorMessage, eventValidationErrorMessage)
-            );
+        );
     }
 
-    private static string FormatException(string photoErrorMessage, string eventErrorMessage) => (photoErrorMessage + " " + eventErrorMessage).Trim();
+    private static string FormatException(string photoErrorMessage, string eventErrorMessage) =>
+        (photoErrorMessage + " " + eventErrorMessage).Trim();
 }

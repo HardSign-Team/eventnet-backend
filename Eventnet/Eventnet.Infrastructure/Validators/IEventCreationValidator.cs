@@ -1,9 +1,9 @@
-﻿using System.Drawing;
+﻿using Eventnet.Domain;
 using Eventnet.Models;
 
 namespace Eventnet.Infrastructure.Validators;
 
 public interface IEventCreationValidator
 {
-    EventCreationValidationResult Validate(List<Image> photos, Event eventForValidation);
+    EventCreationValidationResult Validate(List<Photo> photos, Event eventForValidation);
 }

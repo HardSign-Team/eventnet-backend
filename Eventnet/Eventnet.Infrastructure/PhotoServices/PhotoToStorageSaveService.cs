@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using System.Drawing.Imaging;
+﻿using Eventnet.Domain;
 
 namespace Eventnet.Infrastructure.PhotoServices;
 
@@ -14,9 +13,9 @@ public class PhotoToStorageSaveService : IPhotoToStorageSaveService
             Directory.CreateDirectory(dirToSave);
     }
 
-    public void Save(Image photo, Guid photoId)
+    public void Save(Photo photo, Guid photoId)
     {
-        var path = Path.Combine(dirToSave, photoId + ".jpeg");
-        photo.Save(path, ImageFormat.Jpeg);
+        var path = Path.Combine(dirToSave, photoId.ToString());
+        photo.Save(path);
     }
 }
