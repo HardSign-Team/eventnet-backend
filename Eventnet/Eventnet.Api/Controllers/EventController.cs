@@ -118,7 +118,7 @@ public class EventController : Controller
 
     [HttpPost]
     [Authorize]
-    public async Task<IActionResult> CreateEvent([FromBody] CreateEventModel createModel)
+    public async Task<IActionResult> CreateEvent([FromForm] CreateEventModel createModel)
     {
         var photos = createModel.Photos;
 
