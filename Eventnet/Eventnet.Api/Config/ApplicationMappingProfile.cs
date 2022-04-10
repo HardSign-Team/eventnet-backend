@@ -4,7 +4,6 @@ using Eventnet.Api.Models.Authentication;
 using Eventnet.DataAccess.Entities;
 using Eventnet.Domain.Events;
 using Eventnet.Domain.Selectors;
-using Eventnet.Models;
 
 namespace Eventnet.Api.Config;
 

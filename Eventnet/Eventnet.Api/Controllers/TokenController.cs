@@ -1,6 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using AutoMapper;
-using Eventnet.Models;
+using Eventnet.Api.Models;
 using Eventnet.Models.Authentication.Tokens;
 using Eventnet.Api.Models.Authentication.Tokens;
 using Eventnet.Api.Services;
