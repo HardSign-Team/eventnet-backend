@@ -8,5 +8,5 @@ public class UserEntity : IdentityUser
     // ReSharper disable once UnusedAutoPropertyAccessor.Global
     public Gender Gender { get; set; }
     
-    public DateOnly BirthDate { get; set; }
+    public DateTime BirthDate { get; set; }
 }
