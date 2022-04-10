@@ -21,4 +21,7 @@ public class RegisterModel
     
     [Required]
     public Gender Gender { get; init; }
+    
+    [Required]
+    public DateOnly BirthDate { get; init; }
 }
