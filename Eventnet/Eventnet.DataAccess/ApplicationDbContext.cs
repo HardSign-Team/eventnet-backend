@@ -25,5 +25,6 @@ public class ApplicationDbContext : IdentityDbContext<UserEntity>
         builder.ApplyConfiguration(new UserRolesConfiguration());
         builder.ApplyConfiguration(new EventTagEntityConfiguration());
         builder.ApplyConfiguration(new TagEntityConfiguration());
+        builder.ApplyConfiguration(new UserEntityConfiguration());
     }
 }
