@@ -23,5 +23,6 @@ public class RegisterModel
     public Gender Gender { get; init; }
     
     [Required]
-    public DateOnly BirthDate { get; init; }
+    // ReSharper disable once UnusedAutoPropertyAccessor.Global
+    public DateTime BirthDate { get; init; }
 }
