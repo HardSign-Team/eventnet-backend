@@ -1,7 +1,9 @@
 ﻿using Eventnet.DataAccess.Configurations;
+using Eventnet.DataAccess.Converters;
 using Eventnet.DataAccess.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+
 // Context auto init own properties
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 #pragma warning disable CS8618
@@ -26,5 +28,18 @@ public class ApplicationDbContext : IdentityDbContext<UserEntity>
         builder.ApplyConfiguration(new EventTagEntityConfiguration());
         builder.ApplyConfiguration(new TagEntityConfiguration());
         builder.ApplyConfiguration(new UserEntityConfiguration());
+    }
+
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        base.ConfigureConventions(configurationBuilder);
+        
+        configurationBuilder.Properties<DateOnly>()
+            .HaveConversion<DateOnlyConverter>()
+            .HaveColumnType("date");
+        
+        configurationBuilder.Properties<DateOnly?>()
+            .HaveConversion<NullableDateOnlyConverter>()
+            .HaveColumnType("date");
     }
 }
