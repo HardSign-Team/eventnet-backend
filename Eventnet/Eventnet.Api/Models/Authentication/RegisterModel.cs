@@ -2,8 +2,20 @@
 
 namespace Eventnet.Api.Models.Authentication;
 
-public record RegisterModel(
-    string UserName,
-    [EmailAddress] string Email,
-    [DataType(DataType.Password)] string Password,
-    [Phone] string? Phone);
+public class RegisterModel
+{
+    [Required] public string UserName { get; init; } = null!;
+
+    [EmailAddress] [Required] public string Email { get; init; } = null!;
+    
+    [Phone] public string? PhoneNumber { get; init; } = null!;
+
+    [DataType(DataType.Password)]
+    [Compare(nameof(Password), ErrorMessage = "Password and ConfirmPassword must match.")]
+    [Required]
+    public string ConfirmPassword { get; init; } = null!;
+
+    [DataType(DataType.Password)]
+    [Required]
+    public string Password { get; init; } = null!;
+}

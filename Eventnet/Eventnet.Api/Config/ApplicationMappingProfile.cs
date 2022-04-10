@@ -21,8 +21,6 @@ public class ApplicationMappingProfile : Profile
         CreateProjection<UserEntity, UserNameModel>();
         CreateMap<UserEntity, UserViewModel>();
         CreateMap<RegisterModel, UserEntity>()
-            .ForMember(x => x.PhoneNumber,
-                opt => opt.MapFrom(x => x.Phone))
             .ForSourceMember(x => x.Password,
                 opt => opt.DoNotValidate());
     }
