@@ -18,4 +18,7 @@ public class RegisterModel
     [DataType(DataType.Password)]
     [Required]
     public string Password { get; init; } = null!;
+    
+    [Required]
+    public Gender Gender { get; init; }
 }
