@@ -19,6 +19,7 @@ public class ApplicationMappingProfile : Profile
         CreateProjection<TagEntity, TagName>();
         CreateMap<TagName, TagNameModel>();
         CreateProjection<UserEntity, UserNameModel>();
+        CreateMap<TagEntity, Tag>();
         CreateMap<UserEntity, UserViewModel>();
         CreateMap<RegisterModel, UserEntity>()
             .ForMember(x => x.PhoneNumber,

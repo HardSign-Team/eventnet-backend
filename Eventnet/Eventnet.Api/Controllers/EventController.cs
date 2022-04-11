@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using System.Text.Json;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Eventnet.Api.Helpers;
 using Eventnet.Api.Models;
 using Eventnet.Api.Services;
@@ -44,7 +45,9 @@ public class EventController : Controller
             return UnprocessableEntity(ModelState);
         }
 
-        var eventEntity = await dbContext.Events.FirstOrDefaultAsync(x => x.Id == eventId);
+        var eventEntity = await dbContext.Events
+            .Include(x => x.Tags)
+            .FirstOrDefaultAsync(x => x.Id == eventId);
         if (eventEntity is null)
             return NotFound();
 
@@ -91,7 +94,8 @@ public class EventController : Controller
         pageNumber = NumberHelper.Normalize(pageNumber, 1);
         pageSize = NumberHelper.Normalize(pageSize, 1, MaxPageSize);
 
-        var query = dbContext.Events.AsNoTracking().AsEnumerable().Select(mapper.Map<Event>);
+        var q = dbContext.Events.Include(x => x.Tags).AsNoTracking();
+        var query = q.AsEnumerable().Select(x => mapper.Map<Event>(x));
         var filter = filterMapper.Map(filterModel);
         var filteredEvents = filter.Filter(query);
 
