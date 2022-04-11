@@ -12,7 +12,6 @@ public class ApplicationDbContext : IdentityDbContext<UserEntity>
 {
     public DbSet<EventEntity> Events { get; set; }
     public DbSet<TagEntity> Tags { get; set; }
-    public DbSet<EventTagEntity> EventsTags { get; set; }
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
@@ -23,7 +22,6 @@ public class ApplicationDbContext : IdentityDbContext<UserEntity>
         base.OnModelCreating(builder);
         builder.ApplyConfiguration(new EventConfiguration());
         builder.ApplyConfiguration(new UserRolesConfiguration());
-        builder.ApplyConfiguration(new EventTagEntityConfiguration());
         builder.ApplyConfiguration(new TagEntityConfiguration());
     }
 }

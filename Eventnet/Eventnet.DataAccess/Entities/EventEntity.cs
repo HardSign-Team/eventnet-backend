@@ -16,8 +16,10 @@ public class EventEntity
     public string Name { get; set; }
     public string OwnerId { get; }
     public DateTime StartDate { get; set; }
+    public List<TagEntity> Tags { get; set; } = new();
 
-    private EventEntity(Guid id,
+    private EventEntity(
+        Guid id,
         string ownerId,
         DateTime startDate,
         DateTime? endDate,
@@ -32,7 +34,8 @@ public class EventEntity
         Description = description.Trim();
     }
 
-    public EventEntity(Guid id,
+    public EventEntity(
+        Guid id,
         string ownerId,
         DateTime startDate,
         DateTime? endDate,
