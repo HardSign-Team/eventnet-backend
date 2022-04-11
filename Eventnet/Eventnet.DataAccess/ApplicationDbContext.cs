@@ -21,6 +21,7 @@ public class ApplicationDbContext : IdentityDbContext<UserEntity>
     {
         base.OnModelCreating(builder);
         builder.ApplyConfiguration(new EventConfiguration());
+        builder.ApplyConfiguration(new SubscriptionEntityConfiguration());
         builder.ApplyConfiguration(new UserRolesConfiguration());
         builder.ApplyConfiguration(new TagEntityConfiguration());
     }
