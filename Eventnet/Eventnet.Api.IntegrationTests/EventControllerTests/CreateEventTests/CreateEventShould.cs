@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -29,7 +30,9 @@ public class CreateEventTestsShould : CreateEventTestsBase
     [Test]
     public async Task ResponseCode202_WhenEventIsCorrect()
     {
-        var response = await PostAsync(Guid.NewGuid(), Guid.NewGuid(), PathToPhoto, ImageMediaTypePng);
+        var photo = GetFileStream(PathToPhoto);
+        
+        var response = await PostAsync(Guid.NewGuid(), Guid.NewGuid(), photo, ImageMediaTypePng);
         
         response.StatusCode.Should().Be(HttpStatusCode.Accepted);
     }
@@ -37,15 +40,17 @@ public class CreateEventTestsShould : CreateEventTestsBase
     [Test]
     public async Task ResponseCode400_WhenFileTypeIsNotSupported()
     {
-        var response = await PostAsync(Guid.NewGuid(), Guid.NewGuid(), PathToText, TextMediaType);
+        var text = GetFileStream(PathToText);
+        
+        var response = await PostAsync(Guid.NewGuid(), Guid.NewGuid(), text, TextMediaType);
         
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
-    private async Task<HttpResponseMessage> PostAsync(Guid eventId, Guid ownerId, string filename, string mediaType)
+    private async Task<HttpResponseMessage> PostAsync(Guid eventId, Guid ownerId, FileStream fileStream, string mediaType)
     {
         var client = GetAuthorizedClient();
-        var multipart = GetEventCreationRequestMessage(eventId, ownerId, filename, mediaType);
+        var multipart = GetEventCreationRequestMessage(eventId, ownerId, fileStream, mediaType);
         var uri = new UriBuilder(Configuration.BaseUrl) { Path = BaseRoute }.Uri;
         return await client.PostAsync(uri, multipart);
     }
@@ -54,10 +59,11 @@ public class CreateEventTestsShould : CreateEventTestsBase
     public async Task SaveEvent_WhenAllCorrect()
     {
         var client = GetAuthorizedClient();
+        var photo = GetFileStream(PathToPhoto);
         
         var eventId = await GetEventGuid();
         
-        await PostAsync(eventId, Guid.NewGuid(), PathToPhoto, ImageMediaTypePng);
+        await PostAsync(eventId, Guid.NewGuid(), photo, ImageMediaTypePng);
         var saveToDbTime = Task.Delay(1000);
         await saveToDbTime;
         
@@ -69,6 +75,7 @@ public class CreateEventTestsShould : CreateEventTestsBase
 
         var eventEntity = ApplyToDb(context => context.Events.Find(eventId));
         eventEntity.Should().NotBeNull();
+        eventEntity!.Id.Should().Be(eventId);
     }
 
     [Test]
@@ -76,7 +83,9 @@ public class CreateEventTestsShould : CreateEventTestsBase
     {
         var client = GetAuthorizedClient();
         var eventId = Guid.NewGuid();
-        await PostAsync(eventId, Guid.NewGuid(), PathToPhoto, ImageMediaTypePng);
+        var photo = GetFileStream(PathToPhoto);
+        
+        await PostAsync(eventId, Guid.NewGuid(), photo, ImageMediaTypePng);
         var request = GetIsCreatedRequest(eventId);
         
         var response = await client.SendAsync(request);

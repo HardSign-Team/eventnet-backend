@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -54,7 +55,9 @@ public class CreateEventTestsBase : TestWithRabbitMqBase
         return Guid.Parse(guid.Replace("\"", ""));
     }
 
-    protected static MultipartFormDataContent GetEventCreationRequestMessage(Guid eventId, Guid ownerId, string filename, string mediaType)
+    protected static FileStream GetFileStream(string path) => File.OpenRead(path);
+
+    protected static MultipartFormDataContent GetEventCreationRequestMessage(Guid eventId, Guid ownerId, FileStream fileStream, string mediaType)
     {
         var multiContent = new MultipartFormDataContent()
         {
@@ -66,15 +69,16 @@ public class CreateEventTestsBase : TestWithRabbitMqBase
             { new StringContent("TestDescription"), "Description" },
             { new StringContent(JsonConvert.SerializeObject(new Location(0, 0))), "Location" }
         };
-        var fileStreamContent = GetFileStreamContent(filename, mediaType);
+        var fileStreamContent = GetFileStreamContent(fileStream, mediaType);
+        var filename = fileStream.Name.Split(Path.PathSeparator).Last();
         multiContent.Add(fileStreamContent, "Photos", filename);
         
         return multiContent;
     }
 
-    private static StreamContent GetFileStreamContent(string filename, string mediaType)
+    private static StreamContent GetFileStreamContent(FileStream fileStream, string mediaType)
     {
-        var content = new StreamContent(File.OpenRead(filename));
+        var content = new StreamContent(fileStream);
         content.Headers.ContentType = new MediaTypeHeaderValue(mediaType);
         return content;
     }
