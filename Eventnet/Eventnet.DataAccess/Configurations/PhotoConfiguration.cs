@@ -13,6 +13,6 @@ public class PhotoConfiguration : IEntityTypeConfiguration<PhotoEntity>
             .HasForeignKey(x => x.EventId)
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
-        builder.Property(x => x.EventId);
+            // builder.Property(x => x.EventId);
     }
 }
