@@ -3,7 +3,11 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using AutoFixture;
 using Eventnet.Api.IntegrationTests.Helpers;
+using Eventnet.Api.TestsUtils;
+using Eventnet.DataAccess.Entities;
+using Eventnet.DataAccess.Migrations;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -55,7 +59,9 @@ public class GetEventByIdShould : EventApiTestsBase
     [Test]
     public async Task ResponseCode200_WhenEventExists()
     {
-        var eventEntity = ApplyToDb(context => context.Events.First());
+        var eventEntity = EventEntityMother.CreateEventEntity();
+        var tags = new[] { "A", "B", "ccc" };
+        AddTags(eventEntity, tags);
         var request = new HttpRequestMessage();
         request.Method = HttpMethod.Get;
         request.RequestUri = BuildEventsByIdUri(eventEntity.Id);
@@ -73,7 +79,24 @@ public class GetEventByIdShould : EventApiTestsBase
             description = eventEntity.Description,
             startDate = eventEntity.StartDate,
             endDate = eventEntity.EndDate,
-            locationEntity = eventEntity.Location
+            locationEntity = eventEntity.Location,
+            tags = eventEntity.Tags,
         });
     }
+
+    private void AddTags(EventEntity eventEntity, string[] tags)
+    {
+        ApplyToDb(context =>
+        {
+            var tagEntities = tags.Select(x => new TagEntity(x)).ToArray();
+            context.Tags.AddRange(tagEntities);
+            context.SaveChanges();
+
+            eventEntity.Tags.AddRange(tagEntities);
+            context.Events.Add(eventEntity);
+            context.SaveChanges();
+        });
+    }
+
+   
 }

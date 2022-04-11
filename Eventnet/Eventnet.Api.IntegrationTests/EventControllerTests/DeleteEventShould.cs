@@ -48,7 +48,12 @@ public class DeleteEventShould : EventApiTestsBase
     [Test]
     public async Task ResponseCode200_WhenDeleteGuid()
     {
-        var eventEntity = ApplyToDb(context => context.Events.First());
+        var eventEntity = EventEntityMother.CreateEventEntity();;
+        ApplyToDb(context =>
+        {
+            context.Events.Add(eventEntity);
+            context.SaveChanges();
+        });
         var request = CreateDefaultRequest(eventEntity.Id);
 
         var response = await HttpClient.SendAsync(request);
