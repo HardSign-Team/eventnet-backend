@@ -49,7 +49,7 @@ public class GetTagsByNameShould : TagsApiTestsBase
             "aabbb",
             "aabbbb",
             "aabbbbb",
-            "aabbbbb",
+            "aabbbbb"
         });
         var request = CreateDefaultRequest("a", maxCount);
 

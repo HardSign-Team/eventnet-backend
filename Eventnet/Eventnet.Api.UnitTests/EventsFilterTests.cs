@@ -120,20 +120,17 @@ public class EventsFilterTests
             fixture.CreateEventStartedAt(new DateTime(2022, 2, 24))
         };
 
-        yield return new TestCaseData(
-                store,
+        yield return new TestCaseData(store,
                 new DateFilterModel(new DateTime(2016, 1, 1), DateEquality.Before),
                 store[..4])
             .SetName("Filter before start date");
 
-        yield return new TestCaseData(
-                store,
+        yield return new TestCaseData(store,
                 new DateFilterModel(new DateTime(2016, 1, 1), DateEquality.After),
                 store[4..])
             .SetName("Filter after start date");
 
-        yield return new TestCaseData(
-                store,
+        yield return new TestCaseData(store,
                 new DateFilterModel(new DateTime(2002, 1, 31), DateEquality.SameDay),
                 store[..2])
             .SetName("Filter same day start date");
@@ -165,20 +162,17 @@ public class EventsFilterTests
             fixture.CreateEventEndedAt(null)
         };
 
-        yield return new TestCaseData(
-                store,
+        yield return new TestCaseData(store,
                 new DateFilterModel(new DateTime(2016, 1, 1), DateEquality.Before),
                 store[..4])
             .SetName("Filter before end date");
 
-        yield return new TestCaseData(
-                store,
+        yield return new TestCaseData(store,
                 new DateFilterModel(new DateTime(2016, 1, 1), DateEquality.After),
                 store[4..6])
             .SetName("Filter after end date");
 
-        yield return new TestCaseData(
-                store,
+        yield return new TestCaseData(store,
                 new DateFilterModel(new DateTime(2002, 1, 31), DateEquality.SameDay),
                 store[..2])
             .SetName("Filter same day end date");

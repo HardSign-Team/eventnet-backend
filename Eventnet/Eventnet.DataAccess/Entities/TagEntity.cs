@@ -11,6 +11,8 @@ public class TagEntity
         Id = id;
         Name = name;
     }
-    
-    public TagEntity(string name) : this(0, name) {}
+
+    public TagEntity(string name) : this(0, name)
+    {
+    }
 }

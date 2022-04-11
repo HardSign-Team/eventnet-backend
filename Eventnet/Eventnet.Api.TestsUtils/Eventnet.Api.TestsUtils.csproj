@@ -8,12 +8,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AutoFixture" Version="4.17.0" />
+        <PackageReference Include="AutoFixture" Version="4.17.0"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Eventnet.DataAccess\Eventnet.DataAccess.csproj" />
-        <ProjectReference Include="..\Eventnet.Domain\Eventnet.Domain.csproj" />
+        <ProjectReference Include="..\Eventnet.DataAccess\Eventnet.DataAccess.csproj"/>
+        <ProjectReference Include="..\Eventnet.Domain\Eventnet.Domain.csproj"/>
     </ItemGroup>
 
 </Project>

@@ -2,6 +2,7 @@
 using Eventnet.DataAccess.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+
 // Context auto init own properties
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 #pragma warning disable CS8618

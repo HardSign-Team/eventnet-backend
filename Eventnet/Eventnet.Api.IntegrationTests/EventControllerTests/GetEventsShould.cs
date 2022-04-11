@@ -93,7 +93,6 @@ public class GetEventsShould : EventApiTestsBase
         pagination.PageSize.Should().BeGreaterOrEqualTo(MaxPageSize);
     }
 
-
     [TestCaseSource(nameof(GetInconsistentFilterRequests))]
     public async Task ResponseCode422_WhenInconsistentFilterParameters(EventsFilterModel eventsFilterModel)
     {
@@ -264,8 +263,10 @@ public class GetEventsShould : EventApiTestsBase
         return CreateDefaultRequestMessage(filterModel, pageNumber, pageSize);
     }
 
-    private HttpRequestMessage CreateDefaultRequestMessage(EventsFilterModel eventsFilterModel,
-        int? pageNumber = 1, int? pageSize = DefaultPageSize)
+    private HttpRequestMessage CreateDefaultRequestMessage(
+        EventsFilterModel eventsFilterModel,
+        int? pageNumber = 1,
+        int? pageSize = DefaultPageSize)
     {
         var request = new HttpRequestMessage();
         request.Method = HttpMethod.Get;
@@ -281,7 +282,6 @@ public class GetEventsShould : EventApiTestsBase
         var pagination = JsonConvert.DeserializeObject<Pagination>(paginationHeader);
         return pagination;
     }
-
 
     [SuppressMessage("ReSharper", "UnusedMember.Local")]
     [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Local")]

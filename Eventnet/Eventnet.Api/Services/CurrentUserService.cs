@@ -9,7 +9,8 @@ public class CurrentUserService
     private readonly IHttpContextAccessor httpContextAccessor;
     private readonly UserManager<UserEntity> userManager;
 
-    public CurrentUserService(IHttpContextAccessor httpContextAccessor,
+    public CurrentUserService(
+        IHttpContextAccessor httpContextAccessor,
         UserManager<UserEntity> userManager)
     {
         this.httpContextAccessor = httpContextAccessor;

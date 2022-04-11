@@ -7,6 +7,7 @@ using Eventnet.Api.Services;
 using FluentAssertions;
 using Microsoft.IdentityModel.Tokens;
 using NUnit.Framework;
+
 #pragma warning disable CS8618 TESTS
 
 namespace Eventnet.Api.UnitTests;
@@ -118,8 +119,7 @@ public class JwtAuthServiceShould
 
         var tokens = sut.GenerateTokens(userName, claims, now);
 
-        Assert.Throws<SecurityTokenException>(
-            () => sut.Refresh(tokens.RefreshToken.TokenString, "", now));
+        Assert.Throws<SecurityTokenException>(() => sut.Refresh(tokens.RefreshToken.TokenString, "", now));
     }
 
     [Test]
@@ -131,8 +131,7 @@ public class JwtAuthServiceShould
         var (jwtSecurityToken, refreshToken) = sut.GenerateTokens(userName, claims, now);
         var accessToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
 
-        Assert.Throws<SecurityTokenException>(
-            () => sut.Refresh(refreshToken.TokenString, accessToken, now));
+        Assert.Throws<SecurityTokenException>(() => sut.Refresh(refreshToken.TokenString, accessToken, now));
     }
 
     [Test]
@@ -147,8 +146,8 @@ public class JwtAuthServiceShould
         var (jwtSecurityToken, refreshToken) = sut.GenerateTokens(userName, claims, now);
         var accessToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
 
-        Assert.Throws<SecurityTokenException>(
-            () => sut.Refresh(refreshToken.TokenString, accessToken, now + TimeSpan.FromHours(2)));
+        Assert.Throws<SecurityTokenException>(()
+            => sut.Refresh(refreshToken.TokenString, accessToken, now + TimeSpan.FromHours(2)));
     }
 
     [Test]
@@ -165,7 +164,6 @@ public class JwtAuthServiceShould
 
         sut.RemoveRefreshTokenByUserName(userName);
 
-        Assert.Throws<SecurityTokenException>(
-            () => sut.Refresh(refreshToken.TokenString, accessToken, now));
+        Assert.Throws<SecurityTokenException>(() => sut.Refresh(refreshToken.TokenString, accessToken, now));
     }
 }

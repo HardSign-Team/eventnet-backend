@@ -1,9 +1,9 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using AutoMapper;
-using Eventnet.Models;
-using Eventnet.Models.Authentication.Tokens;
 using Eventnet.Api.Models.Authentication.Tokens;
 using Eventnet.Api.Services;
+using Eventnet.Models;
+using Eventnet.Models.Authentication.Tokens;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +18,8 @@ public class TokenController : Controller
     private readonly IMapper mapper;
     private readonly CurrentUserService currentUserService;
 
-    public TokenController(CurrentUserService currentUserService,
+    public TokenController(
+        CurrentUserService currentUserService,
         IJwtAuthService jwtAuthService,
         IMapper mapper)
     {
@@ -62,8 +63,7 @@ public class TokenController : Controller
             var (jwtSecurityToken, (_, tokenString, _)) =
                 jwtAuthService.Refresh(request.RefreshToken, accessToken, DateTime.Now);
 
-            return Ok(new TokensViewModel(
-                new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
+            return Ok(new TokensViewModel(new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
                 jwtSecurityToken.ValidTo,
                 tokenString));
         }

@@ -10,5 +10,4 @@ public class Utilities
         db.Tags.RemoveRange(db.Tags);
         db.SaveChanges();
     }
-
 }

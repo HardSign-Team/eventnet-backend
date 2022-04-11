@@ -10,4 +10,4 @@ public record Event(
     Location Location)
 {
     public Tag[] Tags { get; set; } = Array.Empty<Tag>();
-};
+}

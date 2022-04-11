@@ -3,11 +3,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using AutoFixture;
 using Eventnet.Api.IntegrationTests.Helpers;
-using Eventnet.Api.TestsUtils;
 using Eventnet.DataAccess.Entities;
-using Eventnet.DataAccess.Migrations;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -80,7 +77,7 @@ public class GetEventByIdShould : EventApiTestsBase
             startDate = eventEntity.StartDate,
             endDate = eventEntity.EndDate,
             locationEntity = eventEntity.Location,
-            tags = eventEntity.Tags,
+            tags = eventEntity.Tags
         });
     }
 
@@ -97,6 +94,4 @@ public class GetEventByIdShould : EventApiTestsBase
             context.SaveChanges();
         });
     }
-
-   
 }

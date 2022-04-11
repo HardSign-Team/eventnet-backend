@@ -9,9 +9,9 @@ services:
     environment:
       - ConnectionStrings__DefaultConnection=Server=db;Port=5432;Database=eventnet;User Id=postgres;Password=1234;
     ports:
-     - 5203:80
+      - 5203:80
     depends_on:
-     - db
+      - db
 
   db:
     image: postgres
@@ -22,6 +22,6 @@ services:
       - POSTGRES_PORT=5432
     volumes:
       - pg_data=/var/lib/postgresql/data
-    
+
 volumes:
   pg_data:

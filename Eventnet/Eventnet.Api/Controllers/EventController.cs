@@ -1,7 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json;
 using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using Eventnet.Api.Helpers;
 using Eventnet.Api.Models;
 using Eventnet.Api.Services;
