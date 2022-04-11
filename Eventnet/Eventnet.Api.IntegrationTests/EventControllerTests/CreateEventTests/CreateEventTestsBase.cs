@@ -132,7 +132,7 @@ public class CreateEventTestsBase : TestWithRabbitMqBase
         request.Method = HttpMethod.Get;
         request.RequestUri = new UriBuilder(Configuration.BaseUrl)
         {
-            Path = $"{BaseRoute}/guid"
+            Path = $"{BaseRoute}/request-event-creation"
         }.Uri;
         return request;
     }

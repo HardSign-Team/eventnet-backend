@@ -173,7 +173,7 @@ public class EventController : Controller
         return Ok(new { eventId });
     }
 
-    [HttpGet("guid")]
+    [HttpGet("request-event-creation")]
     [Authorize]
     public IActionResult GenerateEventGuid()
     {
