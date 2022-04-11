@@ -8,7 +8,6 @@ using Eventnet.DataAccess;
 using Eventnet.DataAccess.Entities;
 using Eventnet.Domain;
 using Eventnet.Infrastructure;
-using Eventnet.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

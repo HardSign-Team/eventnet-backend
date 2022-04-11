@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Eventnet.Models.Authentication;
+namespace Eventnet.Api.Models.Authentication;
 
 public record ChangePasswordModel(
     [DataType(DataType.Password)] string OldPassword,

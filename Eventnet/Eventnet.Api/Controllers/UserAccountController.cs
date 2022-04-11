@@ -1,15 +1,13 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using AutoMapper;
+using Eventnet.Api.Models;
 using Eventnet.Api.Models.Authentication;
+using Eventnet.Api.Models.Authentication.Tokens;
 using Eventnet.Api.Services;
 using Eventnet.DataAccess.Entities;
 using Eventnet.DataAccess.Models;
 using Eventnet.Domain;
-using Eventnet.Models;
-using Eventnet.Models.Authentication;
-using Eventnet.Models.Authentication.Tokens;
-using Eventnet.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
