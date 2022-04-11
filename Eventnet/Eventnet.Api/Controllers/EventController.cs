@@ -2,8 +2,9 @@
 using System.Text.Json;
 using AutoMapper;
 using Eventnet.Api.Helpers;
-using Eventnet.Api.Models;
-using Eventnet.Api.Services;
+using Eventnet.Api.Models.Events;
+using Eventnet.Api.Models.Filtering;
+using Eventnet.Api.Services.Filters;
 using Eventnet.DataAccess;
 using Eventnet.Domain.Events;
 using Eventnet.Domain.Selectors;

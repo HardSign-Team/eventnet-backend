@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Eventnet.Api.Models;
+namespace Eventnet.Api.Models.Events;
 
 public record UpdateEventModel(
     string Username,

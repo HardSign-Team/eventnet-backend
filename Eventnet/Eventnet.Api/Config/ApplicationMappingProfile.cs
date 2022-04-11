@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Eventnet.Api.Models;
 using Eventnet.Api.Models.Authentication;
+using Eventnet.Api.Models.Events;
+using Eventnet.Api.Models.Tags;
 using Eventnet.DataAccess.Entities;
 using Eventnet.Domain.Events;
 using Eventnet.Domain.Selectors;

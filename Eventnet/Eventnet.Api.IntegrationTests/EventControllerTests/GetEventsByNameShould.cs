@@ -7,7 +7,7 @@ using System.Net.Http.Json;
 using System.Threading.Tasks;
 using AutoFixture;
 using Eventnet.Api.IntegrationTests.Helpers;
-using Eventnet.Api.Models;
+using Eventnet.Api.Models.Events;
 using Eventnet.Api.TestsUtils;
 using Eventnet.DataAccess.Entities;
 using FluentAssertions;

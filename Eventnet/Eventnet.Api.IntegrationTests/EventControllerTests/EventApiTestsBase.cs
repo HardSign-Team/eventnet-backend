@@ -2,7 +2,7 @@
 using System.Text;
 using System.Web;
 using Eventnet.Api.IntegrationTests.Helpers;
-using Eventnet.Api.Models;
+using Eventnet.Api.Models.Filtering;
 using Microsoft.AspNetCore.Http.Extensions;
 using Newtonsoft.Json;
 

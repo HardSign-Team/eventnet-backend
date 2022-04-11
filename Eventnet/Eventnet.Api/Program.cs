@@ -4,6 +4,7 @@ using Eventnet.Api.Config;
 using Eventnet.Api.Helpers.EventFilterFactories;
 using Eventnet.Api.Models.Authentication.Tokens;
 using Eventnet.Api.Services;
+using Eventnet.Api.Services.Filters;
 using Eventnet.DataAccess;
 using Eventnet.DataAccess.Entities;
 using Eventnet.Domain;

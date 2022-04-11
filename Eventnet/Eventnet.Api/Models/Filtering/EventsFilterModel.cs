@@ -1,4 +1,4 @@
-﻿namespace Eventnet.Api.Models;
+﻿namespace Eventnet.Api.Models.Filtering;
 
 public class EventsFilterModel
 {
