@@ -2,7 +2,7 @@
 using Eventnet.DataAccess.Entities;
 using Eventnet.Domain.Events;
 
-namespace Eventnet.Api.TestsUtils;
+namespace Eventnet.TestsUtils;
 
 public static class FixtureExtensions
 {

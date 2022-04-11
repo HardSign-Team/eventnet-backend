@@ -1,7 +1,7 @@
 ﻿using AutoFixture;
 using Eventnet.Domain.Selectors;
 
-namespace Eventnet.Api.TestsUtils;
+namespace Eventnet.TestsUtils;
 
 public static class EventNameFixtureExtensions
 {

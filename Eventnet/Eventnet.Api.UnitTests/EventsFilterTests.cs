@@ -5,10 +5,10 @@ using AutoFixture;
 using Eventnet.Api.Helpers.EventFilterFactories;
 using Eventnet.Api.Models.Filtering;
 using Eventnet.Api.Services.Filters;
-using Eventnet.Api.TestsUtils;
 using Eventnet.Domain.Events;
 using Eventnet.Domain.Events.Filters;
 using Eventnet.Domain.Events.Filters.Data;
+using Eventnet.TestsUtils;
 using FluentAssertions;
 using NUnit.Framework;
 

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
 using AutoFixture;
-using Eventnet.Api.TestsUtils;
 using Eventnet.Domain.Selectors;
+using Eventnet.TestsUtils;
 using FluentAssertions;
 using NUnit.Framework;
 
