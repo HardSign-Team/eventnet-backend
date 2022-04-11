@@ -39,4 +39,9 @@ public static class FixtureExtensions
             fixture.Create<string>(),
             fixture.Create<Location>());
     }
+    
+    public static Event CreateEventWithTags(this Fixture fixture, Tag[] tags)
+    {
+        return fixture.Build<Event>().With(x => x.Tags, tags).Create();
+    }
 }

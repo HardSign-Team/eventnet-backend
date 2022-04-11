@@ -107,6 +107,42 @@ public class EventsFilterTests
         filteredEvents.Should().HaveCount(3);
     }
 
+    [Test]
+    public void Filter_ShouldFilterByTags()
+    {
+        var fixture = new Fixture();
+        var tags = new[]
+        {
+            new Tag(1, "gay"),
+            new Tag(2, "boynextdoor"),
+            new Tag(3, "dohomeworkpls"),
+            new Tag(4, "bonjourнаблевал"),
+            new Tag(5, "bonanнаблевал"),
+            new Tag(6, "иваннаблевал"),
+            new Tag(7, "максимнаблевал"),
+            new Tag(8, "артемнаблевал"),
+            new Tag(9, "мишанаблевал"),
+        };
+        var events = new[]
+        {
+            fixture.CreateEventWithTags(new[] { tags[0], tags[1], tags[2]} ),
+            fixture.CreateEventWithTags(new[] { tags[2], tags[1], tags[6]} ),
+            fixture.CreateEventWithTags(new[] { tags[1], tags[2], tags[7]} ),
+            fixture.CreateEventWithTags(new[] { tags[3], tags[5], tags[4]} ),
+            fixture.CreateEventWithTags(new[] { tags[7], tags[6], tags[5]} ),
+        };
+        var filterModel = new EventsFilterModel
+        {
+            Tags = new TagsFilterModel(new[] { tags[1].Id, tags[2].Id })
+        };
+        var sut = CreateDefaultService(filterModel);
+
+        var filteredEvents = sut.Filter(events).ToArray();
+
+        filteredEvents.Should().Equal(events[..3]);
+    }
+
+    
     public static IEnumerable<TestCaseData> GetFilterStartDateCases()
     {
         var fixture = new Fixture();
@@ -143,7 +179,8 @@ public class EventsFilterTests
             new LocationFilterFactory(),
             new StartDateFilterFactory(),
             new EndDateFilterFactory(),
-            new OwnerFilterFactory()
+            new OwnerFilterFactory(),
+            new TagsFilterFactory()
         });
         return mapper.Map(filterModel);
     }
