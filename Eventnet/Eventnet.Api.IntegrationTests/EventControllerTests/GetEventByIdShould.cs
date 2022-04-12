@@ -58,7 +58,9 @@ public class GetEventByIdShould : EventApiTestsBase
     {
         var eventEntity = EventEntityMother.CreateEventEntity();
         var tags = new[] { "A", "B", "ccc" };
+        var subscribers = new[] { "User1", "User2", "User3" };
         AddTags(eventEntity, tags);
+        AddSubscriptions(eventEntity, tags);
         var request = new HttpRequestMessage();
         request.Method = HttpMethod.Get;
         request.RequestUri = BuildEventsByIdUri(eventEntity.Id);
@@ -77,7 +79,8 @@ public class GetEventByIdShould : EventApiTestsBase
             startDate = eventEntity.StartDate,
             endDate = eventEntity.EndDate,
             locationEntity = eventEntity.Location,
-            tags = eventEntity.Tags
+            tags = eventEntity.Tags,
+            totalSubscriptions = subscribers.Length
         });
     }
 
@@ -90,7 +93,23 @@ public class GetEventByIdShould : EventApiTestsBase
             context.SaveChanges();
 
             eventEntity.Tags.AddRange(tagEntities);
-            context.Events.Add(eventEntity);
+            context.Events.Update(eventEntity);
+            context.SaveChanges();
+        });
+    }
+
+    private void AddSubscriptions(EventEntity eventEntity, string[] users)
+    {
+        ApplyToDb(context =>
+        {
+            var subscriptionEntities = users
+                .Select(user => new SubscriptionEntity(eventEntity.Id, user, DateTime.Now))
+                .ToArray();
+            context.SubscriptionEntities.AddRange(subscriptionEntities);
+            context.SaveChanges();
+            
+            eventEntity.Subscriptions.AddRange(subscriptionEntities);
+            context.Events.Update(eventEntity);
             context.SaveChanges();
         });
     }

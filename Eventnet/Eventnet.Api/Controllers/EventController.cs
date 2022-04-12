@@ -1,11 +1,13 @@
 ﻿using System.Text;
 using System.Text.Json;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Eventnet.Api.Helpers;
 using Eventnet.Api.Models.Events;
 using Eventnet.Api.Models.Filtering;
 using Eventnet.Api.Services.Filters;
 using Eventnet.DataAccess;
+using Eventnet.DataAccess.Entities;
 using Eventnet.Domain.Events;
 using Eventnet.Domain.Selectors;
 using Microsoft.AspNetCore.Mvc;
@@ -45,13 +47,16 @@ public class EventController : Controller
             return UnprocessableEntity(ModelState);
         }
 
-        var eventEntity = await dbContext.Events
+        var eventViewModel = await dbContext.Events
+            .AsNoTracking()
             .Include(x => x.Tags)
+            .Include(x => x.Subscriptions)
+            .ProjectTo<EventViewModel>(mapper.ConfigurationProvider)
             .FirstOrDefaultAsync(x => x.Id == eventId);
-        if (eventEntity is null)
+        if (eventViewModel is null)
             return NotFound();
 
-        return Ok(mapper.Map<Event>(eventEntity));
+        return Ok(eventViewModel);
     }
 
     [HttpGet("search/name/{eventName}")]

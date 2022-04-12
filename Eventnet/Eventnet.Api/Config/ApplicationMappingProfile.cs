@@ -15,12 +15,16 @@ public class ApplicationMappingProfile : Profile
     {
         CreateMap<EventEntity, Event>();
         CreateMap<EventEntity, EventName>();
+        CreateProjection<EventEntity, EventViewModel>()
+            .ForMember(x => x.TotalSubscriptions, 
+                opt => opt.MapFrom(entity => entity.Subscriptions.Count()));
         CreateMap<Event, EventLocationModel>();
         CreateMap<LocationEntity, Location>();
+        CreateMap<TagEntity, Tag>();
         CreateProjection<TagEntity, TagName>();
         CreateMap<TagName, TagNameModel>();
+        CreateProjection<TagEntity, TagNameModel>();
         CreateProjection<UserEntity, UserNameModel>();
-        CreateMap<TagEntity, Tag>();
         CreateMap<UserEntity, UserViewModel>();
         CreateMap<RegisterModel, UserEntity>()
             .ForMember(x => x.PhoneNumber,
