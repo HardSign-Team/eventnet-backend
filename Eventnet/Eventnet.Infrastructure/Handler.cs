@@ -10,17 +10,13 @@ public class Handler
     {
         this.cache = cache;
     }
+    
+    public bool ContainsGuid(Guid id) => cache.TryGetValue(id, out _);
 
     public void Update(Guid id, SaveEventResult value)
     {
-        cache.Set(id, value, TimeSpan.FromMinutes(2));
+        cache.Set(id, value, TimeSpan.FromMinutes(1));
     }
     
-    public bool TryGetValue(Guid id, out SaveEventResult result)
-    {
-        if (!cache.TryGetValue(id, out result))
-            return false;
-        cache.Remove(id);
-        return true;
-    }
+    public bool TryGetValue(Guid id, out SaveEventResult result) => cache.TryGetValue(id, out result);
 }
