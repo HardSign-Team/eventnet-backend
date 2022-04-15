@@ -5,6 +5,7 @@ using AutoMapper.QueryableExtensions;
 using Eventnet.Api.Helpers;
 using Eventnet.Api.Models.Events;
 using Eventnet.Api.Models.Filtering;
+using Eventnet.Api.Models.Tags;
 using Eventnet.Api.Services.Filters;
 using Eventnet.DataAccess;
 using Eventnet.DataAccess.Entities;
@@ -47,15 +48,33 @@ public class EventController : Controller
             return UnprocessableEntity(ModelState);
         }
 
-        var eventViewModel = await dbContext.Events
+        var entity = await dbContext.Events
             .AsNoTracking()
-            .Include(x => x.Tags)
-            .Include(x => x.Subscriptions)
-            .ProjectTo<EventViewModel>(mapper.ConfigurationProvider)
+            .Select(x=> new
+            {   
+                x.Id,
+                x.OwnerId,
+                x.Description,
+                x.Location,
+                x.StartDate,
+                x.EndDate,
+                x.Name,
+                x.Tags,
+                TotalSubscriptions = x.Subscriptions.Count(),
+            })
             .FirstOrDefaultAsync(x => x.Id == eventId);
-        if (eventViewModel is null)
+        if (entity is null)
             return NotFound();
-
+        var eventViewModel = new EventViewModel(
+            entity.Id,
+            entity.OwnerId,
+            entity.Name,
+            entity.Description,
+            mapper.Map<LocationViewModel>(entity.Location),
+            entity.StartDate,
+            entity.EndDate,
+            entity.Tags.Select(mapper.Map<TagNameModel>).ToArray(),
+            entity.TotalSubscriptions);
         return Ok(eventViewModel);
     }
 

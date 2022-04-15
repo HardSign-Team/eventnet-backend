@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using Eventnet.Api.IntegrationTests.Helpers;
 using Eventnet.DataAccess.Entities;
@@ -56,11 +57,27 @@ public class GetEventByIdShould : EventApiTestsBase
     [Test]
     public async Task ResponseCode200_WhenEventExists()
     {
-        var eventEntity = EventEntityMother.CreateEventEntity();
-        var tags = new[] { "A", "B", "ccc" };
-        var subscribers = new[] { "User1", "User2", "User3" };
-        AddTags(eventEntity, tags);
-        AddSubscriptions(eventEntity, tags);
+        var eventEntity = ApplyToDb(context =>
+        {
+            context.AddUsers();
+            context.AddEvents();
+            context.AddTags();
+
+            var entity = context.Events.First();
+            var tagEntities = context.Tags.Take(6).ToArray();
+            var subscribers = context.Users.Take(3).ToArray();
+
+            foreach (var subscriber in subscribers)
+            {
+                entity.Subscribe(subscriber);
+            }
+            foreach (var tag in tagEntities)
+            {
+                entity.AddTag(tag);
+            }
+            context.SaveChanges();
+            return entity;
+        });
         var request = new HttpRequestMessage();
         request.Method = HttpMethod.Get;
         request.RequestUri = BuildEventsByIdUri(eventEntity.Id);
@@ -78,39 +95,9 @@ public class GetEventByIdShould : EventApiTestsBase
             description = eventEntity.Description,
             startDate = eventEntity.StartDate,
             endDate = eventEntity.EndDate,
-            locationEntity = eventEntity.Location,
+            location = eventEntity.Location,
             tags = eventEntity.Tags,
-            totalSubscriptions = subscribers.Length
-        });
-    }
-
-    private void AddTags(EventEntity eventEntity, string[] tags)
-    {
-        ApplyToDb(context =>
-        {
-            var tagEntities = tags.Select(x => new TagEntity(x)).ToArray();
-            context.Tags.AddRange(tagEntities);
-            context.SaveChanges();
-
-            eventEntity.Tags.AddRange(tagEntities);
-            context.Events.Update(eventEntity);
-            context.SaveChanges();
-        });
-    }
-
-    private void AddSubscriptions(EventEntity eventEntity, string[] users)
-    {
-        ApplyToDb(context =>
-        {
-            var subscriptionEntities = users
-                .Select(user => new SubscriptionEntity(eventEntity.Id, user, DateTime.Now))
-                .ToArray();
-            context.SubscriptionEntities.AddRange(subscriptionEntities);
-            context.SaveChanges();
-            
-            eventEntity.Subscriptions.AddRange(subscriptionEntities);
-            context.Events.Update(eventEntity);
-            context.SaveChanges();
+            totalSubscriptions = eventEntity.Subscriptions.Count
         });
     }
 }
