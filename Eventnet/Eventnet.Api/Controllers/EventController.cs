@@ -132,7 +132,13 @@ public class EventController : Controller
             var recommendedSizeInMb = rabbitMqConfig.RecommendedMessageSizeInBytes / 1024 / 1024;
             return BadRequest($"Too large images. Recommended size of all images is {recommendedSizeInMb}Mb.");
         }
-        
+
+        var isSaved = await IsEventSaved(createModel.Id);
+        if (IsEventInProcess(createModel.Id) || isSaved)
+        {
+            return BadRequest("One event id provided two times");
+        }
+
         var createdEvent = mapper.Map<Event>(createModel);
         await eventSaveService.SaveAsync(createdEvent, photos);
         return Accepted();
@@ -192,6 +198,14 @@ public class EventController : Controller
     {
         var photosSize = photos.Sum(photo => photo.Length);
         return photosSize >= rabbitMqConfig.RecommendedMessageSizeInBytes;
+    }
+    
+    private bool IsEventInProcess(Guid id) => eventSaveService.ContainsGuid(id);
+
+    private async Task<bool> IsEventSaved(Guid id)
+    {
+        var eventInDb =  await dbContext.Events.FindAsync(id);
+        return eventInDb is not null;
     }
 
     private static EventsFilterModel? ParseEventsFilterModel(string base64Model)
