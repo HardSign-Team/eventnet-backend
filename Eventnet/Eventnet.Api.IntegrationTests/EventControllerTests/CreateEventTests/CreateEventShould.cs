@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -46,13 +47,17 @@ public class CreateEventTestsShould : CreateEventTestsBase
         
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
-
-    private async Task<HttpResponseMessage> PostAsync(Guid eventId, Guid ownerId, FileStream fileStream, string mediaType)
+    
+    [Test]
+    public async Task ResponseCode400_WhenSameIdProvidedTwoTimes()
     {
-        var client = GetAuthorizedClient();
-        var multipart = GetEventCreationRequestMessage(eventId, ownerId, fileStream, mediaType);
-        var uri = new UriBuilder(Configuration.BaseUrl) { Path = BaseRoute }.Uri;
-        return await client.PostAsync(uri, multipart);
+        var photo = GetFileStream(PathToPhoto);
+
+        var id = Guid.NewGuid();
+        await PostAsync(id, Guid.NewGuid(), photo, ImageMediaTypePng);
+        var response2 = await PostAsync(id, Guid.NewGuid(), photo, ImageMediaTypePng);
+        
+        response2.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Test]
@@ -76,6 +81,9 @@ public class CreateEventTestsShould : CreateEventTestsBase
         var eventEntity = ApplyToDb(context => context.Events.Find(eventId));
         eventEntity.Should().NotBeNull();
         eventEntity!.Id.Should().Be(eventId);
+
+        var photoEntities = ApplyToDb(context => context.Photos.ToList()).Where(x => x.EventId == eventId);
+        photoEntities.Should().NotBeNull();
     }
 
     [Test]
@@ -92,8 +100,7 @@ public class CreateEventTestsShould : CreateEventTestsBase
         
         response.StatusCode.Should().Be(HttpStatusCode.Accepted);
     }
-    
-    
+
     [Test]
     public async Task IsCreatedResponseCode400_WhenUnknownGuid()
     {
@@ -104,5 +111,13 @@ public class CreateEventTestsShould : CreateEventTestsBase
         var response = await client.SendAsync(request);
         
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+    
+    private async Task<HttpResponseMessage> PostAsync(Guid eventId, Guid ownerId, FileStream fileStream, string mediaType)
+    {
+        var client = GetAuthorizedClient();
+        var multipart = GetEventCreationRequestMessage(eventId, ownerId, fileStream, mediaType);
+        var uri = new UriBuilder(Configuration.BaseUrl) { Path = BaseRoute }.Uri;
+        return await client.PostAsync(uri, multipart);
     }
 }
