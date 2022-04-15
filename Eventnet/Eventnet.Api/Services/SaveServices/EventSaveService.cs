@@ -17,20 +17,24 @@ public class EventSaveService : IEventSaveService
 
     public async Task SaveAsync(Event eventForSave, IFormFile[] photos)
     {
+        var saveEventResult = new SaveEventResult(EventSaveStatus.InProgress, string.Empty);
+        handler.Update(eventForSave.Id, saveEventResult);
         try
         {
-            var streams = await GetRabbitMqPhotosAsync(photos);
-            var message = JsonSerializer.Serialize(new RabbitMqMessage(eventForSave, streams));
-            var saveEventResult = new SaveEventResult(EventSaveStatus.InProgress, string.Empty);
-            handler.Update(eventForSave.Id, saveEventResult);
+            var rabbitMqPhotos = await GetRabbitMqPhotosAsync(photos);
+            var message = JsonSerializer.Serialize(new RabbitMqMessage(eventForSave, rabbitMqPhotos));
             await publishEventService.PublishAsync(message);
         }
         catch (Exception e)
         {
+            saveEventResult = new SaveEventResult(EventSaveStatus.NotSavedDueToServerError, string.Empty);
+            handler.Update(eventForSave.Id, saveEventResult);
             Console.WriteLine(e);
             throw;
         }
     }
+
+    public bool ContainsGuid(Guid id) => handler.ContainsGuid(id);
 
     public SaveEventResult GetSaveEventResult(Guid id)
     {

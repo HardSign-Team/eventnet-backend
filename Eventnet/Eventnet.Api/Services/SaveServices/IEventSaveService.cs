@@ -7,4 +7,5 @@ public interface IEventSaveService
 {
     Task SaveAsync(Event eventForSave, IFormFile[] photos);
     SaveEventResult GetSaveEventResult(Guid id);
+    bool ContainsGuid(Guid id);
 }
