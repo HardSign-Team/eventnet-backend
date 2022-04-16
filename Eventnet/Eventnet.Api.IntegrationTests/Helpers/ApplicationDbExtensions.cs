@@ -14,29 +14,29 @@ public static class ApplicationDbExtensions
     {
         Utilities.ReinitializeDbForTests(db);
     }
-    
+
     public static void AddUsers(this ApplicationDbContext db)
     {
         var users = new[]
         {
-            new UserEntity()
+            new UserEntity
             {
                 UserName = "gODeaLOAple",
                 PasswordHash = "jopabonana",
                 Email = "gODeaLOAple@gmail.com"
             },
-            new UserEntity()
+            new UserEntity
             {
                 UserName = "lapagovna",
                 PasswordHash = "jopabonana",
                 Email = "lapagovna@gmail.com"
             },
-            new UserEntity()
+            new UserEntity
             {
                 UserName = "iva",
                 PasswordHash = "jopabonana",
                 Email = "iva@gmail.com"
-            },
+            }
         };
         db.Users.AddRange(users);
         db.SaveChanges();
@@ -74,7 +74,7 @@ public static class ApplicationDbExtensions
                 DateTime.Now + TimeSpan.FromDays(10),
                 "Event4",
                 "No description",
-                new LocationEntity(56.81787873103509, 60.54074620394152)),
+                new LocationEntity(56.81787873103509, 60.54074620394152))
         };
         db.Events.AddRange(events);
         db.SaveChanges();
@@ -89,7 +89,7 @@ public static class ApplicationDbExtensions
             new TagEntity("Tag3"),
             new TagEntity("Tag4"),
             new TagEntity("Tag5"),
-            new TagEntity("Tag6"),
+            new TagEntity("Tag6")
         };
         db.Tags.AddRange(tags);
         db.SaveChanges();

@@ -1,14 +1,12 @@
 ﻿using System.Text;
 using System.Text.Json;
 using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using Eventnet.Api.Helpers;
 using Eventnet.Api.Models.Events;
 using Eventnet.Api.Models.Filtering;
 using Eventnet.Api.Models.Tags;
 using Eventnet.Api.Services.Filters;
 using Eventnet.DataAccess;
-using Eventnet.DataAccess.Entities;
 using Eventnet.Domain.Events;
 using Eventnet.Domain.Selectors;
 using Microsoft.AspNetCore.Mvc;
@@ -50,8 +48,8 @@ public class EventController : Controller
 
         var entity = await dbContext.Events
             .AsNoTracking()
-            .Select(x=> new
-            {   
+            .Select(x => new
+            {
                 x.Id,
                 x.OwnerId,
                 x.Description,
@@ -60,13 +58,12 @@ public class EventController : Controller
                 x.EndDate,
                 x.Name,
                 x.Tags,
-                TotalSubscriptions = x.Subscriptions.Count(),
+                TotalSubscriptions = x.Subscriptions.Count()
             })
             .FirstOrDefaultAsync(x => x.Id == eventId);
         if (entity is null)
             return NotFound();
-        var eventViewModel = new EventViewModel(
-            entity.Id,
+        var eventViewModel = new EventViewModel(entity.Id,
             entity.OwnerId,
             entity.Name,
             entity.Description,

@@ -20,7 +20,7 @@ public class SubscriptionsApiTestsBase : TestsBase
     {
         ApplyToDb(context => context.Clear());
     }
-    
+
     protected Uri BuildCountOnEventUri(string? eventId)
     {
         var uriBuilder = new UriBuilder(Configuration.BaseUrl)
@@ -38,7 +38,7 @@ public class SubscriptionsApiTestsBase : TestsBase
         };
         return uriBuilder.Uri;
     }
-    
+
     protected Uri BuildUnsubscribeQuery(Guid eventId)
     {
         var uriBuilder = new UriBuilder(Configuration.BaseUrl)
@@ -47,7 +47,7 @@ public class SubscriptionsApiTestsBase : TestsBase
         };
         return uriBuilder.Uri;
     }
-    
+
     protected async Task<(UserEntity, HttpClient)> CreateAuthorizedClient(string username, string password)
     {
         var factory = GetScopeFactory();
@@ -59,6 +59,7 @@ public class SubscriptionsApiTestsBase : TestsBase
             var registerModel = new RegisterModel(username, $"{username}@test.com", password, null);
             user = await AuthorizationHelper.RegisterUserAsync(userManager, registerModel);
         }
+
         var client = await AuthorizationHelper.AuthorizeClient(HttpClient, username, password);
         return (user, client);
     }

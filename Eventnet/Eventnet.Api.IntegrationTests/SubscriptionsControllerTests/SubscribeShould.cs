@@ -29,7 +29,6 @@ public class SubscribeShould : SubscriptionsApiTestsBase
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 
-
     [Test]
     public async Task Response404_WhenEventNotFound()
     {
@@ -60,7 +59,7 @@ public class SubscribeShould : SubscriptionsApiTestsBase
 
         response.StatusCode.Should().Be(HttpStatusCode.Conflict);
     }
-    
+
     [Test]
     public async Task Response409_WhenEventEnded()
     {
@@ -97,9 +96,9 @@ public class SubscribeShould : SubscriptionsApiTestsBase
         for (var i = 0; i < n; i++)
         {
             var request = BuildSubscribeRequest(entity.Id);
-            
+
             var response = await client.SendAsync(request);
-            
+
             response.StatusCode.Should().Be(HttpStatusCode.OK);
             var model = response.ReadContentAs<SubscriptionsCountViewModel>();
             model.EventId.Should().Be(entity.Id);
@@ -126,6 +125,7 @@ public class SubscribeShould : SubscriptionsApiTestsBase
 
         subscription2.SubscriptionDate.Should().BeAfter(subscription1.SubscriptionDate);
     }
-    
-    private HttpRequestMessage BuildSubscribeRequest(Guid entityId) => new(HttpMethod.Post, BuildSubscribeQuery(entityId));
+
+    private HttpRequestMessage BuildSubscribeRequest(Guid entityId)
+        => new(HttpMethod.Post, BuildSubscribeQuery(entityId));
 }

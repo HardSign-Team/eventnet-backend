@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net.Http;
 using Eventnet.DataAccess;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -13,7 +12,7 @@ public class TestsBase
     private readonly WebApplicationFactory<Program> factory = new TestWebApplicationFactory<Program>();
 
     protected IServiceScopeFactory GetScopeFactory() => factory.Services.GetService<IServiceScopeFactory>()!;
-    
+
     protected void ApplyToDb(Action<ApplicationDbContext> action)
     {
         var scopeFactory = factory.Services.GetService<IServiceScopeFactory>();

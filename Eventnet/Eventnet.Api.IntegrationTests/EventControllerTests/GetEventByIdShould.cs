@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Mime;
 using System.Threading.Tasks;
 using Eventnet.Api.IntegrationTests.Helpers;
 using Eventnet.DataAccess.Entities;
@@ -97,10 +96,12 @@ public class GetEventByIdShould : EventApiTestsBase
             {
                 entity.Subscribe(subscriber);
             }
+
             foreach (var tag in tagEntities)
             {
                 entity.AddTag(tag);
             }
+
             context.SaveChanges();
             return entity;
         });

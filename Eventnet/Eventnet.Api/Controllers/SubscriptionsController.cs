@@ -37,9 +37,9 @@ public class SubscriptionsController : Controller
 
         if (eventEntity.EndDate.GetValueOrDefault(eventEntity.StartDate) < DateTime.Now)
             return Conflict("Event had been ended.");
-        
+
         var user = await currentUserService.GetCurrentUser();
-        if (user is null) 
+        if (user is null)
             return Unauthorized();
 
         dbContext.SubscriptionEntities.RemoveRange(
@@ -47,10 +47,10 @@ public class SubscriptionsController : Controller
         var subscription = new SubscriptionEntity(eventId, user.Id, DateTime.Now);
         dbContext.SubscriptionEntities.Add(subscription);
         await dbContext.SaveChangesAsync();
-        
+
         return await GetSubscriptionsCount(eventId);
     }
-    
+
     [Authorize]
     [HttpPost("unsubscribe/{eventId}")]
     public async Task<IActionResult> UnSubscribe(Guid eventId)
@@ -64,18 +64,18 @@ public class SubscriptionsController : Controller
 
         if (eventEntity.EndDate.GetValueOrDefault(eventEntity.StartDate) < DateTime.Now)
             return Conflict("Event had been ended.");
-        
+
         var user = await currentUserService.GetCurrentUser();
-        if (user is null) 
+        if (user is null)
             return Unauthorized();
 
         dbContext.SubscriptionEntities.RemoveRange(
             dbContext.SubscriptionEntities.Where(x => x.EventId == eventId && x.UserId == user.Id));
         await dbContext.SaveChangesAsync();
-        
+
         return await GetSubscriptionsCount(eventId);
     }
-    
+
     [HttpGet("count/{eventId}")]
     public async Task<IActionResult> GetSubscriptionsCount(Guid eventId)
     {
@@ -85,14 +85,14 @@ public class SubscriptionsController : Controller
         var result = await dbContext.Events
             .Select(x => new
             {
-                x.Id, 
+                x.Id,
                 SubscriptionsCount = x.Subscriptions.Count()
             })
             .FirstOrDefaultAsync(x => x.Id == eventId);
 
         if (result is null)
             return NotFound();
-        
+
         return Ok(new SubscriptionsCountViewModel(result.Id, result.SubscriptionsCount));
     }
 }

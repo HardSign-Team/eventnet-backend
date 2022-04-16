@@ -28,7 +28,6 @@ public class UnsubscribeShould : SubscriptionsApiTestsBase
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 
-
     [Test]
     public async Task Response404_WhenEventNotFound()
     {
@@ -59,7 +58,7 @@ public class UnsubscribeShould : SubscriptionsApiTestsBase
 
         response.StatusCode.Should().Be(HttpStatusCode.Conflict);
     }
-    
+
     [Test]
     public async Task Response409_WhenEventEnded()
     {
@@ -128,6 +127,7 @@ public class UnsubscribeShould : SubscriptionsApiTestsBase
         model.EventId.Should().Be(entity.Id);
         model.Count.Should().Be(0);
     }
-    
-    private HttpRequestMessage BuildUnsubscribeRequest(Guid entityId) => new(HttpMethod.Post, BuildUnsubscribeQuery(entityId));
+
+    private HttpRequestMessage BuildUnsubscribeRequest(Guid entityId)
+        => new(HttpMethod.Post, BuildUnsubscribeQuery(entityId));
 }

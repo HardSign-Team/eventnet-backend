@@ -51,6 +51,7 @@ public class GetSubscriptionsCountShould : SubscriptionsApiTestsBase
             count = eventEntity.Subscriptions.Count
         });
     }
-    
-    private HttpRequestMessage CreateCountRequest(string? eventId) => new(HttpMethod.Get, BuildCountOnEventUri(eventId));
+
+    private HttpRequestMessage CreateCountRequest(string? eventId)
+        => new(HttpMethod.Get, BuildCountOnEventUri(eventId));
 }
