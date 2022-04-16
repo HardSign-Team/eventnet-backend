@@ -10,7 +10,7 @@ using NUnit.Framework;
 
 namespace Eventnet.Api.IntegrationTests.EventControllerTests.CreateEventTests;
 
-public class CreateEventTestsShould : CreateEventTestsBase
+public class CreateEventShould : CreateEventTestsBase
 {
     private const string PathToPhoto = "test.png";
     private const string PathToText = "notImage.txt";

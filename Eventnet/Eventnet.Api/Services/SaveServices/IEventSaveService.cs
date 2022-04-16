@@ -5,7 +5,7 @@ namespace Eventnet.Services.SaveServices;
 
 public interface IEventSaveService
 {
-    Task SaveAsync(Event eventForSave, IFormFile[] photos);
+    Task RequestSave(Event eventForSave, IFormFile[] photos);
     SaveEventResult GetSaveEventResult(Guid id);
-    bool ContainsGuid(Guid id);
+    bool IsHandling(Guid id);
 }

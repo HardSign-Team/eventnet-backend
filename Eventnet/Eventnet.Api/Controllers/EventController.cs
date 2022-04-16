@@ -134,13 +134,13 @@ public class EventController : Controller
         }
 
         var isSaved = await IsEventSaved(createModel.Id);
-        if (IsEventInProcess(createModel.Id) || isSaved)
+        if (WhetherSaveEventBeingHandling(createModel.Id) || isSaved)
         {
             return BadRequest("One event id provided two times");
         }
 
         var createdEvent = mapper.Map<Event>(createModel);
-        await eventSaveService.SaveAsync(createdEvent, photos);
+        await eventSaveService.RequestSave(createdEvent, photos);
         return Accepted();
     }
 
@@ -200,7 +200,7 @@ public class EventController : Controller
         return photosSize >= rabbitMqConfig.RecommendedMessageSizeInBytes;
     }
     
-    private bool IsEventInProcess(Guid id) => eventSaveService.ContainsGuid(id);
+    private bool WhetherSaveEventBeingHandling(Guid id) => eventSaveService.IsHandling(id);
 
     private async Task<bool> IsEventSaved(Guid id)
     {

@@ -11,7 +11,7 @@ public class Handler
         this.cache = cache;
     }
     
-    public bool ContainsGuid(Guid id) => cache.TryGetValue(id, out _);
+    public bool IsHandling(Guid id) => cache.TryGetValue(id, out _);
 
     public void Update(Guid id, SaveEventResult value)
     {

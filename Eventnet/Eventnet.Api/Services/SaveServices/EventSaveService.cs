@@ -15,7 +15,7 @@ public class EventSaveService : IEventSaveService
         this.handler = handler;
     }
 
-    public async Task SaveAsync(Event eventForSave, IFormFile[] photos)
+    public async Task RequestSave(Event eventForSave, IFormFile[] photos)
     {
         var saveEventResult = new SaveEventResult(EventSaveStatus.InProgress, string.Empty);
         handler.Update(eventForSave.Id, saveEventResult);
@@ -34,7 +34,7 @@ public class EventSaveService : IEventSaveService
         }
     }
 
-    public bool ContainsGuid(Guid id) => handler.ContainsGuid(id);
+    public bool IsHandling(Guid id) => handler.IsHandling(id);
 
     public SaveEventResult GetSaveEventResult(Guid id)
     {
