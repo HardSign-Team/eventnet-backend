@@ -10,6 +10,11 @@ public static class ApplicationDbExtensions
 {
     private static readonly Random Rnd = new();
 
+    public static void Clear(this ApplicationDbContext db)
+    {
+        Utilities.ReinitializeDbForTests(db);
+    }
+    
     public static void AddUsers(this ApplicationDbContext db)
     {
         var users = new[]

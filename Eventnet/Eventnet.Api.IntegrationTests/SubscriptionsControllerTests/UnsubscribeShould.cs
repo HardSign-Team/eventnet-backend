@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
 using Eventnet.Api.IntegrationTests.Helpers;
 using FluentAssertions;
@@ -10,7 +9,7 @@ using NUnit.Framework;
 
 namespace Eventnet.Api.IntegrationTests.SubscriptionsControllerTests;
 
-public class SubscribeShould : SubscriptionsApiTestsBase
+public class UnsubscribeShould : SubscriptionsApiTestsBase
 {
     [Test]
     public async Task Response401_WhenUserNotAuthorized()
@@ -21,7 +20,7 @@ public class SubscribeShould : SubscriptionsApiTestsBase
             context.AddEvents(context.Users);
             return context.Events.First();
         });
-        var request = BuildSubscribeRequest(entity.Id);
+        var request = BuildUnsubscribeRequest(entity.Id);
 
         var response = await HttpClient.SendAsync(request);
 
@@ -33,7 +32,7 @@ public class SubscribeShould : SubscriptionsApiTestsBase
     public async Task Response404_WhenEventNotFound()
     {
         var (_, client) = await CreateAuthorizedClient("TestUser", "TestPassword");
-        var request = BuildSubscribeRequest(Guid.Empty);
+        var request = BuildUnsubscribeRequest(Guid.Empty);
 
         var response = await client.SendAsync(request);
 
@@ -53,7 +52,7 @@ public class SubscribeShould : SubscriptionsApiTestsBase
             context.SaveChanges();
             return entity;
         });
-        var request = BuildSubscribeRequest(entity.Id);
+        var request = BuildUnsubscribeRequest(entity.Id);
 
         var response = await client.SendAsync(request);
 
@@ -74,7 +73,7 @@ public class SubscribeShould : SubscriptionsApiTestsBase
             context.SaveChanges();
             return entity;
         });
-        var request = BuildSubscribeRequest(entity.Id);
+        var request = BuildUnsubscribeRequest(entity.Id);
 
         var response = await client.SendAsync(request);
 
@@ -84,32 +83,35 @@ public class SubscribeShould : SubscriptionsApiTestsBase
     [TestCase(1)]
     [TestCase(2)]
     [TestCase(10)]
-    public async Task Response200_WhenSubscribeNTimes(int n)
+    public async Task Response200_WhenUnsubscribeNTimes(int n)
     {
-        var (_, client) = await CreateAuthorizedClient("TestUser", "TestPassword");
+        var (user, client) = await CreateAuthorizedClient("TestUser", "TestPassword");
         var entity = ApplyToDb(context =>
         {
             context.AddUsers();
             context.AddEvents(context.Users);
-            return context.Events.First();
+            var entity = context.Events.First();
+            entity.Subscribe(user);
+            context.SaveChanges();
+            return entity;
         });
         for (var i = 0; i < n; i++)
         {
-            var request = BuildSubscribeRequest(entity.Id);
-            
+            var request = BuildUnsubscribeRequest(entity.Id);
+
             var response = await client.SendAsync(request);
-            
+
             response.StatusCode.Should().Be(HttpStatusCode.OK);
             response.ShouldHaveJsonContentEquivalentTo(new
             {
                 eventId = entity.Id,
-                count = 1
+                count = 0
             });
         }
     }
 
     [Test]
-    public async Task Response200_AndUpdateLastSubscriptionDate_WhenSubscribeSeveralTimes()
+    public async Task Response200_WhenWasNotSubscribed()
     {
         var (_, client) = await CreateAuthorizedClient("TestUser", "TestPassword");
         var entity = ApplyToDb(context =>
@@ -118,15 +120,17 @@ public class SubscribeShould : SubscriptionsApiTestsBase
             context.AddEvents(context.Users);
             return context.Events.First();
         });
+        var request = BuildUnsubscribeRequest(entity.Id);
 
-        await client.SendAsync(BuildSubscribeRequest(entity.Id));
-        var subscription1 = ApplyToDb(context => context.SubscriptionEntities.First(x => x.EventId == entity.Id));
-        Thread.Sleep(500);
-        await client.SendAsync(BuildSubscribeRequest(entity.Id));
-        var subscription2 = ApplyToDb(context => context.SubscriptionEntities.First(x => x.EventId == entity.Id));
+        var response = await client.SendAsync(request);
 
-        subscription2.SubscriptionDate.Should().BeAfter(subscription1.SubscriptionDate);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.ShouldHaveJsonContentEquivalentTo(new
+        {
+            eventId = entity.Id,
+            count = 0
+        });
     }
     
-    private HttpRequestMessage BuildSubscribeRequest(Guid entityId) => new(HttpMethod.Post, BuildSubscribeQuery(entityId));
+    private HttpRequestMessage BuildUnsubscribeRequest(Guid entityId) => new(HttpMethod.Post, BuildUnsubscribeQuery(entityId));
 }
