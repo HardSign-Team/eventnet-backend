@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Eventnet.Api.IntegrationTests.Helpers;
+using Eventnet.Api.Models.Subscriptions;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -100,11 +101,9 @@ public class SubscribeShould : SubscriptionsApiTestsBase
             var response = await client.SendAsync(request);
             
             response.StatusCode.Should().Be(HttpStatusCode.OK);
-            response.ShouldHaveJsonContentEquivalentTo(new
-            {
-                eventId = entity.Id,
-                count = 1
-            });
+            var model = response.ReadContentAs<SubscriptionsCountViewModel>();
+            model.EventId.Should().Be(entity.Id);
+            model.Count.Should().Be(1);
         }
     }
 

@@ -55,9 +55,27 @@ public class SubscriptionsController : Controller
     [HttpPost("unsubscribe/{eventId}")]
     public async Task<IActionResult> UnSubscribe(Guid eventId)
     {
-        throw new NotImplementedException();
-    }
+        if (eventId == Guid.Empty)
+            return NotFound();
 
+        var eventEntity = await dbContext.Events.FirstOrDefaultAsync(x => x.Id == eventId);
+        if (eventEntity is null)
+            return NotFound();
+
+        if (eventEntity.EndDate.GetValueOrDefault(eventEntity.StartDate) < DateTime.Now)
+            return Conflict("Event had been ended.");
+        
+        var user = await currentUserService.GetCurrentUser();
+        if (user is null) 
+            return Unauthorized();
+
+        dbContext.SubscriptionEntities.RemoveRange(
+            dbContext.SubscriptionEntities.Where(x => x.EventId == eventId && x.UserId == user.Id));
+        await dbContext.SaveChangesAsync();
+        
+        return await GetSubscriptionsCount(eventId);
+    }
+    
     [HttpGet("count/{eventId}")]
     public async Task<IActionResult> GetSubscriptionsCount(Guid eventId)
     {

@@ -1,3 +1,7 @@
-﻿namespace Eventnet.Api.Models.Subscriptions;
+﻿using System.Text.Json.Serialization;
 
-public record SubscriptionsCountViewModel(Guid EventId, int Count);
+namespace Eventnet.Api.Models.Subscriptions;
+
+public record SubscriptionsCountViewModel(
+    [property: JsonPropertyName("eventId")] Guid EventId, 
+    [property: JsonPropertyName("count")] int Count);
