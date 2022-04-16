@@ -29,7 +29,7 @@ public class EventSaveService : IEventSaveService
         {
             saveEventResult = new SaveEventResult(EventSaveStatus.NotSavedDueToServerError, string.Empty);
             handler.Update(eventForSave.Id, saveEventResult);
-            Console.WriteLine(e);
+            Console.WriteLine(e); // TODO: add logger
             throw;
         }
     }

@@ -40,7 +40,7 @@ public class RabbitMqMessageHandler : IRabbitMqMessageHandler
         {
             errorMessage = "Something went wrong on server. Please try again later" + "\n" + errorMessage;
             status = EventSaveStatus.NotSavedDueToServerError;
-            Console.WriteLine(e);
+            Console.WriteLine(e); // TODO: add logger
         }
         handler.Update(id, new SaveEventResult(status, errorMessage));
     }
