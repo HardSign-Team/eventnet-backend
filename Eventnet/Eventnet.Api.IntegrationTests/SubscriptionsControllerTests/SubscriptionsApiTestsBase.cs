@@ -16,4 +16,13 @@ public class SubscriptionsApiTestsBase : TestsBase
         };
         return uriBuilder.Uri;
     }
+
+    protected Uri BuildSubscribeQuery(Guid eventId)
+    {
+        var uriBuilder = new UriBuilder(Configuration.BaseUrl)
+        {
+            Path = $"{BaseRoute}/subscribe/{HttpUtility.UrlEncode(eventId.ToString())}"
+        };
+        return uriBuilder.Uri;
+    }
 }
