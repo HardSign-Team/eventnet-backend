@@ -86,7 +86,7 @@ public class GetEventByIdShould : EventApiTestsBase
         return ApplyToDb(context =>
         {
             context.AddUsers();
-            context.AddEvents();
+            context.AddEvents(context.Users);
             context.AddTags();
 
             var entity = context.Events.First();

@@ -27,8 +27,8 @@ public class GetSubscriptionsCountShould : SubscriptionsApiTestsBase
     {
         var eventEntity = ApplyToDb(context =>
         {
-            context.AddEvents();
             context.AddUsers();
+            context.AddEvents(context.Users);
 
             var entity = context.Events.First();
             foreach (var user in context.Users)
