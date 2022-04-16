@@ -17,4 +17,16 @@ public class EventEntityMother
             fixture.Create<string>(),
             fixture.Create<LocationEntity>());
     }
+    
+    public static EventEntity CreateEventEntity(string userId, DateTime startDate, DateTime? endDate = null)
+    {
+        var fixture = new Fixture();
+        return new EventEntity(Guid.NewGuid(),
+            userId,
+            startDate,
+            endDate,
+            fixture.Create<string>(),
+            fixture.Create<string>(),
+            fixture.Create<LocationEntity>());
+    }
 }
