@@ -1,4 +1,4 @@
-﻿using Eventnet.Api.Models.Authentication;
+﻿using Eventnet.DataAccess.Models;
 
 namespace Eventnet.Api.Models;
 

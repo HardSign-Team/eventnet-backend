@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Eventnet.DataAccess.Models;
 
 namespace Eventnet.Api.Models.Authentication;
 
