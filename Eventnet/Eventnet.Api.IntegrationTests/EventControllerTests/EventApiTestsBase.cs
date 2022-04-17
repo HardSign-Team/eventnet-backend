@@ -2,7 +2,7 @@
 using System.Text;
 using System.Web;
 using Eventnet.Api.IntegrationTests.Helpers;
-using Eventnet.Models;
+using Eventnet.Api.Models.Filtering;
 using Microsoft.AspNetCore.Http.Extensions;
 using Newtonsoft.Json;
 
@@ -41,7 +41,7 @@ public abstract class EventApiTestsBase : TestsBase
             query.Add("p", pageNumber.Value.ToString());
         if (pageSize.HasValue)
             query.Add("ps", pageSize.Value.ToString());
-        
+
         var uriBuilder = new UriBuilder(Configuration.BaseUrl)
         {
             Path = BaseRoute,
@@ -53,11 +53,12 @@ public abstract class EventApiTestsBase : TestsBase
     protected Uri BuildEventsByNameUri(string? name, int? maxCount)
     {
         var query = new QueryBuilder();
-        if (maxCount.HasValue) query.Add("m", maxCount.Value.ToString());
+        if (maxCount.HasValue)
+            query.Add("m", maxCount.Value.ToString());
 
         var uriBuilder = new UriBuilder(Configuration.BaseUrl)
         {
-            Path = $"{BaseRoute}/search-by-name/{name}",
+            Path = $"{BaseRoute}/search/name/{name}",
             Query = query.ToString()
         };
         return uriBuilder.Uri;

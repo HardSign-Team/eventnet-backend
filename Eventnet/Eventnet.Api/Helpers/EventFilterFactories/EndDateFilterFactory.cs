@@ -1,7 +1,7 @@
-﻿using Eventnet.Domain.Events.Filters.EventFilters;
-using Eventnet.Models;
+﻿using Eventnet.Api.Models.Filtering;
+using Eventnet.Domain.Events.Filters.EventFilters;
 
-namespace Eventnet.Helpers.EventFilterFactories;
+namespace Eventnet.Api.Helpers.EventFilterFactories;
 
 public class EndDateFilterFactory : BaseFilterFactory<DateFilterModel>
 {

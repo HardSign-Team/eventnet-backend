@@ -5,7 +5,6 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-        <RootNamespace>Eventnet</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -20,13 +19,10 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.2" />
-        <PackageReference Include="PagedList" Version="1.17.0" />
-        <PackageReference Include="PagedList.Mvc" Version="4.5.0" />
         <PackageReference Include="RabbitMQ.Client" Version="6.2.4" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
         <PackageReference Include="X.PagedList" Version="8.1.0" />
         <PackageReference Include="X.PagedList.Mvc.Core" Version="8.1.0" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
-        <PackageReference Include="System.Drawing.Common" Version="7.0.0-preview.2.22152.2" />
     </ItemGroup>
 
     <ItemGroup>
@@ -34,5 +30,18 @@
         <ProjectReference Include="..\Eventnet.Domain\Eventnet.Domain.csproj" />
         <ProjectReference Include="..\Eventnet.Infrastructure\Eventnet.Infrastructure.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="storage" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="storage\eafbe94f-8437-4bd5-8fca-0adf18dbf16e.jpeg" />
+    </ItemGroup>
+
+    <PropertyGroup>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>$(NoWarn);1591</NoWarn>
+    </PropertyGroup>
 
 </Project>

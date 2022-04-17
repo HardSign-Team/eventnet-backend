@@ -10,6 +10,7 @@ public abstract class AbstractTestBase
 {
     protected HttpClient HttpClient => Factory.CreateClient();
     protected abstract WebApplicationFactory<Program> Factory { get; }
+    protected IServiceScopeFactory GetScopeFactory() => Factory.Services.GetService<IServiceScopeFactory>()!;
     
     protected void ApplyToDb(Action<ApplicationDbContext> action)
     {

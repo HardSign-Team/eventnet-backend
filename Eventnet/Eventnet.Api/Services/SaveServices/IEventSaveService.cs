@@ -1,5 +1,5 @@
-﻿using Eventnet.Infrastructure;
-using Eventnet.Models;
+﻿using Eventnet.Domain.Events;
+using Eventnet.Infrastructure;
 
 namespace Eventnet.Services.SaveServices;
 

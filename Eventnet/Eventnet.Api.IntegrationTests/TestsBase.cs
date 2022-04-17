@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
+﻿using System;
+using System.Net.Http;
+using Eventnet.DataAccess;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Eventnet.Api.IntegrationTests;
 

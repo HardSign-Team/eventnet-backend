@@ -1,12 +1,16 @@
 ﻿using System.Text;
 using System.Text.Json;
 using AutoMapper;
+using Eventnet.Api.Helpers;
+using Eventnet.Api.Models.Events;
+using Eventnet.Api.Models.Filtering;
+using Eventnet.Api.Models.Tags;
+using Eventnet.Api.Services.Filters;
 using Eventnet.DataAccess;
-using Eventnet.Domain.Events.Selectors;
-using Eventnet.Helpers;
+using Eventnet.DataAccess.Entities;
+using Eventnet.Domain.Events;
+using Eventnet.Domain.Selectors;
 using Eventnet.Infrastructure;
-using Eventnet.Models;
-using Eventnet.Services;
 using Eventnet.Services.SaveServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -54,14 +58,36 @@ public class EventController : Controller
             return UnprocessableEntity(ModelState);
         }
 
-        var eventEntity = await dbContext.Events.FirstOrDefaultAsync(x => x.Id == eventId);
-        if (eventEntity is null)
+        var entity = await dbContext.Events
+            .AsNoTracking()
+            .Select(x => new
+            {
+                x.Id,
+                x.OwnerId,
+                x.Description,
+                x.Location,
+                x.StartDate,
+                x.EndDate,
+                x.Name,
+                x.Tags,
+                TotalSubscriptions = x.Subscriptions.Count()
+            })
+            .FirstOrDefaultAsync(x => x.Id == eventId);
+        if (entity is null)
             return NotFound();
-
-        return Ok(mapper.Map<Event>(eventEntity));
+        var eventViewModel = new EventViewModel(entity.Id,
+            entity.OwnerId,
+            entity.Name,
+            entity.Description,
+            mapper.Map<LocationViewModel>(entity.Location),
+            entity.StartDate,
+            entity.EndDate,
+            entity.Tags.Select(mapper.Map<TagNameModel>).ToArray(),
+            entity.TotalSubscriptions);
+        return Ok(eventViewModel);
     }
 
-    [HttpGet("search-by-name/{eventName}")]
+    [HttpGet("search/name/{eventName}")]
     public IActionResult GetEventsByName(string? eventName, [FromQuery(Name = "m")] int maxCount = 10)
     {
         eventName = eventName?.Trim();
@@ -75,8 +101,7 @@ public class EventController : Controller
 
         var selector = new EventsByNameSelector(eventName);
         var result = selector
-            .Select(dbContext.Events.AsEnumerable(), maxCount)
-            .Select(x => mapper.Map<EventNameModel>(x))
+            .Select(mapper.ProjectTo<EventName>(dbContext.Events).AsNoTracking().AsEnumerable(), maxCount)
             .ToArray();
 
         return Ok(new EventNameListModel(result.Length, result));
@@ -97,24 +122,25 @@ public class EventController : Controller
         TryValidateModel(filterModel);
 
         if (!ModelState.IsValid)
-        {
             return UnprocessableEntity(ModelState);
-        }
 
         pageNumber = NumberHelper.Normalize(pageNumber, 1);
         pageSize = NumberHelper.Normalize(pageSize, 1, MaxPageSize);
 
-        var query = dbContext.Events.AsNoTracking().AsEnumerable();
+        var query = dbContext.Events
+            .AsNoTracking()
+            .AsEnumerable()
+            .Select(x => mapper.Map<Event>(x));
         var filter = filterMapper.Map(filterModel);
         var filteredEvents = filter.Filter(query);
 
-        var events = new PagedList<EventEntity>(filteredEvents, pageNumber, pageSize);
+        var events = new PagedList<Event>(filteredEvents, pageNumber, pageSize);
         var paginationHeader = events
             .ToPaginationHeader((p, ps) => GenerateEventsPageLink(filterModelBase64, p, ps));
 
         Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationHeader));
 
-        return Ok(mapper.Map<IEnumerable<Event>>(events));
+        return Ok(mapper.Map<IEnumerable<EventLocationModel>>(events));
     }
 
     [HttpPost]
@@ -158,10 +184,8 @@ public class EventController : Controller
 
     // TODO use format https://datatracker.ietf.org/doc/html/rfc6902
     [HttpPatch("{eventId:guid}")]
-    public IActionResult UpdateEvent(Guid eventId, [FromBody] UpdateEventModel updateModel)
-    {
+    public IActionResult UpdateEvent(Guid eventId, [FromBody] UpdateEventModel updateModel) =>
         throw new NotImplementedException();
-    }
 
     [HttpDelete("{eventId:guid}")]
     public async Task<IActionResult> DeleteEvent(Guid eventId)

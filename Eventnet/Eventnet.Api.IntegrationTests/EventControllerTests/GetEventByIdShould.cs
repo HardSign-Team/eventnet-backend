@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Eventnet.Api.IntegrationTests.Helpers;
+using Eventnet.DataAccess.Entities;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -55,7 +56,7 @@ public class GetEventByIdShould : EventApiTestsBase
     [Test]
     public async Task ResponseCode200_WhenEventExists()
     {
-        var eventEntity = ApplyToDb(context => context.Events.First());
+        var eventEntity = GetTestEvent();
         var request = new HttpRequestMessage();
         request.Method = HttpMethod.Get;
         request.RequestUri = BuildEventsByIdUri(eventEntity.Id);
@@ -73,7 +74,36 @@ public class GetEventByIdShould : EventApiTestsBase
             description = eventEntity.Description,
             startDate = eventEntity.StartDate,
             endDate = eventEntity.EndDate,
-            locationEntity = eventEntity.Location
+            location = eventEntity.Location,
+            tags = eventEntity.Tags,
+            totalSubscriptions = eventEntity.Subscriptions.Count
+        });
+    }
+
+    private EventEntity GetTestEvent()
+    {
+        return ApplyToDb(context =>
+        {
+            context.AddUsers();
+            context.AddEvents(context.Users);
+            context.AddTags();
+
+            var entity = context.Events.First();
+            var tagEntities = context.Tags.Take(6).ToArray();
+            var subscribers = context.Users.Take(3).ToArray();
+
+            foreach (var subscriber in subscribers)
+            {
+                entity.Subscribe(subscriber);
+            }
+
+            foreach (var tag in tagEntities)
+            {
+                entity.AddTag(tag);
+            }
+
+            context.SaveChanges();
+            return entity;
         });
     }
 }

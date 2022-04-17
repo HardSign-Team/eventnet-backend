@@ -1,5 +1,5 @@
 ﻿using Eventnet.Domain;
-using Eventnet.Models;
+using Eventnet.Domain.Events;
 
 namespace Eventnet.Infrastructure.Validators;
 

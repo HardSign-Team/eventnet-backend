@@ -1,10 +1,11 @@
 ﻿using X.PagedList;
 
-namespace Eventnet.Helpers;
+namespace Eventnet.Api.Helpers;
 
 public static class PagedListExtensions
 {
-    public static object ToPaginationHeader<T>(this PagedList<T> pagedList,
+    public static object ToPaginationHeader<T>(
+        this PagedList<T> pagedList,
         Func<int, int, string?> generatePageLink) =>
         new
         {

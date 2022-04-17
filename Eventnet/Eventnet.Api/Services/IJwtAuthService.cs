@@ -1,9 +1,11 @@
 ﻿using System.Security.Claims;
-using Eventnet.Models;
+using Eventnet.Api.Models.Authentication.Tokens;
 
-namespace Eventnet.Services;
+namespace Eventnet.Api.Services;
 
 public interface IJwtAuthService
 {
-    JwtAuthResult GenerateTokens(Claim[] claims, DateTime now);
+    JwtAuthResult GenerateTokens(string userName, IEnumerable<Claim> claims, DateTime now);
+    JwtAuthResult Refresh(string refreshToken, string accessToken, DateTime now);
+    void RemoveRefreshTokenByUserName(string userName);
 }

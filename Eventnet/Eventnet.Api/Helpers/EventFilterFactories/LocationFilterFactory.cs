@@ -1,8 +1,8 @@
-﻿using Eventnet.Domain.Events.Filters.EventFilters;
-using Eventnet.Models;
+﻿using Eventnet.Api.Models.Filtering;
+using Eventnet.Domain.Events.Filters.EventFilters;
 using GeoCoordinatePortable;
 
-namespace Eventnet.Helpers.EventFilterFactories;
+namespace Eventnet.Api.Helpers.EventFilterFactories;
 
 public class LocationFilterFactory : BaseFilterFactory<LocationFilterModel>
 {

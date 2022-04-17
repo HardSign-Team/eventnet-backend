@@ -1,7 +1,5 @@
-﻿using Eventnet.DataAccess;
+﻿namespace Eventnet.Domain.Events.Filters.EventFilters;
 
-namespace Eventnet.Domain.Events.Filters.EventFilters;
-
-public interface IEventFilter : IFilter<EventEntity>
+public interface IEventFilter : IFilter<Event>
 {
 }

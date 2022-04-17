@@ -1,4 +1,4 @@
-﻿namespace Eventnet.Helpers;
+﻿namespace Eventnet.Api.Helpers;
 
 public static class NumberHelper
 {

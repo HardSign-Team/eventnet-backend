@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
 using Eventnet.DataAccess;
+using Eventnet.DataAccess.Entities;
 using Eventnet.Domain;
+using Eventnet.Domain.Events;
 using Eventnet.Infrastructure.PhotoServices;
-using Eventnet.Models;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Eventnet.Infrastructure;

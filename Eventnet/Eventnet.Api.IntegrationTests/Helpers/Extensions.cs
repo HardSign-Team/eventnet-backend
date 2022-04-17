@@ -7,6 +7,7 @@ using FluentAssertions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Eventnet.Api.IntegrationTests.Helpers;
 
@@ -55,7 +56,14 @@ public static class Extensions
         return JToken.Parse(content);
     }
 
-    public static ByteArrayContent SerializeToJsonContent(this object obj,
+    public static T ReadContentAs<T>(this HttpResponseMessage response)
+    {
+        var content = response.Content.ReadAsStringAsync().Result;
+        return JsonSerializer.Deserialize<T>(content) ?? throw new Exception();
+    }
+
+    public static ByteArrayContent SerializeToJsonContent(
+        this object obj,
         string contentType = "application/json")
     {
         var json = JsonConvert.SerializeObject(obj);
