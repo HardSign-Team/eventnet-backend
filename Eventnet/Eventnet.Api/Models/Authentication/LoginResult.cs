@@ -1,5 +1,4 @@
-﻿using Eventnet.Models;
-using Eventnet.Models.Authentication.Tokens;
+﻿using Eventnet.Models.Authentication.Tokens;
 
 namespace Eventnet.Api.Models.Authentication;
 

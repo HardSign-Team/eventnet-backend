@@ -41,13 +41,12 @@ services.AddMemoryCache();
 
 services.AddHttpContextAccessor();
 
-services.AddControllers().AddJsonOptions(x => 
+services.AddControllers().AddJsonOptions(x =>
     x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 services.AddEndpointsApiExplorer();
 
-services.AddDbContext<ApplicationDbContext>(
-    opt => opt.UseNpgsql(connectionString));
+services.AddDbContext<ApplicationDbContext>(opt => opt.UseNpgsql(connectionString));
 
 services.AddAutoMapper(opt => opt.AddProfile<ApplicationMappingProfile>());
 
@@ -97,15 +96,16 @@ services.AddAuthentication(options =>
 services.AddSwaggerGen(option =>
 {
     option.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
-    option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        In = ParameterLocation.Header,
-        Description = "Please enter a valid token",
-        Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        BearerFormat = "JWT",
-        Scheme = "Bearer"
-    });
+    option.AddSecurityDefinition("Bearer",
+        new OpenApiSecurityScheme
+        {
+            In = ParameterLocation.Header,
+            Description = "Please enter a valid token",
+            Name = "Authorization",
+            Type = SecuritySchemeType.Http,
+            BearerFormat = "JWT",
+            Scheme = "Bearer"
+        });
     option.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {

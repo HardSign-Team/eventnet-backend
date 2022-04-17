@@ -18,7 +18,7 @@ public class TagsController : Controller
         this.context = context;
         this.mapper = mapper;
     }
-    
+
     [HttpGet("search/name/{name}")]
     public IActionResult GetTagsByName(string name, [FromQuery(Name = "mc")] int maxCount = 30)
     {

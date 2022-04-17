@@ -20,8 +20,7 @@ public class ForgotPasswordService : IForgotPasswordService
 
         cache.Set(email, code, TimeSpan.FromMinutes(2));
 
-        return emailService.SendEmailAsync(
-            email,
+        return emailService.SendEmailAsync(email,
             "Restore password",
             $"Ваш код: {code}");
     }
