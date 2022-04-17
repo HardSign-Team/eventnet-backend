@@ -1,10 +1,11 @@
 ﻿using AutoMapper;
 using Eventnet.Api.Models;
 using Eventnet.Api.Models.Authentication;
+using Eventnet.Api.Models.Events;
+using Eventnet.Api.Models.Tags;
 using Eventnet.DataAccess.Entities;
 using Eventnet.Domain.Events;
 using Eventnet.Domain.Selectors;
-using Eventnet.Models;
 
 namespace Eventnet.Api.Config;
 
@@ -19,6 +20,7 @@ public class ApplicationMappingProfile : Profile
         CreateProjection<TagEntity, TagName>();
         CreateMap<TagName, TagNameModel>();
         CreateProjection<UserEntity, UserNameModel>();
+        CreateMap<TagEntity, Tag>();
         CreateMap<UserEntity, UserViewModel>();
         CreateMap<RegisterModel, UserEntity>()
             .ForMember(x => x.PhoneNumber,

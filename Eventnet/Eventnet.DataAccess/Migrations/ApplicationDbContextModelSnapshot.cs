@@ -22,43 +22,149 @@ namespace Eventnet.DataAccess.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Eventnet.DataAccess.EventEntity", b =>
-            {
-                b.Property<Guid>("Id")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("uuid");
+            modelBuilder.Entity("EventEntityTagEntity", b =>
+                {
+                    b.Property<Guid>("EventsId")
+                        .HasColumnType("uuid");
 
-                b.Property<string>("Description")
-                    .IsRequired()
-                    .HasColumnType("text");
+                    b.Property<int>("TagsId")
+                        .HasColumnType("integer");
 
-                b.Property<DateTime?>("EndDate")
-                    .HasColumnType("timestamp with time zone");
+                    b.HasKey("EventsId", "TagsId");
 
-                b.Property<string>("Name")
-                    .IsRequired()
-                    .HasColumnType("text");
+                    b.HasIndex("TagsId");
 
-                b.Property<string>("OwnerId")
-                    .IsRequired()
-                    .HasColumnType("text");
+                    b.ToTable("EventEntityTagEntity");
+                });
 
-                b.Property<DateTime>("StartDate")
-                    .HasColumnType("timestamp with time zone");
+            modelBuilder.Entity("Eventnet.DataAccess.Entities.EventEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
 
-                b.Property<int?>("TagEntityId")
-                    .HasColumnType("integer");
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                b.HasKey("Id");
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("timestamp with time zone");
 
-                b.HasIndex("OwnerId");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                b.HasIndex("TagEntityId");
+                    b.Property<string>("OwnerId")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                b.ToTable("Events");
-            });
-            
-            
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OwnerId");
+
+                    b.ToTable("Events");
+                });
+
+            modelBuilder.Entity("Eventnet.DataAccess.Entities.SubscriptionEntity", b =>
+                {
+                    b.Property<Guid>("EventId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("SubscriptionDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("EventId", "UserId");
+
+                    b.ToTable("SubscriptionEntity");
+                });
+
+            modelBuilder.Entity("Eventnet.DataAccess.Entities.TagEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tags");
+                });
+
+            modelBuilder.Entity("Eventnet.DataAccess.Entities.UserEntity", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex");
+
+                    b.ToTable("AspNetUsers", (string)null);
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -87,15 +193,15 @@ namespace Eventnet.DataAccess.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "22427488-0f6b-414f-9595-113da4a2a0e5",
-                            ConcurrencyStamp = "7fe26813-7ffb-45c6-86d5-6cd1d5b7085d",
+                            Id = "8e4bcfe4-f0c0-436e-96f4-60f1dc9e6ac1",
+                            ConcurrencyStamp = "eaebdf5c-d3e9-401a-8dd8-0b2bf66d1e58",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "55cba6ee-fee7-4908-8ed9-f31a0f434885",
-                            ConcurrencyStamp = "00000000-0000-0000-0000-000000000000",
+                            Id = "73c3dccf-642d-4cab-94ae-519117c9a2d6",
+                            ConcurrencyStamp = "7f2abfaf-3db5-42ca-a6cc-2bd3a685473a",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -207,19 +313,30 @@ namespace Eventnet.DataAccess.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Eventnet.DataAccess.EventEntity", b =>
+            modelBuilder.Entity("EventEntityTagEntity", b =>
                 {
-                    b.HasOne("Eventnet.DataAccess.UserEntity", null)
+                    b.HasOne("Eventnet.DataAccess.Entities.EventEntity", null)
+                        .WithMany()
+                        .HasForeignKey("EventsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Eventnet.DataAccess.Entities.TagEntity", null)
+                        .WithMany()
+                        .HasForeignKey("TagsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Eventnet.DataAccess.Entities.EventEntity", b =>
+                {
+                    b.HasOne("Eventnet.DataAccess.Entities.UserEntity", null)
                         .WithMany()
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Eventnet.DataAccess.TagEntity", null)
-                        .WithMany("Events")
-                        .HasForeignKey("TagEntityId");
-
-                    b.OwnsOne("Eventnet.DataAccess.LocationEntity", "Location", b1 =>
+                    b.OwnsOne("Eventnet.DataAccess.Entities.LocationEntity", "Location", b1 =>
                         {
                             b1.Property<Guid>("EventEntityId")
                                 .HasColumnType("uuid");
@@ -242,17 +359,11 @@ namespace Eventnet.DataAccess.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Eventnet.DataAccess.EventTagEntity", b =>
+            modelBuilder.Entity("Eventnet.DataAccess.Entities.SubscriptionEntity", b =>
                 {
-                    b.HasOne("Eventnet.DataAccess.EventEntity", null)
-                        .WithMany()
+                    b.HasOne("Eventnet.DataAccess.Entities.EventEntity", null)
+                        .WithMany("Subscriptions")
                         .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Eventnet.DataAccess.TagEntity", null)
-                        .WithMany()
-                        .HasForeignKey("TagId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -268,7 +379,7 @@ namespace Eventnet.DataAccess.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Eventnet.DataAccess.UserEntity", null)
+                    b.HasOne("Eventnet.DataAccess.Entities.UserEntity", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -277,7 +388,7 @@ namespace Eventnet.DataAccess.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Eventnet.DataAccess.UserEntity", null)
+                    b.HasOne("Eventnet.DataAccess.Entities.UserEntity", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -292,7 +403,7 @@ namespace Eventnet.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Eventnet.DataAccess.UserEntity", null)
+                    b.HasOne("Eventnet.DataAccess.Entities.UserEntity", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -301,16 +412,16 @@ namespace Eventnet.DataAccess.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Eventnet.DataAccess.UserEntity", null)
+                    b.HasOne("Eventnet.DataAccess.Entities.UserEntity", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Eventnet.DataAccess.TagEntity", b =>
+            modelBuilder.Entity("Eventnet.DataAccess.Entities.EventEntity", b =>
                 {
-                    b.Navigation("Events");
+                    b.Navigation("Subscriptions");
                 });
 #pragma warning restore 612, 618
         }

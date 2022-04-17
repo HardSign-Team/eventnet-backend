@@ -15,7 +15,7 @@ public class UserApiTestsBase : TestsBase
         var uriBuilder = new UriBuilder(Configuration.BaseUrl)
         {
             Path = $"{BaseRoute}/search-by-prefix/{HttpUtility.UrlEncode(prefix)}",
-            Query = qb.ToString(),
+            Query = qb.ToString()
         };
         return uriBuilder.Uri;
     }

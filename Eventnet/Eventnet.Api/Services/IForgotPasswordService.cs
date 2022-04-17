@@ -1,4 +1,4 @@
-﻿namespace Eventnet.Services;
+﻿namespace Eventnet.Api.Services;
 
 public interface IForgotPasswordService
 {

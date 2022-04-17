@@ -4,11 +4,11 @@ using Eventnet.Api.Config;
 using Eventnet.Api.Helpers.EventFilterFactories;
 using Eventnet.Api.Models.Authentication.Tokens;
 using Eventnet.Api.Services;
+using Eventnet.Api.Services.Filters;
 using Eventnet.DataAccess;
 using Eventnet.DataAccess.Entities;
 using Eventnet.Domain;
 using Eventnet.Infrastructure;
-using Eventnet.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -31,6 +31,7 @@ services.AddSingleton<IEventFilterFactory, LocationFilterFactory>();
 services.AddSingleton<IEventFilterFactory, StartDateFilterFactory>();
 services.AddSingleton<IEventFilterFactory, EndDateFilterFactory>();
 services.AddSingleton<IEventFilterFactory, OwnerFilterFactory>();
+services.AddSingleton<IEventFilterFactory, TagsFilterFactory>();
 services.AddSingleton<IEventFilterMapper, EventFilterMapper>();
 
 services.AddScoped<IEmailService, EmailService>();
@@ -44,8 +45,7 @@ services.AddControllers();
 
 services.AddEndpointsApiExplorer();
 
-services.AddDbContext<ApplicationDbContext>(
-    opt => opt.UseNpgsql(connectionString));
+services.AddDbContext<ApplicationDbContext>(opt => opt.UseNpgsql(connectionString));
 
 services.AddAutoMapper(opt => opt.AddProfile<ApplicationMappingProfile>());
 
@@ -95,15 +95,16 @@ services.AddAuthentication(options =>
 services.AddSwaggerGen(option =>
 {
     option.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
-    option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        In = ParameterLocation.Header,
-        Description = "Please enter a valid token",
-        Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        BearerFormat = "JWT",
-        Scheme = "Bearer"
-    });
+    option.AddSecurityDefinition("Bearer",
+        new OpenApiSecurityScheme
+        {
+            In = ParameterLocation.Header,
+            Description = "Please enter a valid token",
+            Name = "Authorization",
+            Type = SecuritySchemeType.Http,
+            BearerFormat = "JWT",
+            Scheme = "Bearer"
+        });
     option.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -136,6 +137,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
 
 if (app.Environment.IsProduction())
 {

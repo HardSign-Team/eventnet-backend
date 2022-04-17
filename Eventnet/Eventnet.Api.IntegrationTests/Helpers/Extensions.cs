@@ -62,7 +62,8 @@ public static class Extensions
         return JsonSerializer.Deserialize<T>(content) ?? throw new Exception();
     }
 
-    public static ByteArrayContent SerializeToJsonContent(this object obj,
+    public static ByteArrayContent SerializeToJsonContent(
+        this object obj,
         string contentType = "application/json")
     {
         var json = JsonConvert.SerializeObject(obj);

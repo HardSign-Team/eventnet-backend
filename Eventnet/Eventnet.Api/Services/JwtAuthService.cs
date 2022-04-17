@@ -37,20 +37,19 @@ public class JwtAuthService : IJwtAuthService
 
     public JwtAuthResult GenerateTokens(string userName, IEnumerable<Claim> claims, DateTime now)
     {
-        var jwtToken = new JwtSecurityToken(
-            jwtTokenConfig.Issuer,
+        var jwtToken = new JwtSecurityToken(jwtTokenConfig.Issuer,
             jwtTokenConfig.Audience,
             claims,
             expires: now.AddMinutes(jwtTokenConfig.AccessTokenExpiration),
             signingCredentials: new SigningCredentials(new SymmetricSecurityKey(secret),
                 SecurityAlgorithms.HmacSha256Signature));
 
-        var refreshToken = new RefreshToken(
-            userName,
+        var refreshToken = new RefreshToken(userName,
             GenerateRefreshTokenString(),
             now.AddMinutes(jwtTokenConfig.RefreshTokenExpiration));
 
-        usersRefreshTokens.AddOrUpdate(refreshToken.TokenString, refreshToken,
+        usersRefreshTokens.AddOrUpdate(refreshToken.TokenString,
+            refreshToken,
             (_, _) => refreshToken);
 
         return new JwtAuthResult(jwtToken, refreshToken);

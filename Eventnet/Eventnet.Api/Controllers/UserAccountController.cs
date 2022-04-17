@@ -1,15 +1,13 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using AutoMapper;
+using Eventnet.Api.Models;
 using Eventnet.Api.Models.Authentication;
+using Eventnet.Api.Models.Authentication.Tokens;
 using Eventnet.Api.Services;
 using Eventnet.DataAccess.Entities;
-using AutoMapper;
 using Eventnet.DataAccess.Models;
 using Eventnet.Domain;
-using Eventnet.Models;
-using Eventnet.Models.Authentication;
-using Eventnet.Models.Authentication.Tokens;
-using Eventnet.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -27,7 +25,8 @@ public class UserAccountController : Controller
     private readonly IMapper mapper;
     private readonly IForgotPasswordService forgotPasswordService;
 
-    public UserAccountController(UserManager<UserEntity> userManager,
+    public UserAccountController(
+        UserManager<UserEntity> userManager,
         CurrentUserService currentUserService,
         IJwtAuthService jwtAuthService,
         IEmailService emailService,
@@ -43,7 +42,7 @@ public class UserAccountController : Controller
     }
 
     /// <summary>
-    /// Logins user
+    ///     Logins user
     /// </summary>
     /// <param name="loginModel">Login may be a userName or an email</param>
     /// <returns></returns>
@@ -71,13 +70,12 @@ public class UserAccountController : Controller
 
         var userView = mapper.Map<UserViewModel>(user);
         var tokens = new TokensViewModel(new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
-            jwtSecurityToken.ValidTo, refreshToken.TokenString);
+            jwtSecurityToken.ValidTo,
+            refreshToken.TokenString);
 
-        return Ok(new LoginResult(
-            tokens,
+        return Ok(new LoginResult(tokens,
             userView,
-            roles
-        ));
+            roles));
     }
 
     [Authorize]
@@ -94,8 +92,8 @@ public class UserAccountController : Controller
     }
 
     /// <summary>
-    /// Register user and send message with confirmation link to an email.
-    /// Link is "OriginHeader" + "/confirm"
+    ///     Register user and send message with confirmation link to an email.
+    ///     Link is "OriginHeader" + "/confirm"
     /// </summary>
     /// <param name="registerModel"></param>
     /// <returns></returns>
@@ -130,8 +128,8 @@ public class UserAccountController : Controller
     }
 
     /// <summary>
-    /// Changes user password.
-    /// Password mustn't match
+    ///     Changes user password.
+    ///     Password mustn't match
     /// </summary>
     /// <param name="changePasswordModel"></param>
     /// <returns></returns>
@@ -148,7 +146,8 @@ public class UserAccountController : Controller
             return NotFound();
 
         var changePasswordResult = await userManager.ChangePasswordAsync(user,
-            changePasswordModel.OldPassword, changePasswordModel.NewPassword);
+            changePasswordModel.OldPassword,
+            changePasswordModel.NewPassword);
 
         if (!changePasswordResult.Succeeded)
             return BadRequest(changePasswordResult.ToString());
@@ -157,8 +156,8 @@ public class UserAccountController : Controller
     }
 
     /// <summary>
-    /// Just sends email confirmation message.
-    /// Link is "OriginHeader" + "/confirm"
+    ///     Just sends email confirmation message.
+    ///     Link is "OriginHeader" + "/confirm"
     /// </summary>
     /// <param name="userName"></param>
     /// <returns></returns>
@@ -176,7 +175,7 @@ public class UserAccountController : Controller
     }
 
     /// <summary>
-    /// Verify that code is right and confirm email
+    ///     Verify that code is right and confirm email
     /// </summary>
     /// <param name="userId">Id from email redirect link</param>
     /// <param name="code">Code from email redirect link</param>
@@ -197,7 +196,7 @@ public class UserAccountController : Controller
     }
 
     /// <summary>
-    /// Sends email message with code to user's mail
+    ///     Sends email message with code to user's mail
     /// </summary>
     /// <param name="model"></param>
     /// <returns></returns>
@@ -216,7 +215,7 @@ public class UserAccountController : Controller
     }
 
     /// <summary>
-    /// Verify that code is exists and belongs to user
+    ///     Verify that code is exists and belongs to user
     /// </summary>
     /// <param name="email"></param>
     /// <param name="code"></param>
@@ -229,7 +228,7 @@ public class UserAccountController : Controller
     }
 
     /// <summary>
-    /// Remove user's password and set a new one
+    ///     Remove user's password and set a new one
     /// </summary>
     /// <param name="restorePasswordModel"></param>
     /// <returns></returns>
@@ -248,7 +247,7 @@ public class UserAccountController : Controller
 
         await userManager.RemovePasswordAsync(user);
         var result = await userManager.AddPasswordAsync(user, restorePasswordModel.NewPassword);
-        
+
         if (!result.Succeeded)
             return BadRequest(result.ToString());
 
@@ -280,8 +279,7 @@ public class UserAccountController : Controller
         var query = new Dictionary<string, string> { { "userId", user.Id }, { "code", code } };
         var uri = new Uri(QueryHelpers.AddQueryString(clientAddress + "/confirm", query!));
 
-        await emailService.SendEmailAsync(
-            user.Email,
+        await emailService.SendEmailAsync(user.Email,
             "Подтверждение регистрации",
             $"Подтвердите регистрацию, перейдя по ссылке: <a href='{uri}'>{uri}</a>");
     }

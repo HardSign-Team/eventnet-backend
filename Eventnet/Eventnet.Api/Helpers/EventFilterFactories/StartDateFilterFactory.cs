@@ -1,4 +1,4 @@
-﻿using Eventnet.Api.Models;
+﻿using Eventnet.Api.Models.Filtering;
 using Eventnet.Domain.Events.Filters.EventFilters;
 
 namespace Eventnet.Api.Helpers.EventFilterFactories;

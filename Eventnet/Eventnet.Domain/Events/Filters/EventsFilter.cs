@@ -22,7 +22,7 @@ public class EventsFilter : IEventsFilter
         foreach (var f in filters)
         {
             var copy = filter;
-            filter = (ev) => copy(ev) && f.Filter(ev);
+            filter = ev => copy(ev) && f.Filter(ev);
         }
 
         return filter;

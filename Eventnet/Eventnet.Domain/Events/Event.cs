@@ -7,4 +7,7 @@ public record Event(
     DateTime? EndDate,
     string Name,
     string Description,
-    Location Location);
+    Location Location)
+{
+    public Tag[] Tags { get; set; } = Array.Empty<Tag>();
+}

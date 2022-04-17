@@ -2,7 +2,7 @@
 using Eventnet.DataAccess.Entities;
 using Eventnet.Domain.Events;
 
-namespace Eventnet.Api.TestsUtils;
+namespace Eventnet.TestsUtils;
 
 public static class FixtureExtensions
 {
@@ -10,7 +10,7 @@ public static class FixtureExtensions
     {
         return fixture.Build<EventEntity>().With(x => x.Name, name).Create();
     }
-    
+
     public static Event CreateEventAt(this Fixture fixture, Location location)
     {
         return fixture
@@ -37,7 +37,11 @@ public static class FixtureExtensions
             fixture.Create<DateTime?>(),
             fixture.Create<string>(),
             fixture.Create<string>(),
-            fixture.Create<Location>()
-        );
+            fixture.Create<Location>());
+    }
+    
+    public static Event CreateEventWithTags(this Fixture fixture, Tag[] tags)
+    {
+        return fixture.Build<Event>().With(x => x.Tags, tags).Create();
     }
 }
