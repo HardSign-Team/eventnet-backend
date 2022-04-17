@@ -124,11 +124,8 @@ services.AddSwaggerGen(option =>
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseCors(corsName);
 
@@ -140,11 +137,14 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-using var scope = app.Services.CreateScope();
-var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+if (app.Environment.IsProduction())
+{
+    using var scope = app.Services.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-if (context.Database.GetPendingMigrations().Any())
-    context.Database.Migrate();
+    if (context.Database.GetPendingMigrations().Any())
+        context.Database.Migrate();
+}
 
 app.Run();
 
