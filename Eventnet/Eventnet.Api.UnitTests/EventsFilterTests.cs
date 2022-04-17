@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoFixture;
 using Eventnet.Api.Helpers.EventFilterFactories;
-using Eventnet.Api.Models;
-using Eventnet.Api.Services;
-using Eventnet.Api.TestsUtils;
+using Eventnet.Api.Models.Filtering;
+using Eventnet.Api.Services.Filters;
 using Eventnet.Domain.Events;
 using Eventnet.Domain.Events.Filters;
 using Eventnet.Domain.Events.Filters.Data;
+using Eventnet.TestsUtils;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -107,6 +107,41 @@ public class EventsFilterTests
         filteredEvents.Should().HaveCount(3);
     }
 
+    [Test]
+    public void Filter_ShouldFilterByTags()
+    {
+        var fixture = new Fixture();
+        var tags = new[]
+        {
+            new Tag(1, "gay"),
+            new Tag(2, "boynextdoor"),
+            new Tag(3, "dohomeworkpls"),
+            new Tag(4, "bonjourнаблевал"),
+            new Tag(5, "bonanнаблевал"),
+            new Tag(6, "иваннаблевал"),
+            new Tag(7, "максимнаблевал"),
+            new Tag(8, "артемнаблевал"),
+            new Tag(9, "мишанаблевал")
+        };
+        var events = new[]
+        {
+            fixture.CreateEventWithTags(new[] { tags[0], tags[1], tags[2] }),
+            fixture.CreateEventWithTags(new[] { tags[2], tags[1], tags[6] }),
+            fixture.CreateEventWithTags(new[] { tags[1], tags[2], tags[7] }),
+            fixture.CreateEventWithTags(new[] { tags[3], tags[5], tags[4] }),
+            fixture.CreateEventWithTags(new[] { tags[7], tags[6], tags[5] })
+        };
+        var filterModel = new EventsFilterModel
+        {
+            Tags = new TagsFilterModel(new[] { tags[1].Id, tags[2].Id })
+        };
+        var sut = CreateDefaultService(filterModel);
+
+        var filteredEvents = sut.Filter(events).ToArray();
+
+        filteredEvents.Should().Equal(events[..3]);
+    }
+
     public static IEnumerable<TestCaseData> GetFilterStartDateCases()
     {
         var fixture = new Fixture();
@@ -120,20 +155,17 @@ public class EventsFilterTests
             fixture.CreateEventStartedAt(new DateTime(2022, 2, 24))
         };
 
-        yield return new TestCaseData(
-                store,
+        yield return new TestCaseData(store,
                 new DateFilterModel(new DateTime(2016, 1, 1), DateEquality.Before),
                 store[..4])
             .SetName("Filter before start date");
 
-        yield return new TestCaseData(
-                store,
+        yield return new TestCaseData(store,
                 new DateFilterModel(new DateTime(2016, 1, 1), DateEquality.After),
                 store[4..])
             .SetName("Filter after start date");
 
-        yield return new TestCaseData(
-                store,
+        yield return new TestCaseData(store,
                 new DateFilterModel(new DateTime(2002, 1, 31), DateEquality.SameDay),
                 store[..2])
             .SetName("Filter same day start date");
@@ -146,7 +178,8 @@ public class EventsFilterTests
             new LocationFilterFactory(),
             new StartDateFilterFactory(),
             new EndDateFilterFactory(),
-            new OwnerFilterFactory()
+            new OwnerFilterFactory(),
+            new TagsFilterFactory()
         });
         return mapper.Map(filterModel);
     }
@@ -165,20 +198,17 @@ public class EventsFilterTests
             fixture.CreateEventEndedAt(null)
         };
 
-        yield return new TestCaseData(
-                store,
+        yield return new TestCaseData(store,
                 new DateFilterModel(new DateTime(2016, 1, 1), DateEquality.Before),
                 store[..4])
             .SetName("Filter before end date");
 
-        yield return new TestCaseData(
-                store,
+        yield return new TestCaseData(store,
                 new DateFilterModel(new DateTime(2016, 1, 1), DateEquality.After),
                 store[4..6])
             .SetName("Filter after end date");
 
-        yield return new TestCaseData(
-                store,
+        yield return new TestCaseData(store,
                 new DateFilterModel(new DateTime(2002, 1, 31), DateEquality.SameDay),
                 store[..2])
             .SetName("Filter same day end date");

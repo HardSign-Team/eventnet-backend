@@ -1,7 +1,7 @@
 ﻿using Eventnet.Domain;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace Eventnet.Services;
+namespace Eventnet.Api.Services;
 
 public class ForgotPasswordService : IForgotPasswordService
 {

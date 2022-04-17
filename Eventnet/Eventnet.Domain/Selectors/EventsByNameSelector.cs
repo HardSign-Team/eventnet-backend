@@ -14,12 +14,12 @@ public class EventsByNameSelector : ISelector<EventName>
         this.name = name.Trim().ToLowerInvariant();
         algorithm = new NormalizedLevenshtein();
     }
-    
+
     public IEnumerable<EventName> Select(IEnumerable<EventName> events, int maxCount)
     {
         const double acceptableSimilarity = 0.7;
         var valueTuples = events
-            .Select(x => new { Event=  x, Similarity = algorithm.Similarity(x.Name.ToLowerInvariant(), name)})
+            .Select(x => new { Event = x, Similarity = algorithm.Similarity(x.Name.ToLowerInvariant(), name) })
             .ToArray();
         return valueTuples
             .Where(x => x.Similarity >= acceptableSimilarity)

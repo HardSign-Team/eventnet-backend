@@ -16,8 +16,11 @@ public class EventEntity
     public string Name { get; set; }
     public string OwnerId { get; }
     public DateTime StartDate { get; set; }
+    public List<TagEntity> Tags { get; set; } = new();
+    public List<SubscriptionEntity> Subscriptions { get; set; } = new();
 
-    private EventEntity(Guid id,
+    private EventEntity(
+        Guid id,
         string ownerId,
         DateTime startDate,
         DateTime? endDate,
@@ -32,7 +35,8 @@ public class EventEntity
         Description = description.Trim();
     }
 
-    public EventEntity(Guid id,
+    public EventEntity(
+        Guid id,
         string ownerId,
         DateTime startDate,
         DateTime? endDate,
@@ -41,5 +45,17 @@ public class EventEntity
         LocationEntity location) : this(id, ownerId, startDate, endDate, name, description)
     {
         Location = location;
+    }
+
+    public SubscriptionEntity Subscribe(UserEntity user)
+    {
+        var subscription = new SubscriptionEntity(Id, user.Id, DateTime.Now);
+        Subscriptions.Add(subscription);
+        return subscription;
+    }
+
+    public void AddTag(TagEntity tagEntity)
+    {
+        Tags.Add(tagEntity);
     }
 }

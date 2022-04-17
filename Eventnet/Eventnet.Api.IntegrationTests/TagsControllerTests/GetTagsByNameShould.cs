@@ -13,7 +13,6 @@ namespace Eventnet.Api.IntegrationTests.TagsControllerTests;
 
 public class GetTagsByNameShould : TagsApiTestsBase
 {
-
     [TestCase("")]
     [TestCase(null)]
     public async Task ResponseCode404_WhenIncorrectName(string name)
@@ -50,7 +49,7 @@ public class GetTagsByNameShould : TagsApiTestsBase
             "aabbb",
             "aabbbb",
             "aabbbbb",
-            "aabbbbb",
+            "aabbbbb"
         });
         var request = CreateDefaultRequest("a", maxCount);
 

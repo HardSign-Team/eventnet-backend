@@ -3,13 +3,11 @@ using System.Security.Claims;
 using AutoMapper;
 using Eventnet.Api.Models;
 using Eventnet.Api.Models.Authentication;
+using Eventnet.Api.Models.Authentication.Tokens;
 using Eventnet.Api.Services;
 using Eventnet.DataAccess.Entities;
 using Eventnet.DataAccess.Models;
 using Eventnet.Domain;
-using Eventnet.Models.Authentication;
-using Eventnet.Models.Authentication.Tokens;
-using Eventnet.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -225,7 +223,9 @@ public class UserAccountController : Controller
     [HttpGet("password/forgot/code")]
     [Produces(typeof(bool))]
     public IActionResult VerifyUserCode(string email, string code)
-        => Ok(new { Status = forgotPasswordService.VerifyCode(email, code) });
+    {
+        return Ok(new { Status = forgotPasswordService.VerifyCode(email, code) });
+    }
 
     /// <summary>
     ///     Remove user's password and set a new one

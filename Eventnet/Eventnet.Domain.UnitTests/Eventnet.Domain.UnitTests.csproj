@@ -18,6 +18,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Eventnet.TestsUtils\Eventnet.TestsUtils.csproj"/>
+        <ProjectReference Include="..\Eventnet.TestsUtils\Eventnet.TestsUtils.csproj"/>
         <ProjectReference Include="..\Eventnet.DataAccess\Eventnet.DataAccess.csproj"/>
     </ItemGroup>
 

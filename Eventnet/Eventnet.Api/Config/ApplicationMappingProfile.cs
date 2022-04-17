@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Eventnet.Api.Models;
 using Eventnet.Api.Models.Authentication;
+using Eventnet.Api.Models.Events;
+using Eventnet.Api.Models.Tags;
 using Eventnet.DataAccess.Entities;
 using Eventnet.Domain.Events;
 using Eventnet.Domain.Selectors;
@@ -15,8 +17,11 @@ public class ApplicationMappingProfile : Profile
         CreateMap<EventEntity, EventName>();
         CreateMap<Event, EventLocationModel>();
         CreateMap<LocationEntity, Location>();
+        CreateMap<LocationEntity, LocationViewModel>();
+        CreateMap<TagEntity, Tag>();
         CreateProjection<TagEntity, TagName>();
         CreateMap<TagName, TagNameModel>();
+        CreateMap<TagEntity, TagNameModel>();
         CreateProjection<UserEntity, UserNameModel>();
         CreateMap<UserEntity, UserViewModel>();
         CreateMap<RegisterModel, UserEntity>()

@@ -3,7 +3,6 @@ using AutoMapper;
 using Eventnet.Api.Models;
 using Eventnet.Api.Models.Authentication.Tokens;
 using Eventnet.Api.Services;
-using Eventnet.Models.Authentication.Tokens;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
