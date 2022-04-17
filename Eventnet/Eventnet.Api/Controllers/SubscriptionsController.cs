@@ -3,7 +3,6 @@ using Eventnet.Api.Services;
 using Eventnet.DataAccess;
 using Eventnet.DataAccess.Entities;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,7 +16,6 @@ public class SubscriptionsController : Controller
 
     public SubscriptionsController(
         ApplicationDbContext dbContext,
-        UserManager<UserEntity> userManager,
         CurrentUserService currentUserService)
     {
         this.dbContext = dbContext;
@@ -25,7 +23,7 @@ public class SubscriptionsController : Controller
     }
 
     [Authorize]
-    [HttpPost("subscribe/{eventId}")]
+    [HttpPost("subscribe/{eventId:guid}")]
     public async Task<IActionResult> Subscribe(Guid eventId)
     {
         if (eventId == Guid.Empty)
@@ -52,7 +50,7 @@ public class SubscriptionsController : Controller
     }
 
     [Authorize]
-    [HttpPost("unsubscribe/{eventId}")]
+    [HttpPost("unsubscribe/{eventId:guid}")]
     public async Task<IActionResult> UnSubscribe(Guid eventId)
     {
         if (eventId == Guid.Empty)
@@ -76,7 +74,7 @@ public class SubscriptionsController : Controller
         return await GetSubscriptionsCount(eventId);
     }
 
-    [HttpGet("count/{eventId}")]
+    [HttpGet("count/{eventId:guid}")]
     public async Task<IActionResult> GetSubscriptionsCount(Guid eventId)
     {
         if (eventId == Guid.Empty)
@@ -86,7 +84,7 @@ public class SubscriptionsController : Controller
             .Select(x => new
             {
                 x.Id,
-                SubscriptionsCount = x.Subscriptions.Count()
+                SubscriptionsCount = x.Subscriptions.Count
             })
             .FirstOrDefaultAsync(x => x.Id == eventId);
 
