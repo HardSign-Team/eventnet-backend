@@ -1,4 +1,7 @@
-﻿namespace Eventnet.Infrastructure.PhotoServices;
+﻿#pragma warning disable CS8618
+// Used for Configuration
+
+namespace Eventnet.Infrastructure.PhotoServices;
 
 public class PhotoStorageConfig
 {
