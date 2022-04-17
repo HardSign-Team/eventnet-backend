@@ -10,6 +10,10 @@ using Eventnet.DataAccess;
 using Eventnet.DataAccess.Entities;
 using Eventnet.Domain;
 using Eventnet.Infrastructure;
+using Eventnet.Infrastructure.PhotoServices;
+using Eventnet.Infrastructure.Validators;
+using Eventnet.Services;
+using Eventnet.Services.SaveServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -22,9 +26,13 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 var jwtTokenConfig = builder.Configuration.GetSection("JWT").Get<JwtTokenConfig>();
 var emailConfig = builder.Configuration.GetSection("Email").Get<EmailConfiguration>();
 const string corsName = "_myAllowSpecificOrigins";
+var rabbitMqConfig = builder.Configuration.GetSection("RabbitMq").Get<RabbitMqConfig>();
+var photoStorageConfig = builder.Configuration.GetSection("PhotoStorage").Get<PhotoStorageConfig>();
 
 services.AddSingleton(emailConfig);
 services.AddSingleton(jwtTokenConfig);
+services.AddSingleton(rabbitMqConfig);
+services.AddSingleton(photoStorageConfig);
 services.AddSingleton<IJwtAuthService, JwtAuthService>();
 services.AddScoped<CurrentUserService>();
 
@@ -34,6 +42,18 @@ services.AddSingleton<IEventFilterFactory, EndDateFilterFactory>();
 services.AddSingleton<IEventFilterFactory, OwnerFilterFactory>();
 services.AddSingleton<IEventFilterFactory, TagsFilterFactory>();
 services.AddSingleton<IEventFilterMapper, EventFilterMapper>();
+services.AddSingleton<IPublishEventService, PublishEventService>();
+services.AddSingleton<EventSaveHandler>();
+services.AddMemoryCache();
+services.AddSingleton<IConsumeEventService, RabbitMqConsumeEventService>();
+services.AddSingleton<IEventSaveService, EventSaveService>();
+services.AddSingleton<IPhotoValidator, PhotoValidator>();
+services.AddSingleton<IPhotoToStorageSaveService, PhotoToStorageSaveService>();
+services.AddSingleton<ISaveToDbService, SaveToDbService>();
+services.AddSingleton<IEventValidator, EventValidator>();
+services.AddSingleton<IPhotoValidator, PhotoValidator>();
+services.AddSingleton<IEventCreationValidator, EventCreationValidator>();
+services.AddSingleton<IRabbitMqMessageHandler, RabbitMqMessageHandler>();
 
 services.AddScoped<IEmailService, EmailService>();
 services.AddScoped<IForgotPasswordService, ForgotPasswordService>();
@@ -124,6 +144,10 @@ services.AddSwaggerGen(option =>
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     option.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 });
+
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
+services.AddHostedService<BackgroundConsumeEventService>();
 
 var app = builder.Build();
 

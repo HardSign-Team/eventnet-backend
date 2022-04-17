@@ -17,6 +17,9 @@ public class ApplicationMappingProfile : Profile
         CreateMap<EventEntity, EventName>();
         CreateMap<Event, EventLocationModel>();
         CreateMap<LocationEntity, Location>();
+        CreateMap<Event, EventEntity>();
+        CreateMap<Location, LocationEntity>();
+        CreateMap<CreateEventModel, Event>();
         CreateMap<LocationEntity, LocationViewModel>();
         CreateMap<TagEntity, Tag>();
         CreateProjection<TagEntity, TagName>();

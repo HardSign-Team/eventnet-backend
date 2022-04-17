@@ -7,34 +7,46 @@ using Eventnet.Api.Models.Filtering;
 using Eventnet.Api.Models.Tags;
 using Eventnet.Api.Services.Filters;
 using Eventnet.DataAccess;
+using Eventnet.DataAccess.Entities;
 using Eventnet.Domain.Events;
 using Eventnet.Domain.Selectors;
+using Eventnet.Infrastructure;
+using Eventnet.Services.SaveServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using X.PagedList;
 
-namespace Eventnet.Api.Controllers;
+namespace Eventnet.Controllers;
 
 [Route("api/events")]
 public class EventController : Controller
 {
     public const int MaxPageSize = 20;
     public const int DefaultPageSize = 10;
+    private const int Timeout = 20;
+    private static readonly string[] SupportedContentTypes = { "image/bmp", "image/png", "image/jpeg" };
     private readonly IEventFilterMapper filterMapper;
     private readonly ApplicationDbContext dbContext;
-    private readonly IMapper mapper;
+    private readonly IEventSaveService eventSaveService;
+    private readonly RabbitMqConfig rabbitMqConfig;
     private readonly LinkGenerator linkGenerator;
+    private readonly IMapper mapper;
 
     public EventController(
         IEventFilterMapper filterMapper,
         ApplicationDbContext dbContext,
         IMapper mapper,
-        LinkGenerator linkGenerator)
+        LinkGenerator linkGenerator,
+        IEventSaveService eventSaveService,
+        RabbitMqConfig rabbitMqConfig)
     {
         this.filterMapper = filterMapper;
         this.dbContext = dbContext;
         this.mapper = mapper;
         this.linkGenerator = linkGenerator;
+        this.eventSaveService = eventSaveService;
+        this.rabbitMqConfig = rabbitMqConfig;
     }
 
     [HttpGet("{eventId:guid}")]
@@ -131,8 +143,44 @@ public class EventController : Controller
         return Ok(mapper.Map<IEnumerable<EventLocationModel>>(events));
     }
 
-    [HttpPost("create")]
-    public IActionResult CreateEvent([FromBody] CreateEventModel createModel) => throw new NotImplementedException();
+    [HttpPost]
+    [Authorize]
+    public async Task<IActionResult> CreateEvent([FromForm] CreateEventModel createModel)
+    {
+        var photos = createModel.Photos;
+
+        if (!IsContentTypesSupported(photos))
+            return BadRequest("Not supported ContentType");
+
+        if (!IsPhotosSizeLessThanRecommended(photos))
+        {
+            var recommendedSizeInMb = rabbitMqConfig.RecommendedMessageSizeInBytes / 1024 / 1024;
+            return BadRequest($"Too large images. Recommended size of all images is {recommendedSizeInMb}Mb.");
+        }
+
+        var isSaved = await IsEventSaved(createModel.Id);
+        if (IsSaveEventBeingHandling(createModel.Id) || isSaved)
+            return BadRequest("One event id provided two times");
+
+        var createdEvent = mapper.Map<Event>(createModel);
+        await eventSaveService.RequestSave(createdEvent, photos);
+        return Accepted();
+    }
+
+    [HttpGet("is-created")]
+    [Authorize]
+    public IActionResult IsCreated(Guid id)
+    {
+        var (saveStatus, exception) = eventSaveService.GetSaveEventResult(id);
+        return saveStatus switch
+        {
+            EventSaveStatus.Saved                    => Ok(),
+            EventSaveStatus.NotSavedDueToUserError   => BadRequest(exception),
+            EventSaveStatus.NotSavedDueToServerError => BadRequest(exception),
+            EventSaveStatus.InProgress               => Accepted(Timeout),
+            _                                        => throw new ArgumentOutOfRangeException($"Unknown SaveState {saveStatus}")
+        };
+    }
 
     // TODO use format https://datatracker.ietf.org/doc/html/rfc6902
     [HttpPatch("{eventId:guid}")]
@@ -150,6 +198,34 @@ public class EventController : Controller
         await dbContext.SaveChangesAsync();
 
         return Ok(new { eventId });
+    }
+
+    [HttpGet("request-event-creation")]
+    [Authorize]
+    public IActionResult RequestEventCreation()
+    {
+        var id = Guid.NewGuid();
+        return Ok(id);
+    }
+
+    private static bool IsContentTypesSupported(IFormFile[] files)
+    {
+        var contentTypes = files.Select(photo => photo.ContentType);
+        return contentTypes.All(SupportedContentTypes.Contains);
+    }
+
+    private bool IsPhotosSizeLessThanRecommended(IFormFile[] photos)
+    {
+        var photosSize = photos.Sum(photo => photo.Length);
+        return photosSize >= rabbitMqConfig.RecommendedMessageSizeInBytes;
+    }
+    
+    private bool IsSaveEventBeingHandling(Guid id) => eventSaveService.IsHandling(id);
+
+    private async Task<bool> IsEventSaved(Guid id)
+    {
+        var eventInDb =  await dbContext.Events.FindAsync(id);
+        return eventInDb is not null;
     }
 
     private static EventsFilterModel? ParseEventsFilterModel(string base64Model)

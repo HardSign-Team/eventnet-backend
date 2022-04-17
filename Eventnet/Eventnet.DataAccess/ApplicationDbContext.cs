@@ -12,6 +12,8 @@ namespace Eventnet.DataAccess;
 public class ApplicationDbContext : IdentityDbContext<UserEntity>
 {
     public DbSet<EventEntity> Events { get; set; }
+    public DbSet<PhotoEntity> Photos { get; set; }
+
     public DbSet<TagEntity> Tags { get; set; }
     public DbSet<SubscriptionEntity> SubscriptionEntities { get; set; }
 
@@ -23,6 +25,7 @@ public class ApplicationDbContext : IdentityDbContext<UserEntity>
     {
         base.OnModelCreating(builder);
         builder.ApplyConfiguration(new EventConfiguration());
+        builder.ApplyConfiguration(new PhotoConfiguration());
         builder.ApplyConfiguration(new SubscriptionEntityConfiguration());
         builder.ApplyConfiguration(new UserRolesConfiguration());
         builder.ApplyConfiguration(new TagEntityConfiguration());
