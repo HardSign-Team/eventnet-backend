@@ -21,7 +21,7 @@ public class CreateEventShould : CreateEventTestsBase
     public async Task TestGetId()
     {
         var request = CreateDefaultRequestToId();
-        var client = GetAuthorizedClient();
+        var (_, client) = await CreateAuthorizedClient("TestUser", "123456");
         
         var response = await client.SendAsync(request);
         
@@ -63,7 +63,7 @@ public class CreateEventShould : CreateEventTestsBase
     [Test]
     public async Task SaveEvent_WhenAllCorrect()
     {
-        var client = GetAuthorizedClient();
+        var (_, client) = await CreateAuthorizedClient("TestUser", "123456");
         var photo = GetFileStream(PathToPhoto);
         
         var eventId = await GetEventGuid();
@@ -89,7 +89,7 @@ public class CreateEventShould : CreateEventTestsBase
     [Test]
     public async Task IsCreatedResponseCode202_WhenNotSaveYet()
     {
-        var client = GetAuthorizedClient();
+        var (_, client) = await CreateAuthorizedClient("TestUser", "123456");
         var eventId = Guid.NewGuid();
         var photo = GetFileStream(PathToPhoto);
         
@@ -104,7 +104,7 @@ public class CreateEventShould : CreateEventTestsBase
     [Test]
     public async Task IsCreatedResponseCode400_WhenUnknownGuid()
     {
-        var client = GetAuthorizedClient();
+        var (_, client) = await CreateAuthorizedClient("TestUser", "123456");
         var eventId = Guid.NewGuid();
         var request = GetIsCreatedRequest(eventId);
         
@@ -115,7 +115,7 @@ public class CreateEventShould : CreateEventTestsBase
     
     private async Task<HttpResponseMessage> PostAsync(Guid eventId, Guid ownerId, FileStream fileStream, string mediaType)
     {
-        var client = GetAuthorizedClient();
+        var (_, client) = await CreateAuthorizedClient("TestUser", "123456");
         var multipart = GetEventCreationRequestMessage(eventId, ownerId, fileStream, mediaType);
         var uri = new UriBuilder(Configuration.BaseUrl) { Path = BaseRoute }.Uri;
         return await client.PostAsync(uri, multipart);

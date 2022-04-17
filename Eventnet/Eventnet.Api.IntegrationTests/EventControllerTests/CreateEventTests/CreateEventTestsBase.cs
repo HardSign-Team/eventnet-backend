@@ -4,36 +4,23 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
 using Eventnet.Api.IntegrationTests.Helpers;
 using Eventnet.Api.Models.Authentication;
 using Eventnet.DataAccess.Entities;
+using Eventnet.DataAccess.Models;
 using Eventnet.Domain.Events;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json;
-using NUnit.Framework;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Eventnet.Api.IntegrationTests.EventControllerTests.CreateEventTests;
 
 public class CreateEventTestsBase : TestWithRabbitMqBase
 {
     protected const string BaseRoute = "/api/events";
-    private string token;
-
-    [OneTimeSetUp]
-    public async Task SetUp()
-    {
-        token = await GetAccessToken();
-    }
-
-    protected HttpClient GetAuthorizedClient()
-    {
-        var client = HttpClient;
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        return client;
-    }
-
+    
     protected static HttpRequestMessage GetIsCreatedRequest(Guid eventId)
     {
         var request = new HttpRequestMessage();
@@ -49,11 +36,36 @@ public class CreateEventTestsBase : TestWithRabbitMqBase
 
     protected async Task<Guid> GetEventGuid()
     {
-        var client = GetAuthorizedClient();
+        var (_, client) = await CreateAuthorizedClient("TestUser", "123456");
         var request = CreateDefaultRequestToId();
         var response = await client.SendAsync(request);
         var guid = await response.Content.ReadAsStringAsync();
         return Guid.Parse(guid.Replace("\"", ""));
+    }
+    
+    protected async Task<(UserEntity, HttpClient)> CreateAuthorizedClient(string username, string password)
+    {
+        var factory = GetScopeFactory();
+        using var scope = factory.CreateScope();
+        var userManager = scope.ServiceProvider.GetService<UserManager<UserEntity>>()!;
+        var user = await userManager.FindByNameAsync(username);
+        if (user is null)
+        {
+            var registerModel = new RegisterModel
+            {
+                UserName = username,
+                Email = $"{username}@test.com",
+                Password = password,
+                ConfirmPassword = password,
+                Gender = Gender.Male,
+                PhoneNumber = null
+            };
+
+            user = await AuthorizationHelper.RegisterUserAsync(userManager, registerModel);
+        }
+
+        var client = await AuthorizationHelper.AuthorizeClient(HttpClient, username, password);
+        return (user, client);
     }
 
     protected static FileStream GetFileStream(string path) => File.OpenRead(path);
@@ -83,50 +95,7 @@ public class CreateEventTestsBase : TestWithRabbitMqBase
         content.Headers.ContentType = new MediaTypeHeaderValue(mediaType);
         return content;
     }
-
-    private async Task<string> GetAccessToken()
-    {
-        const string username = "TestUser";
-        const string password = "12345678";
-        
-        CreateTestUser(username);
-        var request = GetLoginRequest(username, password);
-        var response = await HttpClient.SendAsync(request);
-        var loginModel = JsonConvert.DeserializeObject<LoginResponseModel>(response.Content.ReadAsStringAsync().Result);
-        return loginModel.AccessToken;
-    }
     
-    private void CreateTestUser(string username)
-    {
-        ApplyToDb(context =>
-        {
-            context.Users.Add(new UserEntity()
-            {
-                UserName = username, 
-                Email = "TestUser@example.com", 
-                Id = Guid.NewGuid().ToString(),
-                ConcurrencyStamp = Guid.NewGuid().ToString(), 
-                EmailConfirmed = true, 
-                PasswordHash = "AQAAAAEAACcQAAAAEG61NA2ZZp6xzxqrMvfOgbKU1P+pJEuu2Rt6IiHgJuXQcWQukjPJ9cbR22n5h7T/RA==", // 12345678
-                NormalizedUserName = username.ToUpper()
-            });
-            context.SaveChanges();
-        });
-    }
-
-    private static HttpRequestMessage GetLoginRequest(string username, string password)
-    {
-        var request = new HttpRequestMessage();
-        var login = new LoginModel(username, password);
-        request.Method = HttpMethod.Post;
-        request.Content = new StringContent(JsonConvert.SerializeObject(login), Encoding.UTF8, "application/json");
-        request.RequestUri = new UriBuilder(Configuration.BaseUrl)
-        {
-            Path = "/api/auth/login"
-        }.Uri;
-        return request;
-    }
-
     protected static HttpRequestMessage CreateDefaultRequestToId()
     {
         var request = new HttpRequestMessage();
