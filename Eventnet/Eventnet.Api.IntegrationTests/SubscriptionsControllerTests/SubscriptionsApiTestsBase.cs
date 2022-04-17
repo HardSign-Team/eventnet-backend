@@ -5,6 +5,7 @@ using System.Web;
 using Eventnet.Api.IntegrationTests.Helpers;
 using Eventnet.Api.Models.Authentication;
 using Eventnet.DataAccess.Entities;
+using Eventnet.DataAccess.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -56,8 +57,17 @@ public class SubscriptionsApiTestsBase : TestsBase
         var user = await userManager.FindByNameAsync(username);
         if (user is null)
         {
-            var registerModel = new RegisterModel(username, $"{username}@test.com", password, null);
-            user = await AuthorizationHelper.RegisterUserAsync(userManager, registerModel);
+            var registerModel = new RegisterModel
+            {
+                UserName = username,
+                Email = $"{username}@test.com",
+                Password = password,
+                ConfirmPassword = password,
+                Gender = Gender.Male,
+                PhoneNumber = null
+            };
+
+        user = await AuthorizationHelper.RegisterUserAsync(userManager, registerModel);
         }
 
         var client = await AuthorizationHelper.AuthorizeClient(HttpClient, username, password);

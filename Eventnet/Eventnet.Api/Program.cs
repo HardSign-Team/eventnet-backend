@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Text;
+using System.Text.Json.Serialization;
 using Eventnet.Api.Config;
 using Eventnet.Api.Helpers.EventFilterFactories;
 using Eventnet.Api.Models.Authentication.Tokens;
@@ -41,7 +42,8 @@ services.AddMemoryCache();
 
 services.AddHttpContextAccessor();
 
-services.AddControllers();
+services.AddControllers().AddJsonOptions(x =>
+    x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 services.AddEndpointsApiExplorer();
 

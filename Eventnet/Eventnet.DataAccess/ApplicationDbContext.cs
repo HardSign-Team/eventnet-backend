@@ -26,5 +26,6 @@ public class ApplicationDbContext : IdentityDbContext<UserEntity>
         builder.ApplyConfiguration(new SubscriptionEntityConfiguration());
         builder.ApplyConfiguration(new UserRolesConfiguration());
         builder.ApplyConfiguration(new TagEntityConfiguration());
+        builder.ApplyConfiguration(new UserEntityConfiguration());
     }
 }
