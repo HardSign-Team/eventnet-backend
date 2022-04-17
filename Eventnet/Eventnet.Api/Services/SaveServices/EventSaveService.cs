@@ -6,19 +6,19 @@ namespace Eventnet.Services.SaveServices;
 
 public class EventSaveService : IEventSaveService
 {
-    private readonly Handler handler;
+    private readonly EventSaveHandler eventSaveHandler;
     private readonly IPublishEventService publishEventService;
 
-    public EventSaveService(IPublishEventService publishEventService, Handler handler)
+    public EventSaveService(IPublishEventService publishEventService, EventSaveHandler eventSaveHandler)
     {
         this.publishEventService = publishEventService;
-        this.handler = handler;
+        this.eventSaveHandler = eventSaveHandler;
     }
 
     public async Task RequestSave(Event eventForSave, IFormFile[] photos)
     {
         var saveEventResult = new SaveEventResult(EventSaveStatus.InProgress, string.Empty);
-        handler.Update(eventForSave.Id, saveEventResult);
+        eventSaveHandler.Update(eventForSave.Id, saveEventResult);
         try
         {
             var rabbitMqPhotos = await GetRabbitMqPhotosAsync(photos);
@@ -28,17 +28,17 @@ public class EventSaveService : IEventSaveService
         catch (Exception e)
         {
             saveEventResult = new SaveEventResult(EventSaveStatus.NotSavedDueToServerError, string.Empty);
-            handler.Update(eventForSave.Id, saveEventResult);
+            eventSaveHandler.Update(eventForSave.Id, saveEventResult);
             Console.WriteLine(e); // TODO: add logger
             throw;
         }
     }
 
-    public bool IsHandling(Guid id) => handler.IsHandling(id);
+    public bool IsHandling(Guid id) => eventSaveHandler.IsHandling(id);
 
     public SaveEventResult GetSaveEventResult(Guid id)
     {
-        if (!handler.TryGetValue(id, out var saveEventResult))
+        if (!eventSaveHandler.TryGetValue(id, out var saveEventResult))
             return new SaveEventResult(EventSaveStatus.NotSavedDueToUserError, "No such Guid");
         return saveEventResult;
     }

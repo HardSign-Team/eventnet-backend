@@ -5,14 +5,14 @@ namespace Eventnet.Infrastructure;
 
 public class RabbitMqMessageHandler : IRabbitMqMessageHandler
 {
-    private readonly Handler handler;
+    private readonly EventSaveHandler eventSaveHandler;
     private readonly ISaveToDbService saveToDbService;
     private readonly IEventCreationValidator validator;
 
-    public RabbitMqMessageHandler(Handler handler, IEventCreationValidator validator,
+    public RabbitMqMessageHandler(EventSaveHandler eventSaveHandler, IEventCreationValidator validator,
         ISaveToDbService saveToDbService)
     {
-        this.handler = handler;
+        this.eventSaveHandler = eventSaveHandler;
         this.validator = validator;
         this.saveToDbService = saveToDbService;
     }
@@ -42,7 +42,7 @@ public class RabbitMqMessageHandler : IRabbitMqMessageHandler
             status = EventSaveStatus.NotSavedDueToServerError;
             Console.WriteLine(e); // TODO: add logger
         }
-        handler.Update(id, new SaveEventResult(status, errorMessage));
+        eventSaveHandler.Update(id, new SaveEventResult(status, errorMessage));
     }
 
     private List<Photo> GetPhotos(List<RabbitMqPhoto> rabbitMqPhotos) => 

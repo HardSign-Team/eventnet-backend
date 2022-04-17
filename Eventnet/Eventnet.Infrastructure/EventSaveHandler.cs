@@ -2,11 +2,11 @@
 
 namespace Eventnet.Infrastructure;
 
-public class Handler
+public class EventSaveHandler
 {
     private readonly IMemoryCache cache;
 
-    public Handler(IMemoryCache cache)
+    public EventSaveHandler(IMemoryCache cache)
     {
         this.cache = cache;
     }

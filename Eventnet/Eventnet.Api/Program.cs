@@ -32,7 +32,7 @@ services.AddSingleton<IEventFilterFactory, EndDateFilterFactory>();
 services.AddSingleton<IEventFilterFactory, OwnerFilterFactory>();
 services.AddSingleton<IEventFilterMapper, EventFilterMapper>();
 services.AddSingleton<IPublishEventService, PublishEventService>();
-services.AddSingleton<Handler>();
+services.AddSingleton<EventSaveHandler>();
 services.AddMemoryCache();
 services.AddSingleton<IConsumeEventService, RabbitMqConsumeEventService>();
 services.AddSingleton<IEventSaveService, EventSaveService>();
