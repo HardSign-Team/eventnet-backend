@@ -11,6 +11,8 @@ public class TestsBase
     protected HttpClient HttpClient => factory.CreateClient();
     private readonly WebApplicationFactory<Program> factory = new TestWebApplicationFactory<Program>();
 
+    protected IServiceScopeFactory GetScopeFactory() => factory.Services.GetService<IServiceScopeFactory>()!;
+
     protected void ApplyToDb(Action<ApplicationDbContext> action)
     {
         var scopeFactory = factory.Services.GetService<IServiceScopeFactory>();

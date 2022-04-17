@@ -13,6 +13,7 @@ public class ApplicationDbContext : IdentityDbContext<UserEntity>
 {
     public DbSet<EventEntity> Events { get; set; }
     public DbSet<TagEntity> Tags { get; set; }
+    public DbSet<SubscriptionEntity> SubscriptionEntities { get; set; }
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {

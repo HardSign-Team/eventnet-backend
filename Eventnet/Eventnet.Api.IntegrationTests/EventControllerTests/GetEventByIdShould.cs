@@ -56,9 +56,7 @@ public class GetEventByIdShould : EventApiTestsBase
     [Test]
     public async Task ResponseCode200_WhenEventExists()
     {
-        var eventEntity = EventEntityMother.CreateEventEntity();
-        var tags = new[] { "A", "B", "ccc" };
-        AddTags(eventEntity, tags);
+        var eventEntity = GetTestEvent();
         var request = new HttpRequestMessage();
         request.Method = HttpMethod.Get;
         request.RequestUri = BuildEventsByIdUri(eventEntity.Id);
@@ -76,22 +74,36 @@ public class GetEventByIdShould : EventApiTestsBase
             description = eventEntity.Description,
             startDate = eventEntity.StartDate,
             endDate = eventEntity.EndDate,
-            locationEntity = eventEntity.Location,
-            tags = eventEntity.Tags
+            location = eventEntity.Location,
+            tags = eventEntity.Tags,
+            totalSubscriptions = eventEntity.Subscriptions.Count
         });
     }
 
-    private void AddTags(EventEntity eventEntity, string[] tags)
+    private EventEntity GetTestEvent()
     {
-        ApplyToDb(context =>
+        return ApplyToDb(context =>
         {
-            var tagEntities = tags.Select(x => new TagEntity(x)).ToArray();
-            context.Tags.AddRange(tagEntities);
-            context.SaveChanges();
+            context.AddUsers();
+            context.AddEvents(context.Users);
+            context.AddTags();
 
-            eventEntity.Tags.AddRange(tagEntities);
-            context.Events.Add(eventEntity);
+            var entity = context.Events.First();
+            var tagEntities = context.Tags.Take(6).ToArray();
+            var subscribers = context.Users.Take(3).ToArray();
+
+            foreach (var subscriber in subscribers)
+            {
+                entity.Subscribe(subscriber);
+            }
+
+            foreach (var tag in tagEntities)
+            {
+                entity.AddTag(tag);
+            }
+
             context.SaveChanges();
+            return entity;
         });
     }
 }

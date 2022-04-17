@@ -17,10 +17,12 @@ public class ApplicationMappingProfile : Profile
         CreateMap<EventEntity, EventName>();
         CreateMap<Event, EventLocationModel>();
         CreateMap<LocationEntity, Location>();
+        CreateMap<LocationEntity, LocationViewModel>();
+        CreateMap<TagEntity, Tag>();
         CreateProjection<TagEntity, TagName>();
         CreateMap<TagName, TagNameModel>();
+        CreateMap<TagEntity, TagNameModel>();
         CreateProjection<UserEntity, UserNameModel>();
-        CreateMap<TagEntity, Tag>();
         CreateMap<UserEntity, UserViewModel>();
         CreateMap<RegisterModel, UserEntity>()
             .ForMember(x => x.PhoneNumber,

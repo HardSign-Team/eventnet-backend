@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Eventnet.DataAccess.Configurations;
 
-public class SubscriptionEntityConfiguration :IEntityTypeConfiguration<SubscriptionEntity>
+public class SubscriptionEntityConfiguration : IEntityTypeConfiguration<SubscriptionEntity>
 {
     public void Configure(EntityTypeBuilder<SubscriptionEntity> builder)
     {

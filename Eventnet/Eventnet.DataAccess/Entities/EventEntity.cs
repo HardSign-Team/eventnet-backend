@@ -46,4 +46,16 @@ public class EventEntity
     {
         Location = location;
     }
+
+    public SubscriptionEntity Subscribe(UserEntity user)
+    {
+        var subscription = new SubscriptionEntity(Id, user.Id, DateTime.Now);
+        Subscriptions.Add(subscription);
+        return subscription;
+    }
+
+    public void AddTag(TagEntity tagEntity)
+    {
+        Tags.Add(tagEntity);
+    }
 }

@@ -4,6 +4,7 @@ using AutoMapper;
 using Eventnet.Api.Helpers;
 using Eventnet.Api.Models.Events;
 using Eventnet.Api.Models.Filtering;
+using Eventnet.Api.Models.Tags;
 using Eventnet.Api.Services.Filters;
 using Eventnet.DataAccess;
 using Eventnet.Domain.Events;
@@ -45,13 +46,33 @@ public class EventController : Controller
             return UnprocessableEntity(ModelState);
         }
 
-        var eventEntity = await dbContext.Events
-            .Include(x => x.Tags)
+        var entity = await dbContext.Events
+            .AsNoTracking()
+            .Select(x => new
+            {
+                x.Id,
+                x.OwnerId,
+                x.Description,
+                x.Location,
+                x.StartDate,
+                x.EndDate,
+                x.Name,
+                x.Tags,
+                TotalSubscriptions = x.Subscriptions.Count()
+            })
             .FirstOrDefaultAsync(x => x.Id == eventId);
-        if (eventEntity is null)
+        if (entity is null)
             return NotFound();
-
-        return Ok(mapper.Map<Event>(eventEntity));
+        var eventViewModel = new EventViewModel(entity.Id,
+            entity.OwnerId,
+            entity.Name,
+            entity.Description,
+            mapper.Map<LocationViewModel>(entity.Location),
+            entity.StartDate,
+            entity.EndDate,
+            entity.Tags.Select(mapper.Map<TagNameModel>).ToArray(),
+            entity.TotalSubscriptions);
+        return Ok(eventViewModel);
     }
 
     [HttpGet("search/name/{eventName}")]
@@ -94,8 +115,10 @@ public class EventController : Controller
         pageNumber = NumberHelper.Normalize(pageNumber, 1);
         pageSize = NumberHelper.Normalize(pageSize, 1, MaxPageSize);
 
-        var q = dbContext.Events.Include(x => x.Tags).AsNoTracking();
-        var query = q.AsEnumerable().Select(x => mapper.Map<Event>(x));
+        var query = dbContext.Events
+            .AsNoTracking()
+            .AsEnumerable()
+            .Select(x => mapper.Map<Event>(x));
         var filter = filterMapper.Map(filterModel);
         var filteredEvents = filter.Filter(query);
 
