@@ -115,8 +115,10 @@ public class EventController : Controller
         pageNumber = NumberHelper.Normalize(pageNumber, 1);
         pageSize = NumberHelper.Normalize(pageSize, 1, MaxPageSize);
 
-        var q = dbContext.Events.Include(x => x.Tags).AsNoTracking();
-        var query = q.AsEnumerable().Select(x => mapper.Map<Event>(x));
+        var query = dbContext.Events
+            .AsNoTracking()
+            .AsEnumerable()
+            .Select(x => mapper.Map<Event>(x));
         var filter = filterMapper.Map(filterModel);
         var filteredEvents = filter.Filter(query);
 
