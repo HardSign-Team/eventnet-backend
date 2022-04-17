@@ -39,7 +39,7 @@ public class EventSaveService : IEventSaveService
     public SaveEventResult GetSaveEventResult(Guid id)
     {
         if (!eventSaveHandler.TryGetValue(id, out var saveEventResult))
-            return new SaveEventResult(EventSaveStatus.NotSavedDueToUserError, "No such Guid");
+            return new SaveEventResult(EventSaveStatus.NotSavedDueToUserError, "No such Id");
         return saveEventResult;
     }
 

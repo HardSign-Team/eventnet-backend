@@ -21,6 +21,7 @@ public class EventController : Controller
     public const int MaxPageSize = 20;
     public const int DefaultPageSize = 10;
     private const int Timeout = 20;
+    private static readonly string[] SupportedContentTypes = { "image/bmp", "image/png", "image/jpeg" };
     private readonly IEventFilterMapper filterMapper;
     private readonly ApplicationDbContext dbContext;
     private readonly IEventSaveService eventSaveService;
@@ -123,9 +124,7 @@ public class EventController : Controller
         var photos = createModel.Photos;
 
         if (!IsContentTypesSupported(photos))
-        {
             return BadRequest("Not supported ContentType");
-        }
 
         if (!IsPhotosSizeLessThanRecommended(photos))
         {
@@ -134,10 +133,8 @@ public class EventController : Controller
         }
 
         var isSaved = await IsEventSaved(createModel.Id);
-        if (WhetherSaveEventBeingHandling(createModel.Id) || isSaved)
-        {
+        if (IsSaveEventBeingHandling(createModel.Id) || isSaved)
             return BadRequest("One event id provided two times");
-        }
 
         var createdEvent = mapper.Map<Event>(createModel);
         await eventSaveService.RequestSave(createdEvent, photos);
@@ -181,7 +178,7 @@ public class EventController : Controller
 
     [HttpGet("request-event-creation")]
     [Authorize]
-    public IActionResult GenerateEventGuid()
+    public IActionResult RequestEventCreation()
     {
         var id = Guid.NewGuid();
         return Ok(id);
@@ -189,9 +186,8 @@ public class EventController : Controller
 
     private static bool IsContentTypesSupported(IFormFile[] files)
     {
-        var supportedContentTypes = new [] { "image/bmp", "image/png", "image/jpeg" };
         var contentTypes = files.Select(photo => photo.ContentType);
-        return contentTypes.All(supportedContentTypes.Contains);
+        return contentTypes.All(SupportedContentTypes.Contains);
     }
 
     private bool IsPhotosSizeLessThanRecommended(IFormFile[] photos)
@@ -200,7 +196,7 @@ public class EventController : Controller
         return photosSize >= rabbitMqConfig.RecommendedMessageSizeInBytes;
     }
     
-    private bool WhetherSaveEventBeingHandling(Guid id) => eventSaveService.IsHandling(id);
+    private bool IsSaveEventBeingHandling(Guid id) => eventSaveService.IsHandling(id);
 
     private async Task<bool> IsEventSaved(Guid id)
     {
