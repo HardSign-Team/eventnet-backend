@@ -28,8 +28,6 @@ public class ApplicationMappingProfile : Profile
         CreateProjection<UserEntity, UserNameModel>();
         CreateMap<UserEntity, UserViewModel>();
         CreateMap<RegisterModel, UserEntity>()
-            .ForMember(x => x.BirthDate,
-                x => x.MapFrom(opt => DateOnly.FromDateTime(opt.BirthDate)))
             .ForSourceMember(x => x.Password,
                 opt => opt.DoNotValidate());
     }

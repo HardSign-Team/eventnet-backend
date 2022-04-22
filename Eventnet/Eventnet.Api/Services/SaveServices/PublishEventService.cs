@@ -15,13 +15,14 @@ public class PublishEventService : IPublishEventService
         var factory = new ConnectionFactory { HostName = config.HostName };
         connection = factory.CreateConnection();
         channel = connection.CreateModel();
+        channel.QueueDeclare(queue, true, false, false);
     }
 
     public async Task PublishAsync(string message)
     {
         await Task.Run(() =>
         {
-            channel.QueueDeclare(queue, true, false, false);
+            
             var properties = channel.CreateBasicProperties();
             properties.Persistent = false;
             channel.BasicPublish(string.Empty, queue, null, Encoding.UTF8.GetBytes(message));
