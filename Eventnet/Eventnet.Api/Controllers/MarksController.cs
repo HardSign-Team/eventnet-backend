@@ -96,7 +96,19 @@ public class MarksController : Controller
     [HttpPost("dislikes/remove/{eventId:guid}")]
     public async Task<IActionResult> RemoveDislike(Guid eventId)
     {
-        throw new NotImplementedException();
+        if (eventId == Guid.Empty)
+            return NotFound();
+
+        var eventExists = await dbContext.Events.AnyAsync(x => x.Id == eventId);
+        if (!eventExists)
+            return NotFound();
+
+        var user = await currentUserService.GetCurrentUser() ?? throw new Exception();
+        var likes = dbContext.Marks.Dislikes().Of(user).For(eventId);
+        dbContext.Marks.RemoveRange(likes);
+        await dbContext.SaveChangesAsync();
+
+        return await CountMarks(eventId);
     }
 
     private async Task<IActionResult> CountMarks(Guid eventId)
