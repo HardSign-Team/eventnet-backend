@@ -59,4 +59,8 @@ public class EventEntity
     {
         Tags.Add(tagEntity);
     }
+
+    public MarkEntity Like(UserEntity user) => new(user.Id, Id, true, DateTime.Now);
+    
+    public MarkEntity Dislike(UserEntity user) => new(user.Id, Id, false, DateTime.Now);
 }

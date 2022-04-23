@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -76,7 +77,11 @@ public class GetEventByIdShould : EventApiTestsBase
             endDate = eventEntity.EndDate,
             location = eventEntity.Location,
             tags = eventEntity.Tags,
-            totalSubscriptions = eventEntity.Subscriptions.Count
+            totalSubscriptions = eventEntity.Subscriptions.Count,
+            marks = new {
+                likes = 2,
+                dislikes = 1
+            }
         });
     }
 
@@ -89,21 +94,37 @@ public class GetEventByIdShould : EventApiTestsBase
             context.AddTags();
 
             var entity = context.Events.First();
-            var tagEntities = context.Tags.Take(6).ToArray();
-            var subscribers = context.Users.Take(3).ToArray();
 
-            foreach (var subscriber in subscribers)
-            {
-                entity.Subscribe(subscriber);
-            }
+            AddSubscribers(entity, context.Users.Take(3).ToArray());
+            AddTags(entity, context.Tags.Take(6).ToArray());
 
-            foreach (var tag in tagEntities)
-            {
-                entity.AddTag(tag);
-            }
-
+            var marks = AddMarks(entity, context.Users.Take(3).ToArray());
+            context.Marks.AddRange(marks);
             context.SaveChanges();
             return entity;
         });
+    }
+
+    private static IEnumerable<MarkEntity> AddMarks(EventEntity eventEntity, UserEntity[] users)
+    {
+        yield return eventEntity.Like(users[0]);
+        yield return eventEntity.Like(users[1]);
+        yield return eventEntity.Dislike(users[2]);
+    }
+
+    private static void AddSubscribers(EventEntity eventEntity, IEnumerable<UserEntity> users)
+    {
+        foreach (var user in users)
+        {
+            eventEntity.Subscribe(user);
+        }
+    }
+
+    private static void AddTags(EventEntity eventEntity, IEnumerable<TagEntity> tags)
+    {
+        foreach (var tag in tags)
+        {
+            eventEntity.AddTag(tag);
+        }
     }
 }
