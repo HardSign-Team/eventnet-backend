@@ -42,20 +42,7 @@ public class MarksController : Controller
 
         await dbContext.SaveChangesAsync();
 
-        var marksCount = await dbContext.Marks
-            .Where(x => x.EventId == eventId)
-            .GroupBy(x => x.EventId)
-            .Select(x => new
-            {
-                Likes = x.Count(y => y.IsLike),
-                Dislikes = x.Count(y => !y.IsLike)
-            })
-            .FirstOrDefaultAsync();
-
-        if (marksCount is null)
-            return NotFound();
-
-        return Ok(new MarksCountViewModel(marksCount.Likes, marksCount.Dislikes));
+        return await CountMarks(eventId);
     }
     
     [Authorize]
@@ -69,7 +56,27 @@ public class MarksController : Controller
     [HttpPost("dislikes/add/{eventId:guid}")]
     public async Task<IActionResult> AddDislike(Guid eventId)
     {
-        throw new NotImplementedException();
+        if (eventId == Guid.Empty)
+            return NotFound();
+        
+        var user = await currentUserService.GetCurrentUser() ?? throw new Exception();
+        var mark = await dbContext.Marks.FirstOrDefaultAsync(x => x.UserId == user.Id && x.EventId == eventId);
+        if (mark is null)
+        {
+            var eventEntity = await dbContext.Events.FirstOrDefaultAsync(x => x.Id == eventId);
+            if (eventEntity is null)
+                return NotFound();
+            mark = eventEntity.Dislike(user);
+            await dbContext.Marks.AddAsync(mark);
+        }
+        else
+        {
+            mark.Dislike();
+        }
+
+        await dbContext.SaveChangesAsync();
+
+        return await CountMarks(eventId);
     }
     
     [Authorize]
@@ -77,5 +84,20 @@ public class MarksController : Controller
     public async Task<IActionResult> RemoveDislike(Guid eventId)
     {
         throw new NotImplementedException();
+    }
+
+    private async Task<IActionResult> CountMarks(Guid eventId)
+    {
+        var viewModel = await dbContext.Marks
+            .Where(x => x.EventId == eventId)
+            .GroupBy(x => x.EventId)
+            .Select(x => new MarksCountViewModel(
+                x.Count(y => y.IsLike),  
+                x.Count(y => !y.IsLike)))
+            .FirstOrDefaultAsync();
+        
+        if (viewModel is null)
+            return NotFound();
+        return Ok(viewModel);
     }
 }
