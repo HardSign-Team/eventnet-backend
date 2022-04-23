@@ -4,6 +4,7 @@ using AutoMapper;
 using Eventnet.Api.Helpers;
 using Eventnet.Api.Models.Events;
 using Eventnet.Api.Models.Filtering;
+using Eventnet.Api.Models.Marks;
 using Eventnet.Api.Models.Tags;
 using Eventnet.Api.Services.Filters;
 using Eventnet.DataAccess;
@@ -70,7 +71,9 @@ public class EventController : Controller
                 x.EndDate,
                 x.Name,
                 x.Tags,
-                TotalSubscriptions = x.Subscriptions.Count()
+                TotalSubscriptions = x.Subscriptions.Count,
+                Likes = x.Marks.Count(mark => mark.IsLike),
+                Dislikes = x.Marks.Count(mark => !mark.IsLike)
             })
             .FirstOrDefaultAsync(x => x.Id == eventId);
         if (entity is null)
@@ -83,7 +86,8 @@ public class EventController : Controller
             entity.StartDate,
             entity.EndDate,
             entity.Tags.Select(mapper.Map<TagNameModel>).ToArray(),
-            entity.TotalSubscriptions);
+            entity.TotalSubscriptions,
+            new MarksCountViewModel(entity.Likes, entity.Dislikes));
         return Ok(eventViewModel);
     }
 

@@ -1,4 +1,5 @@
-﻿using Eventnet.Api.Models.Tags;
+﻿using Eventnet.Api.Models.Marks;
+using Eventnet.Api.Models.Tags;
 
 namespace Eventnet.Api.Models.Events;
 
@@ -11,4 +12,5 @@ public record EventViewModel(
     DateTime StartDate,
     DateTime? EndDate,
     TagNameModel[] Tags,
-    int TotalSubscriptions);
+    int TotalSubscriptions,
+    MarksCountViewModel Marks);
