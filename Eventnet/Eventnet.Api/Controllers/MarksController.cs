@@ -2,6 +2,7 @@
 using Eventnet.Api.Models.Marks;
 using Eventnet.Api.Services;
 using Eventnet.DataAccess;
+using Eventnet.DataAccess.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -24,32 +25,38 @@ public class MarksController : Controller
     [HttpPost("likes/add/{eventId:guid}")]
     public async Task<IActionResult> AddLike(Guid eventId)
     {
-        if (eventId == Guid.Empty)
-            return NotFound();
-        var user = await currentUserService.GetCurrentUser() ?? throw new Exception();
-        var mark = await dbContext.Marks.Of(user).For(eventId).FirstOrDefaultAsync();
-        if (mark is null)
-        {
-            var eventEntity = await dbContext.Events.FirstOrDefaultAsync(x => x.Id == eventId);
-            if (eventEntity is null)
-                return NotFound();
-            mark = eventEntity.Like(user);
-            await dbContext.Marks.AddAsync(mark);
-        }
-        else
-        {
-            mark.Like();
-        }
-
-        await dbContext.SaveChangesAsync();
-
-        return await CountMarks(eventId);
+        return await HandleAddMark(eventId, 
+            (eventEntity, user) => eventEntity.Like(user), 
+            mark => mark.Like());
     }
 
     [Authorize]
     [HttpPost("likes/remove/{eventId:guid}")]
     public async Task<IActionResult> RemoveLike(Guid eventId)
     {
+        return await HandleRemoveMarks(eventId, context => context.Marks.Likes());
+    }
+
+    [Authorize]
+    [HttpPost("dislikes/add/{eventId:guid}")]
+    public async Task<IActionResult> AddDislike(Guid eventId)
+    {
+        return await HandleAddMark(eventId, 
+            (eventEntity, user) => eventEntity.Dislike(user), 
+            mark => mark.Dislike());
+    }
+
+    [Authorize]
+    [HttpPost("dislikes/remove/{eventId:guid}")]
+    public async Task<IActionResult> RemoveDislike(Guid eventId)
+    {
+        return await HandleRemoveMarks(eventId, context => context.Marks.Dislikes());
+    }
+
+    private async Task<IActionResult> HandleRemoveMarks(
+        Guid eventId,
+        Func<ApplicationDbContext, IQueryable<MarkEntity>> marks)
+    {
         if (eventId == Guid.Empty)
             return NotFound();
 
@@ -58,20 +65,20 @@ public class MarksController : Controller
             return NotFound();
 
         var user = await currentUserService.GetCurrentUser() ?? throw new Exception();
-        var likes = dbContext.Marks.Likes().Of(user).For(eventId);
-        dbContext.Marks.RemoveRange(likes);
+        var filtered = marks(dbContext).Of(user).For(eventId);
+        dbContext.Marks.RemoveRange(filtered);
         await dbContext.SaveChangesAsync();
 
         return await CountMarks(eventId);
     }
 
-    [Authorize]
-    [HttpPost("dislikes/add/{eventId:guid}")]
-    public async Task<IActionResult> AddDislike(Guid eventId)
+    private async Task<IActionResult> HandleAddMark(
+        Guid eventId,
+        Func<EventEntity, UserEntity, MarkEntity> createMark,
+        Action<MarkEntity> changeMark)
     {
         if (eventId == Guid.Empty)
             return NotFound();
-
         var user = await currentUserService.GetCurrentUser() ?? throw new Exception();
         var mark = await dbContext.Marks.Of(user).For(eventId).FirstOrDefaultAsync();
         if (mark is null)
@@ -79,33 +86,14 @@ public class MarksController : Controller
             var eventEntity = await dbContext.Events.FirstOrDefaultAsync(x => x.Id == eventId);
             if (eventEntity is null)
                 return NotFound();
-            mark = eventEntity.Dislike(user);
+            mark = createMark(eventEntity, user);
             await dbContext.Marks.AddAsync(mark);
         }
         else
         {
-            mark.Dislike();
+            changeMark(mark);
         }
 
-        await dbContext.SaveChangesAsync();
-
-        return await CountMarks(eventId);
-    }
-
-    [Authorize]
-    [HttpPost("dislikes/remove/{eventId:guid}")]
-    public async Task<IActionResult> RemoveDislike(Guid eventId)
-    {
-        if (eventId == Guid.Empty)
-            return NotFound();
-
-        var eventExists = await dbContext.Events.AnyAsync(x => x.Id == eventId);
-        if (!eventExists)
-            return NotFound();
-
-        var user = await currentUserService.GetCurrentUser() ?? throw new Exception();
-        var likes = dbContext.Marks.Dislikes().Of(user).For(eventId);
-        dbContext.Marks.RemoveRange(likes);
         await dbContext.SaveChangesAsync();
 
         return await CountMarks(eventId);
