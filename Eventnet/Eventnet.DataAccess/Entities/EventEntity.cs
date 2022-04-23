@@ -18,6 +18,7 @@ public class EventEntity
     public DateTime StartDate { get; set; }
     public List<TagEntity> Tags { get; set; } = new();
     public List<SubscriptionEntity> Subscriptions { get; set; } = new();
+    public List<MarkEntity> Marks { get; set; } = new();
 
     private EventEntity(
         Guid id,

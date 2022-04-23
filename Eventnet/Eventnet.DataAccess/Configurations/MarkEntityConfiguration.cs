@@ -4,21 +4,22 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Eventnet.DataAccess.Configurations;
 
-public class SubscriptionEntityConfiguration : IEntityTypeConfiguration<SubscriptionEntity>
+public class MarkEntityConfiguration : IEntityTypeConfiguration<MarkEntity>
 {
-    public void Configure(EntityTypeBuilder<SubscriptionEntity> builder)
+    public void Configure(EntityTypeBuilder<MarkEntity> builder)
     {
         builder.HasKey(x => new { x.EventId, x.UserId });
-        builder.Property(x => x.SubscriptionDate);
         builder.HasOne<UserEntity>()
             .WithMany()
             .HasForeignKey(x => x.UserId)
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
         builder.HasOne<EventEntity>()
-            .WithMany(x => x.Subscriptions)
+            .WithMany(x => x.Marks)
             .HasForeignKey(x => x.EventId)
-            .OnDelete(DeleteBehavior.Cascade)
-            .IsRequired();
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Cascade);
+        builder.Property(x => x.IsLike);
+        builder.Property(x => x.Date);
     }
 }

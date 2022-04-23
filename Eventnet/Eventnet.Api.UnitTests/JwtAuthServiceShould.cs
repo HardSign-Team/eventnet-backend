@@ -8,7 +8,8 @@ using FluentAssertions;
 using Microsoft.IdentityModel.Tokens;
 using NUnit.Framework;
 
-#pragma warning disable CS8618 TESTS
+// TESTS
+#pragma warning disable CS8618
 
 namespace Eventnet.Api.UnitTests;
 

@@ -13,7 +13,7 @@ public class Utilities
     {
         db.Events.RemoveRange(db.Events);
         db.Tags.RemoveRange(db.Tags);
-        db.SubscriptionEntities.RemoveRange(db.SubscriptionEntities);
+        db.Subscriptions.RemoveRange(db.Subscriptions);
         db.Users.RemoveRange(db.Users);
         db.SaveChanges();
     }

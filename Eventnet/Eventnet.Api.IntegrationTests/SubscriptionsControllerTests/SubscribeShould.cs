@@ -118,10 +118,10 @@ public class SubscribeShould : SubscriptionsApiTestsBase
         });
 
         await client.SendAsync(BuildSubscribeRequest(entity.Id));
-        var subscription1 = ApplyToDb(context => context.SubscriptionEntities.First(x => x.EventId == entity.Id));
+        var subscription1 = ApplyToDb(context => context.Subscriptions.First(x => x.EventId == entity.Id));
         Thread.Sleep(500);
         await client.SendAsync(BuildSubscribeRequest(entity.Id));
-        var subscription2 = ApplyToDb(context => context.SubscriptionEntities.First(x => x.EventId == entity.Id));
+        var subscription2 = ApplyToDb(context => context.Subscriptions.First(x => x.EventId == entity.Id));
 
         subscription2.SubscriptionDate.Should().BeAfter(subscription1.SubscriptionDate);
     }

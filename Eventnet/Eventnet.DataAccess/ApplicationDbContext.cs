@@ -13,9 +13,9 @@ public class ApplicationDbContext : IdentityDbContext<UserEntity>
 {
     public DbSet<EventEntity> Events { get; set; }
     public DbSet<PhotoEntity> Photos { get; set; }
-
     public DbSet<TagEntity> Tags { get; set; }
-    public DbSet<SubscriptionEntity> SubscriptionEntities { get; set; }
+    public DbSet<SubscriptionEntity> Subscriptions { get; set; }
+    public DbSet<MarkEntity> Marks { get; set; }
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
@@ -30,5 +30,6 @@ public class ApplicationDbContext : IdentityDbContext<UserEntity>
         builder.ApplyConfiguration(new UserRolesConfiguration());
         builder.ApplyConfiguration(new TagEntityConfiguration());
         builder.ApplyConfiguration(new UserEntityConfiguration());
+        builder.ApplyConfiguration(new MarkEntityConfiguration());
     }
 }
