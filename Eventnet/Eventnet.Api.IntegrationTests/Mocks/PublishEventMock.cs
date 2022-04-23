@@ -9,6 +9,5 @@ public class PublishEventMock : IPublishEventService
 
     public void Dispose()
     {
-        
     }
 }

@@ -58,7 +58,7 @@ public class AddLikeShould : MarksApiTestBase
         viewModel.Likes.Should().Be(1);
         viewModel.Dislikes.Should().Be(0);
     }
-    
+
     [TestCase(2)]
     [TestCase(10)]
     public async Task Response200_WhenAddSeveralTimes(int n)
@@ -83,7 +83,7 @@ public class AddLikeShould : MarksApiTestBase
             viewModel.Dislikes.Should().Be(0);
         }
     }
-    
+
     [Test]
     public async Task Response200_WhenDislikeBefore()
     {
@@ -101,16 +101,16 @@ public class AddLikeShould : MarksApiTestBase
             context.Marks.Add(mark);
             await context.SaveChangesAsync();
         });
-        
+
         var request = BuildAddLikeRequest(entity.Id);
         var response = await client.SendAsync(request);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        
+
         var viewModel = response.ReadContentAs<MarksCountViewModel>();
         viewModel.Likes.Should().Be(1);
         viewModel.Dislikes.Should().Be(0);
     }
-    
+
     private HttpRequestMessage BuildAddLikeRequest(Guid eventId) => new(HttpMethod.Post, BuildAddLikeUri(eventId));
 }

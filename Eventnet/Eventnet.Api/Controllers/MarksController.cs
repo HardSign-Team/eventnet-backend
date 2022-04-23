@@ -25,8 +25,8 @@ public class MarksController : Controller
     [HttpPost("likes/add/{eventId:guid}")]
     public async Task<IActionResult> AddLike(Guid eventId)
     {
-        return await HandleAddMark(eventId, 
-            (eventEntity, user) => eventEntity.Like(user), 
+        return await HandleAddMark(eventId,
+            (eventEntity, user) => eventEntity.Like(user),
             mark => mark.Like());
     }
 
@@ -41,8 +41,8 @@ public class MarksController : Controller
     [HttpPost("dislikes/add/{eventId:guid}")]
     public async Task<IActionResult> AddDislike(Guid eventId)
     {
-        return await HandleAddMark(eventId, 
-            (eventEntity, user) => eventEntity.Dislike(user), 
+        return await HandleAddMark(eventId,
+            (eventEntity, user) => eventEntity.Dislike(user),
             mark => mark.Dislike());
     }
 

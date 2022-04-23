@@ -7,10 +7,18 @@ public class BackgroundConsumeEventService : BackgroundService
     private readonly IRabbitMqMessageHandler rabbitMqMessageHandler;
     private readonly IConsumeEventService consumeEventService;
 
-    public BackgroundConsumeEventService(IRabbitMqMessageHandler rabbitMqMessageHandler, IConsumeEventService consumeEventService)
+    public BackgroundConsumeEventService(
+        IRabbitMqMessageHandler rabbitMqMessageHandler,
+        IConsumeEventService consumeEventService)
     {
         this.rabbitMqMessageHandler = rabbitMqMessageHandler;
         this.consumeEventService = consumeEventService;
+    }
+
+    public override void Dispose()
+    {
+        consumeEventService.Dispose();
+        base.Dispose();
     }
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -18,11 +26,5 @@ public class BackgroundConsumeEventService : BackgroundService
         stoppingToken.ThrowIfCancellationRequested();
         consumeEventService.ConsumeAndHandle(rabbitMqMessageHandler.Handle);
         return Task.CompletedTask;
-    }
-
-    public override void Dispose()
-    {
-        consumeEventService.Dispose();
-        base.Dispose();
     }
 }

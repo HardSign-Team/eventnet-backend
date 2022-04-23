@@ -9,7 +9,9 @@ public class RabbitMqMessageHandler : IRabbitMqMessageHandler
     private readonly ISaveToDbService saveToDbService;
     private readonly IEventCreationValidator validator;
 
-    public RabbitMqMessageHandler(EventSaveHandler eventSaveHandler, IEventCreationValidator validator,
+    public RabbitMqMessageHandler(
+        EventSaveHandler eventSaveHandler,
+        IEventCreationValidator validator,
         ISaveToDbService saveToDbService)
     {
         this.eventSaveHandler = eventSaveHandler;
@@ -42,10 +44,11 @@ public class RabbitMqMessageHandler : IRabbitMqMessageHandler
             status = EventSaveStatus.NotSavedDueToServerError;
             Console.WriteLine(e); // TODO: add logger
         }
+
         eventSaveHandler.Update(id, new SaveEventResult(status, errorMessage));
     }
 
-    private static List<Photo> GetPhotos(List<RabbitMqPhoto> rabbitMqPhotos) => 
+    private static List<Photo> GetPhotos(List<RabbitMqPhoto> rabbitMqPhotos) =>
         rabbitMqPhotos
             .Select(rabbitMqPhoto => new Photo(rabbitMqPhoto.PhotoInBytes, rabbitMqPhoto.ContentType))
             .ToList();

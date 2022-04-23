@@ -78,7 +78,8 @@ public class GetEventByIdShould : EventApiTestsBase
             location = eventEntity.Location,
             tags = eventEntity.Tags,
             totalSubscriptions = eventEntity.Subscriptions.Count,
-            marks = new {
+            marks = new
+            {
                 likes = 2,
                 dislikes = 1
             }

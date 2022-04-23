@@ -23,19 +23,19 @@ public class CreateEventShould : CreateEventTestsBase
     {
         var request = CreateDefaultRequestToId();
         var (_, client) = await CreateAuthorizedClient("TestUser", "123456");
-        
+
         var response = await client.SendAsync(request);
-        
+
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
-    
+
     [Test]
     public async Task ResponseCode202_WhenEventIsCorrect()
     {
         var photo = GetFileStream(PathToPhoto);
-        
+
         var response = await PostAsync(Guid.NewGuid(), Guid.NewGuid(), photo, ImageMediaTypePng);
-        
+
         response.StatusCode.Should().Be(HttpStatusCode.Accepted);
     }
 
@@ -43,12 +43,12 @@ public class CreateEventShould : CreateEventTestsBase
     public async Task ResponseCode400_WhenFileTypeIsNotSupported()
     {
         var text = GetFileStream(PathToText);
-        
+
         var response = await PostAsync(Guid.NewGuid(), Guid.NewGuid(), text, TextMediaType);
-        
+
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
-    
+
     [Test]
     public async Task ResponseCode400_WhenSameIdProvidedTwoTimes()
     {
@@ -57,7 +57,7 @@ public class CreateEventShould : CreateEventTestsBase
         var id = Guid.NewGuid();
         await PostAsync(id, Guid.NewGuid(), photo, ImageMediaTypePng);
         var response2 = await PostAsync(id, Guid.NewGuid(), photo, ImageMediaTypePng);
-        
+
         response2.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
@@ -66,17 +66,17 @@ public class CreateEventShould : CreateEventTestsBase
     {
         var (_, client) = await CreateAuthorizedClient("TestUser", "123456");
         var photo = GetFileStream(PathToPhoto);
-        
+
         var eventId = await GetEventGuid();
-        
+
         await PostAsync(eventId, Guid.NewGuid(), photo, ImageMediaTypePng);
         var saveToDbTime = Task.Delay(1000);
         await saveToDbTime;
-        
+
         var request = GetIsCreatedRequest(eventId);
-        
+
         var response = await client.SendAsync(request);
-        
+
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var eventEntity = ApplyToDb(context => context.Events.Find(eventId));
@@ -93,12 +93,12 @@ public class CreateEventShould : CreateEventTestsBase
         var (_, client) = await CreateAuthorizedClient("TestUser", "123456");
         var eventId = Guid.NewGuid();
         var photo = GetFileStream(PathToPhoto);
-        
+
         await PostAsync(eventId, Guid.NewGuid(), photo, ImageMediaTypePng);
         var request = GetIsCreatedRequest(eventId);
-        
+
         var response = await client.SendAsync(request);
-        
+
         response.StatusCode.Should().Be(HttpStatusCode.Accepted);
     }
 
@@ -108,13 +108,17 @@ public class CreateEventShould : CreateEventTestsBase
         var (_, client) = await CreateAuthorizedClient("TestUser", "123456");
         var eventId = Guid.NewGuid();
         var request = GetIsCreatedRequest(eventId);
-        
+
         var response = await client.SendAsync(request);
-        
+
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
-    
-    private async Task<HttpResponseMessage> PostAsync(Guid eventId, Guid ownerId, FileStream fileStream, string mediaType)
+
+    private async Task<HttpResponseMessage> PostAsync(
+        Guid eventId,
+        Guid ownerId,
+        FileStream fileStream,
+        string mediaType)
     {
         var (_, client) = await CreateAuthorizedClient("TestUser", "123456");
         var multipart = GetEventCreationRequestMessage(eventId, ownerId, fileStream, mediaType);

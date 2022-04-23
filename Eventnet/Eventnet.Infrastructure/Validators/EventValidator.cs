@@ -6,5 +6,5 @@ public class EventValidator : IEventValidator
 {
     public EventCreationValidationResult Validate(Event eventForValidation) =>
         // надо придумать что проверять на бэкенде.
-        new (true, string.Empty);
+        new(true, string.Empty);
 }

@@ -32,18 +32,18 @@ public class SaveToDbService : ISaveToDbService
         }
     }
 
-    private async Task SavePhotoToDbAsync(PhotoEntity photoEntity)
-    {
-        await using var dbContext = factory.CreateScope().ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        dbContext.Photos.Add(photoEntity);
-        await dbContext.SaveChangesAsync();
-    }
-
     public async Task SaveEvent(Event eventForSave)
     {
         await using var dbContext = factory.CreateScope().ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var eventEntity = mapper.Map<EventEntity>(eventForSave);
         dbContext.Events.Add(eventEntity);
+        await dbContext.SaveChangesAsync();
+    }
+
+    private async Task SavePhotoToDbAsync(PhotoEntity photoEntity)
+    {
+        await using var dbContext = factory.CreateScope().ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        dbContext.Photos.Add(photoEntity);
         await dbContext.SaveChangesAsync();
     }
 }

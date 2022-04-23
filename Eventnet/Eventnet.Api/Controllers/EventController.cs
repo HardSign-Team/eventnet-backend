@@ -8,7 +8,6 @@ using Eventnet.Api.Models.Marks;
 using Eventnet.Api.Models.Tags;
 using Eventnet.Api.Services.Filters;
 using Eventnet.DataAccess;
-using Eventnet.DataAccess.Entities;
 using Eventnet.Domain.Events;
 using Eventnet.Domain.Selectors;
 using Eventnet.Infrastructure;
@@ -178,11 +177,11 @@ public class EventController : Controller
         var (saveStatus, exception) = eventSaveService.GetSaveEventResult(id);
         return saveStatus switch
         {
-            EventSaveStatus.Saved                    => Ok(),
-            EventSaveStatus.NotSavedDueToUserError   => BadRequest(exception),
+            EventSaveStatus.Saved => Ok(),
+            EventSaveStatus.NotSavedDueToUserError => BadRequest(exception),
             EventSaveStatus.NotSavedDueToServerError => BadRequest(exception),
-            EventSaveStatus.InProgress               => Accepted(Timeout),
-            _                                        => throw new ArgumentOutOfRangeException($"Unknown SaveState {saveStatus}")
+            EventSaveStatus.InProgress => Accepted(Timeout),
+            _ => throw new ArgumentOutOfRangeException($"Unknown SaveState {saveStatus}")
         };
     }
 
@@ -223,12 +222,12 @@ public class EventController : Controller
         var photosSize = photos.Sum(photo => photo.Length);
         return photosSize >= rabbitMqConfig.RecommendedMessageSizeInBytes;
     }
-    
+
     private bool IsSaveEventBeingHandling(Guid id) => eventSaveService.IsHandling(id);
 
     private async Task<bool> IsEventSaved(Guid id)
     {
-        var eventInDb =  await dbContext.Events.FindAsync(id);
+        var eventInDb = await dbContext.Events.FindAsync(id);
         return eventInDb is not null;
     }
 

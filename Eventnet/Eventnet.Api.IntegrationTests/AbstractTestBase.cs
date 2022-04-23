@@ -12,12 +12,12 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Eventnet.Api.IntegrationTests;
 
-public abstract class AbstractTestBase 
+public abstract class AbstractTestBase
 {
     protected HttpClient HttpClient => Factory.CreateClient();
     protected abstract WebApplicationFactory<Program> Factory { get; }
     protected IServiceScopeFactory GetScopeFactory() => Factory.Services.GetService<IServiceScopeFactory>()!;
-    
+
     protected void ApplyToDb(Action<ApplicationDbContext> action)
     {
         var scopeFactory = Factory.Services.GetService<IServiceScopeFactory>();
@@ -33,7 +33,7 @@ public abstract class AbstractTestBase
         var context = scope.ServiceProvider.GetService<ApplicationDbContext>();
         return action(context!);
     }
-    
+
     protected async Task ApplyToDbAsync(Func<ApplicationDbContext, Task> action)
     {
         var scopeFactory = Factory.Services.GetService<IServiceScopeFactory>();
@@ -41,7 +41,7 @@ public abstract class AbstractTestBase
         var context = scope.ServiceProvider.GetService<ApplicationDbContext>();
         await action(context!);
     }
-    
+
     protected async Task<T> ApplyToDbAsync<T>(Func<ApplicationDbContext, Task<T>> action)
     {
         var scopeFactory = Factory.Services.GetService<IServiceScopeFactory>();
@@ -49,7 +49,7 @@ public abstract class AbstractTestBase
         var context = scope.ServiceProvider.GetService<ApplicationDbContext>();
         return await action(context!);
     }
-    
+
     protected async Task<(UserEntity, HttpClient)> CreateAuthorizedClient(string username, string password)
     {
         var factory = GetScopeFactory();

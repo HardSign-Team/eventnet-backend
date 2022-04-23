@@ -19,8 +19,7 @@ public class EventCreationValidator : IEventCreationValidator
         var (photoValidationResult, photoValidationErrorMessage) = photoValidator.Validate(photos);
         var (eventValidationResult, eventValidationErrorMessage) = eventValidator.Validate(eventForValidation);
         return new EventCreationValidationResult(photoValidationResult && eventValidationResult,
-            FormatException(photoValidationErrorMessage, eventValidationErrorMessage)
-        );
+            FormatException(photoValidationErrorMessage, eventValidationErrorMessage));
     }
 
     private static string FormatException(string photoErrorMessage, string eventErrorMessage) =>

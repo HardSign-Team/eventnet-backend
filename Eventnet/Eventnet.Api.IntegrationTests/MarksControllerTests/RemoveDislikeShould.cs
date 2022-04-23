@@ -58,7 +58,7 @@ public class RemoveDislikeShould : MarksApiTestBase
         viewModel.Likes.Should().Be(0);
         viewModel.Dislikes.Should().Be(0);
     }
-    
+
     [TestCase(2)]
     [TestCase(10)]
     public async Task Response200_WhenRemoveSeveralTimes(int n)
@@ -83,6 +83,7 @@ public class RemoveDislikeShould : MarksApiTestBase
             viewModel.Dislikes.Should().Be(0);
         }
     }
-    
-    private HttpRequestMessage BuildRemoveDislikeRequest(Guid eventId) => new(HttpMethod.Post, BuildRemoveDislikeUri(eventId));
+
+    private HttpRequestMessage BuildRemoveDislikeRequest(Guid eventId)
+        => new(HttpMethod.Post, BuildRemoveDislikeUri(eventId));
 }

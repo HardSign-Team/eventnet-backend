@@ -22,7 +22,6 @@ public class PublishEventService : IPublishEventService
     {
         await Task.Run(() =>
         {
-            
             var properties = channel.CreateBasicProperties();
             properties.Persistent = false;
             channel.BasicPublish(string.Empty, queue, null, Encoding.UTF8.GetBytes(message));

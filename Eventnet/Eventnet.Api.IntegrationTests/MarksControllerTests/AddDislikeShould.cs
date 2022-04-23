@@ -22,7 +22,7 @@ public class AddDislikeShould : MarksApiTestBase
             context.SaveChanges();
         });
     }
-    
+
     [Test]
     public async Task Response400_WhenNotAuthorized()
     {
@@ -69,7 +69,7 @@ public class AddDislikeShould : MarksApiTestBase
         viewModel.Likes.Should().Be(0);
         viewModel.Dislikes.Should().Be(1);
     }
-    
+
     [TestCase(2)]
     [TestCase(10)]
     public async Task Response200_WhenAddSeveralTimes(int n)
@@ -94,7 +94,7 @@ public class AddDislikeShould : MarksApiTestBase
             viewModel.Dislikes.Should().Be(1);
         }
     }
-    
+
     [Test]
     public async Task Response200_WhenLikeBefore()
     {
@@ -112,16 +112,17 @@ public class AddDislikeShould : MarksApiTestBase
             context.Marks.Add(mark);
             await context.SaveChangesAsync();
         });
-        
+
         var request = BuildAddDislikeRequest(entity.Id);
         var response = await client.SendAsync(request);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        
+
         var viewModel = response.ReadContentAs<MarksCountViewModel>();
         viewModel.Likes.Should().Be(0);
         viewModel.Dislikes.Should().Be(1);
     }
 
-    private HttpRequestMessage BuildAddDislikeRequest(Guid eventId) => new(HttpMethod.Post, BuildAddDislikeUri(eventId));
+    private HttpRequestMessage BuildAddDislikeRequest(Guid eventId)
+        => new(HttpMethod.Post, BuildAddDislikeUri(eventId));
 }

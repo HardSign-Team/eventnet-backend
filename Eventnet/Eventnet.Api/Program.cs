@@ -12,7 +12,6 @@ using Eventnet.Domain;
 using Eventnet.Infrastructure;
 using Eventnet.Infrastructure.PhotoServices;
 using Eventnet.Infrastructure.Validators;
-using Eventnet.Services;
 using Eventnet.Services.SaveServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -163,7 +162,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
 
 if (app.Environment.IsProduction())
 {

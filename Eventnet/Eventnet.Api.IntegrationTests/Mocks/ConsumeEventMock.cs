@@ -8,11 +8,9 @@ public class ConsumeEventMock : IConsumeEventService
 {
     public void Dispose()
     {
-        
     }
 
     public void ConsumeAndHandle(Action<RabbitMqMessage> handle)
     {
-        
     }
 }
