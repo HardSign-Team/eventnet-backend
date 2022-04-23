@@ -3,6 +3,8 @@ using System.Drawing.Imaging;
 
 namespace Eventnet.Domain;
 
+// Disable only windows-supported functions warnings
+#pragma warning disable CA1416
 public class Photo
 {
     private readonly byte[] rawData;

@@ -40,10 +40,10 @@ public class SubscriptionsController : Controller
         if (user is null)
             return Unauthorized();
 
-        dbContext.SubscriptionEntities.RemoveRange(
-            dbContext.SubscriptionEntities.Where(x => x.EventId == eventId && x.UserId == user.Id));
+        dbContext.Subscriptions.RemoveRange(
+            dbContext.Subscriptions.Where(x => x.EventId == eventId && x.UserId == user.Id));
         var subscription = new SubscriptionEntity(eventId, user.Id, DateTime.Now);
-        dbContext.SubscriptionEntities.Add(subscription);
+        dbContext.Subscriptions.Add(subscription);
         await dbContext.SaveChangesAsync();
 
         return await GetSubscriptionsCount(eventId);
@@ -67,8 +67,8 @@ public class SubscriptionsController : Controller
         if (user is null)
             return Unauthorized();
 
-        dbContext.SubscriptionEntities.RemoveRange(
-            dbContext.SubscriptionEntities.Where(x => x.EventId == eventId && x.UserId == user.Id));
+        dbContext.Subscriptions.RemoveRange(
+            dbContext.Subscriptions.Where(x => x.EventId == eventId && x.UserId == user.Id));
         await dbContext.SaveChangesAsync();
 
         return await GetSubscriptionsCount(eventId);
