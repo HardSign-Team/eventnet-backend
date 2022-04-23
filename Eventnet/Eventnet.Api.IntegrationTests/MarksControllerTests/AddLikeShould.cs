@@ -84,5 +84,33 @@ public class AddLikeShould : MarksApiTestBase
         }
     }
     
+    [Test]
+    public async Task Response200_WhenDislikeBefore()
+    {
+        var (user, client) = await CreateAuthorizedClient("TestUser", "TestPassword");
+        var entity = ApplyToDb(context =>
+        {
+            context.AddUsers();
+            context.AddEvents(context.Users);
+            return context.Events.First();
+        });
+
+        await ApplyToDbAsync(async context =>
+        {
+            var mark = entity.Dislike(user);
+            context.Marks.Add(mark);
+            await context.SaveChangesAsync();
+        });
+        
+        var request = BuildAddLikeRequest(entity.Id);
+        var response = await client.SendAsync(request);
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        
+        var viewModel = response.ReadContentAs<MarksCountViewModel>();
+        viewModel.Likes.Should().Be(1);
+        viewModel.Dislikes.Should().Be(0);
+    }
+    
     private HttpRequestMessage BuildAddLikeRequest(Guid eventId) => new(HttpMethod.Post, BuildAddLikeUri(eventId));
 }

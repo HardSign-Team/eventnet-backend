@@ -34,6 +34,22 @@ public abstract class AbstractTestBase
         return action(context!);
     }
     
+    protected async Task ApplyToDbAsync(Func<ApplicationDbContext, Task> action)
+    {
+        var scopeFactory = Factory.Services.GetService<IServiceScopeFactory>();
+        using var scope = scopeFactory!.CreateScope();
+        var context = scope.ServiceProvider.GetService<ApplicationDbContext>();
+        await action(context!);
+    }
+    
+    protected async Task<T> ApplyToDbAsync<T>(Func<ApplicationDbContext, Task<T>> action)
+    {
+        var scopeFactory = Factory.Services.GetService<IServiceScopeFactory>();
+        using var scope = scopeFactory!.CreateScope();
+        var context = scope.ServiceProvider.GetService<ApplicationDbContext>();
+        return await action(context!);
+    }
+    
     protected async Task<(UserEntity, HttpClient)> CreateAuthorizedClient(string username, string password)
     {
         var factory = GetScopeFactory();

@@ -12,7 +12,7 @@ namespace Eventnet.Api.IntegrationTests.MarksControllerTests;
 
 public class RemoveDislikeShould : MarksApiTestBase
 {
-        [Test]
+    [Test]
     public async Task Response400_WhenNotAuthorized()
     {
         var entity = ApplyToDb(context =>
@@ -27,7 +27,6 @@ public class RemoveDislikeShould : MarksApiTestBase
 
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
-
 
     [Test]
     public async Task Response404_WhenEventNotFound()
