@@ -84,5 +84,5 @@ public class RemoveLikeShould : MarksApiTestBase
         }
     }
     
-    private HttpRequestMessage BuildRemoveLikeRequest(Guid eventId) => new(HttpMethod.Post, BuildRemoveDislikeUri(eventId));
+    private HttpRequestMessage BuildRemoveLikeRequest(Guid eventId) => new(HttpMethod.Post, BuildRemoveLikeUri(eventId));
 }

@@ -4,7 +4,7 @@ namespace Eventnet.Api.IntegrationTests.MarksControllerTests;
 
 public class MarksApiTestBase : TestsBase
 {
-    private const string BaseRoute = "api/marks";
+    private const string BaseRoute = "/api/marks";
     
     protected Uri BuildAddLikeUri(Guid eventId)
     {
