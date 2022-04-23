@@ -32,9 +32,10 @@ public class RemoveLikeShould : MarksApiTestBase
     [Test]
     public async Task Response404_WhenEventNotFound()
     {
+        var (_, client) = await CreateAuthorizedClient("TestUser", "TestPassword");
         var request = BuildRemoveLikeRequest(Guid.Empty);
 
-        var response = await HttpClient.SendAsync(request);
+        var response = await client.SendAsync(request);
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
