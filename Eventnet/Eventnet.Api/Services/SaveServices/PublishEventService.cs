@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using RabbitMQ.Client;
 
-namespace Eventnet.Services.SaveServices;
+namespace Eventnet.Api.Services.SaveServices;
 
 public class PublishEventService : IPublishEventService
 {

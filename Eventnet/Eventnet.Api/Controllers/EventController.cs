@@ -7,17 +7,17 @@ using Eventnet.Api.Models.Filtering;
 using Eventnet.Api.Models.Marks;
 using Eventnet.Api.Models.Tags;
 using Eventnet.Api.Services.Filters;
+using Eventnet.Api.Services.SaveServices;
 using Eventnet.DataAccess;
 using Eventnet.Domain.Events;
 using Eventnet.Domain.Selectors;
 using Eventnet.Infrastructure;
-using Eventnet.Services.SaveServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using X.PagedList;
 
-namespace Eventnet.Controllers;
+namespace Eventnet.Api.Controllers;
 
 [Route("api/events")]
 public class EventController : Controller

@@ -1,6 +1,6 @@
 ﻿using Eventnet.Infrastructure;
 
-namespace Eventnet.Services.SaveServices;
+namespace Eventnet.Api.Services.SaveServices;
 
 public class BackgroundConsumeEventService : BackgroundService
 {

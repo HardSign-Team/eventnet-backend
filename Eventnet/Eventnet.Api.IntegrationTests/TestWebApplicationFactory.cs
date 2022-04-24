@@ -2,8 +2,8 @@
 using System.Linq;
 using Eventnet.Api.IntegrationTests.Helpers;
 using Eventnet.Api.IntegrationTests.Mocks;
+using Eventnet.Api.Services.SaveServices;
 using Eventnet.DataAccess;
-using Eventnet.Services.SaveServices;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;

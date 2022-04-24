@@ -4,7 +4,7 @@ using Eventnet.Infrastructure;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
-namespace Eventnet.Services.SaveServices;
+namespace Eventnet.Api.Services.SaveServices;
 
 public class RabbitMqConsumeEventService : IConsumeEventService
 {

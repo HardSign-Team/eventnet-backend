@@ -1,4 +1,4 @@
-﻿namespace Eventnet.Services.SaveServices;
+﻿namespace Eventnet.Api.Services.SaveServices;
 
 public interface IPublishEventService : IDisposable
 {
