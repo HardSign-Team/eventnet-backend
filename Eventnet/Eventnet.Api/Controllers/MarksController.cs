@@ -3,6 +3,7 @@ using Eventnet.Api.Models.Marks;
 using Eventnet.Api.Services;
 using Eventnet.DataAccess;
 using Eventnet.DataAccess.Entities;
+using Eventnet.DataAccess.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

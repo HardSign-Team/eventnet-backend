@@ -1,6 +1,6 @@
 ﻿using Eventnet.DataAccess.Entities;
 
-namespace Eventnet.Api.Helpers;
+namespace Eventnet.DataAccess.Extensions;
 
 public static class MarksQueryExtensions
 {
