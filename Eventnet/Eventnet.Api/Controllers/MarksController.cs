@@ -24,6 +24,7 @@ public class MarksController : Controller
 
     [Authorize]
     [HttpPost("likes/add/{eventId:guid}")]
+    [Produces(typeof(MarksCountViewModel))]
     public async Task<IActionResult> AddLike(Guid eventId)
     {
         return await HandleAddMark(eventId,
@@ -33,6 +34,7 @@ public class MarksController : Controller
 
     [Authorize]
     [HttpPost("likes/remove/{eventId:guid}")]
+    [Produces(typeof(MarksCountViewModel))]
     public async Task<IActionResult> RemoveLike(Guid eventId)
     {
         return await HandleRemoveMarks(eventId, context => context.Marks.Likes());
@@ -40,6 +42,7 @@ public class MarksController : Controller
 
     [Authorize]
     [HttpPost("dislikes/add/{eventId:guid}")]
+    [Produces(typeof(MarksCountViewModel))]
     public async Task<IActionResult> AddDislike(Guid eventId)
     {
         return await HandleAddMark(eventId,
@@ -49,6 +52,7 @@ public class MarksController : Controller
 
     [Authorize]
     [HttpPost("dislikes/remove/{eventId:guid}")]
+    [Produces(typeof(MarksCountViewModel))]
     public async Task<IActionResult> RemoveDislike(Guid eventId)
     {
         return await HandleRemoveMarks(eventId, context => context.Marks.Dislikes());
