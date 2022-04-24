@@ -1,16 +1,13 @@
-﻿namespace Eventnet.DataAccess.Entities;
+﻿// ReSharper disable AutoPropertyCanBeMadeGetOnly.Local EFCORE
+
+namespace Eventnet.DataAccess.Entities;
 
 public class EventEntity
 {
     public string Description { get; set; }
     public DateTime? EndDate { get; set; }
 
-    public Guid Id
-    {
-        get;
-        // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Local EF.Core autogenerate
-        private set;
-    }
+    public Guid Id { get; private set; }
 
     public LocationEntity Location { get; set; } = new();
     public string Name { get; set; }
@@ -18,7 +15,7 @@ public class EventEntity
     public DateTime StartDate { get; set; }
     public List<TagEntity> Tags { get; set; } = new();
     public List<SubscriptionEntity> Subscriptions { get; set; } = new();
-    public List<MarkEntity> Marks { get; set; } = new();
+    public IReadOnlyCollection<MarkEntity> Marks { get; private set; } = new List<MarkEntity>();
 
     private EventEntity(
         Guid id,
