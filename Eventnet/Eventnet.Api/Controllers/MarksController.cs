@@ -1,5 +1,4 @@
-﻿using Eventnet.Api.Helpers;
-using Eventnet.Api.Models.Marks;
+﻿using Eventnet.Api.Models.Marks;
 using Eventnet.Api.Services;
 using Eventnet.DataAccess;
 using Eventnet.DataAccess.Entities;
@@ -69,7 +68,10 @@ public class MarksController : Controller
         if (!eventExists)
             return NotFound();
 
-        var user = await currentUserService.GetCurrentUser() ?? throw new Exception();
+        var user = await currentUserService.GetCurrentUser();
+        if (user is null)
+            return Unauthorized();
+        
         var filtered = marks(dbContext).Of(user).For(eventId);
         dbContext.Marks.RemoveRange(filtered);
         await dbContext.SaveChangesAsync();
@@ -84,7 +86,11 @@ public class MarksController : Controller
     {
         if (eventId == Guid.Empty)
             return NotFound();
-        var user = await currentUserService.GetCurrentUser() ?? throw new Exception();
+        
+        var user = await currentUserService.GetCurrentUser();
+        if (user is null) 
+            return Unauthorized();
+        
         var mark = await dbContext.Marks.Of(user).For(eventId).FirstOrDefaultAsync();
         if (mark is null)
         {
