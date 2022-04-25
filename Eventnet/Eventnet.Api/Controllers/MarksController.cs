@@ -61,16 +61,16 @@ public class MarksController : Controller
         Guid eventId,
         Func<ApplicationDbContext, IQueryable<MarkEntity>> marks)
     {
+        var user = await currentUserService.GetCurrentUser();
+        if (user is null)
+            return Unauthorized();
+        
         if (eventId == Guid.Empty)
             return NotFound();
 
         var eventExists = await dbContext.Events.AnyAsync(x => x.Id == eventId);
         if (!eventExists)
             return NotFound();
-
-        var user = await currentUserService.GetCurrentUser();
-        if (user is null)
-            return Unauthorized();
         
         var filtered = marks(dbContext).Of(user).For(eventId);
         dbContext.Marks.RemoveRange(filtered);
@@ -84,12 +84,12 @@ public class MarksController : Controller
         Func<EventEntity, UserEntity, MarkEntity> createMark,
         Action<MarkEntity> changeMark)
     {
-        if (eventId == Guid.Empty)
-            return NotFound();
-        
         var user = await currentUserService.GetCurrentUser();
         if (user is null) 
             return Unauthorized();
+        
+        if (eventId == Guid.Empty)
+            return NotFound();
         
         var mark = await dbContext.Marks.Of(user).For(eventId).FirstOrDefaultAsync();
         if (mark is null)
