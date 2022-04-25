@@ -1,7 +1,6 @@
 ﻿using Eventnet.Api.Models.Subscriptions;
 using Eventnet.Api.Services;
 using Eventnet.DataAccess;
-using Eventnet.DataAccess.Entities;
 using Eventnet.DataAccess.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -27,6 +26,10 @@ public class SubscriptionsController : Controller
     [HttpPost("subscribe/{eventId:guid}")]
     public async Task<IActionResult> Subscribe(Guid eventId)
     {
+        var user = await currentUserService.GetCurrentUser();
+        if (user is null)
+            return Unauthorized();
+        
         if (eventId == Guid.Empty)
             return NotFound();
 
@@ -36,10 +39,6 @@ public class SubscriptionsController : Controller
 
         if (eventEntity.EndDate.GetValueOrDefault(eventEntity.StartDate) < DateTime.Now)
             return Conflict("Event had been ended.");
-
-        var user = await currentUserService.GetCurrentUser();
-        if (user is null)
-            return Unauthorized();
 
         var subscription = await dbContext.Subscriptions.Of(user).For(eventEntity).FirstOrDefaultAsync();
         if (subscription is not null)
@@ -56,6 +55,10 @@ public class SubscriptionsController : Controller
     [HttpPost("unsubscribe/{eventId:guid}")]
     public async Task<IActionResult> UnSubscribe(Guid eventId)
     {
+        var user = await currentUserService.GetCurrentUser();
+        if (user is null)
+            return Unauthorized();
+        
         if (eventId == Guid.Empty)
             return NotFound();
 
@@ -65,10 +68,6 @@ public class SubscriptionsController : Controller
 
         if (eventEntity.EndDate.GetValueOrDefault(eventEntity.StartDate) < DateTime.Now)
             return Conflict("Event had been ended.");
-
-        var user = await currentUserService.GetCurrentUser();
-        if (user is null)
-            return Unauthorized();
 
         var subscription = await dbContext.Subscriptions.Of(user).For(eventEntity).FirstOrDefaultAsync();
         if (subscription is not null)
