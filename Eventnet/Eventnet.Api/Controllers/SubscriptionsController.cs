@@ -2,6 +2,7 @@
 using Eventnet.Api.Services;
 using Eventnet.DataAccess;
 using Eventnet.DataAccess.Entities;
+using Eventnet.DataAccess.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -40,10 +41,12 @@ public class SubscriptionsController : Controller
         if (user is null)
             return Unauthorized();
 
-        dbContext.Subscriptions.RemoveRange(
-            dbContext.Subscriptions.Where(x => x.EventId == eventId && x.UserId == user.Id));
-        var subscription = new SubscriptionEntity(eventId, user.Id, DateTime.Now);
-        dbContext.Subscriptions.Add(subscription);
+        var subscription = await dbContext.Subscriptions.Of(user).For(eventEntity).FirstOrDefaultAsync();
+        if (subscription is not null)
+        {
+            dbContext.Subscriptions.Remove(subscription);
+        }
+        await dbContext.Subscriptions.AddAsync(eventEntity.Subscribe(user));
         await dbContext.SaveChangesAsync();
 
         return await GetSubscriptionsCount(eventId);
@@ -67,9 +70,13 @@ public class SubscriptionsController : Controller
         if (user is null)
             return Unauthorized();
 
-        dbContext.Subscriptions.RemoveRange(
-            dbContext.Subscriptions.Where(x => x.EventId == eventId && x.UserId == user.Id));
-        await dbContext.SaveChangesAsync();
+        var subscription = await dbContext.Subscriptions.Of(user).For(eventEntity).FirstOrDefaultAsync();
+        if (subscription is not null)
+        {
+            dbContext.Subscriptions.Remove(subscription);
+            await dbContext.SaveChangesAsync();
+        }
+
 
         return await GetSubscriptionsCount(eventId);
     }

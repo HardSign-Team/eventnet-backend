@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Eventnet.Api.IntegrationTests.Helpers;
+using Eventnet.Api.Models.Subscriptions;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -25,7 +26,7 @@ public class GetSubscriptionsCountShould : SubscriptionsApiTestsBase
     [Test]
     public async Task Response200_WhenEventExists()
     {
-        var eventEntity = ApplyToDb(context =>
+        var (eventEntity, subscriptions) = ApplyToDb(context =>
         {
             context.AddUsers();
             context.AddEvents(context.Users);
@@ -36,20 +37,19 @@ public class GetSubscriptionsCountShould : SubscriptionsApiTestsBase
                 entity.Subscribe(user);
             }
 
+            var subscriptionEntities = context.Users.Select(user => entity.Subscribe(user)).ToArray();
+            context.Subscriptions.AddRange(subscriptionEntities);        
             context.SaveChanges();
 
-            return entity;
+            return (entity, subscriptionEntities);
         });
         var request = CreateCountRequest(eventEntity.Id.ToString());
 
         var response = await HttpClient.SendAsync(request);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        response.ShouldHaveJsonContentEquivalentTo(new
-        {
-            eventId = eventEntity.Id,
-            count = eventEntity.Subscriptions.Count
-        });
+        var viewModel = response.ReadContentAs<SubscriptionsCountViewModel>();
+        viewModel.Should().Be(new SubscriptionsCountViewModel(eventEntity.Id, subscriptions.Length));
     }
 
     private HttpRequestMessage CreateCountRequest(string? eventId)
