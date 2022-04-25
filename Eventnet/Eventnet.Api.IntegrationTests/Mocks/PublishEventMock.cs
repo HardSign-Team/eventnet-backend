@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Eventnet.Services.SaveServices;
+using Eventnet.Api.Services.SaveServices;
 
 namespace Eventnet.Api.IntegrationTests.Mocks;
 
@@ -9,6 +9,5 @@ public class PublishEventMock : IPublishEventService
 
     public void Dispose()
     {
-        
     }
 }

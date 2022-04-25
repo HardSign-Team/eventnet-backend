@@ -15,6 +15,7 @@ public class Utilities
         db.Tags.RemoveRange(db.Tags);
         db.Subscriptions.RemoveRange(db.Subscriptions);
         db.Users.RemoveRange(db.Users);
+        db.Marks.RemoveRange(db.Marks);
         db.SaveChanges();
     }
 }

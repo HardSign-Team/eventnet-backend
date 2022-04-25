@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using RabbitMQ.Client;
 
-namespace Eventnet.Services.SaveServices;
+namespace Eventnet.Api.Services.SaveServices;
 
 public class PublishEventService : IPublishEventService
 {
@@ -22,7 +22,6 @@ public class PublishEventService : IPublishEventService
     {
         await Task.Run(() =>
         {
-            
             var properties = channel.CreateBasicProperties();
             properties.Persistent = false;
             channel.BasicPublish(string.Empty, queue, null, Encoding.UTF8.GetBytes(message));

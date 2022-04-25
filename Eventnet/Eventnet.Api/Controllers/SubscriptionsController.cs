@@ -29,7 +29,7 @@ public class SubscriptionsController : Controller
         var user = await currentUserService.GetCurrentUser();
         if (user is null)
             return Unauthorized();
-        
+
         if (eventId == Guid.Empty)
             return NotFound();
 
@@ -45,6 +45,7 @@ public class SubscriptionsController : Controller
         {
             dbContext.Subscriptions.Remove(subscription);
         }
+
         await dbContext.Subscriptions.AddAsync(eventEntity.Subscribe(user));
         await dbContext.SaveChangesAsync();
 
@@ -58,7 +59,7 @@ public class SubscriptionsController : Controller
         var user = await currentUserService.GetCurrentUser();
         if (user is null)
             return Unauthorized();
-        
+
         if (eventId == Guid.Empty)
             return NotFound();
 
@@ -75,7 +76,6 @@ public class SubscriptionsController : Controller
             dbContext.Subscriptions.Remove(subscription);
             await dbContext.SaveChangesAsync();
         }
-
 
         return await GetSubscriptionsCount(eventId);
     }

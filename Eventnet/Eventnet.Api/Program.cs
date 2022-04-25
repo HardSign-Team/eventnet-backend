@@ -6,14 +6,13 @@ using Eventnet.Api.Helpers.EventFilterFactories;
 using Eventnet.Api.Models.Authentication.Tokens;
 using Eventnet.Api.Services;
 using Eventnet.Api.Services.Filters;
+using Eventnet.Api.Services.SaveServices;
 using Eventnet.DataAccess;
 using Eventnet.DataAccess.Entities;
 using Eventnet.Domain;
 using Eventnet.Infrastructure;
 using Eventnet.Infrastructure.PhotoServices;
 using Eventnet.Infrastructure.Validators;
-using Eventnet.Services;
-using Eventnet.Services.SaveServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -163,7 +162,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
 
 if (app.Environment.IsProduction())
 {

@@ -10,7 +10,6 @@ using Eventnet.Api.Controllers;
 using Eventnet.Api.IntegrationTests.Helpers;
 using Eventnet.Api.Models.Events;
 using Eventnet.Api.Models.Filtering;
-using Eventnet.Controllers;
 using Eventnet.DataAccess.Entities;
 using Eventnet.Domain.Events;
 using FluentAssertions;

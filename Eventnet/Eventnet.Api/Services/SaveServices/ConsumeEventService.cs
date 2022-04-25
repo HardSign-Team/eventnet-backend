@@ -4,14 +4,14 @@ using Eventnet.Infrastructure;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
-namespace Eventnet.Services.SaveServices;
+namespace Eventnet.Api.Services.SaveServices;
 
 public class RabbitMqConsumeEventService : IConsumeEventService
 {
     private readonly IModel channel;
     private readonly IConnection connection;
     private readonly string queue;
-    
+
     public RabbitMqConsumeEventService(RabbitMqConfig config)
     {
         queue = config.Queue;
@@ -34,7 +34,7 @@ public class RabbitMqConsumeEventService : IConsumeEventService
 
         channel.BasicConsume(queue, false, consumer);
     }
-    
+
     public void Dispose()
     {
         channel.Close();

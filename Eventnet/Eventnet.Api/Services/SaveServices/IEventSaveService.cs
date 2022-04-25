@@ -1,7 +1,7 @@
 ﻿using Eventnet.Domain.Events;
 using Eventnet.Infrastructure;
 
-namespace Eventnet.Services.SaveServices;
+namespace Eventnet.Api.Services.SaveServices;
 
 public interface IEventSaveService
 {

@@ -12,15 +12,15 @@ using Eventnet.DataAccess.Models;
 using Eventnet.Domain.Events;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Identity;
-using Newtonsoft.Json;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 
 namespace Eventnet.Api.IntegrationTests.EventControllerTests.CreateEventTests;
 
 public class CreateEventTestsBase : TestWithRabbitMqBase
 {
     protected const string BaseRoute = "/api/events";
-    
+
     protected static HttpRequestMessage GetIsCreatedRequest(Guid eventId)
     {
         var request = new HttpRequestMessage();
@@ -42,7 +42,7 @@ public class CreateEventTestsBase : TestWithRabbitMqBase
         var guid = await response.Content.ReadAsStringAsync();
         return Guid.Parse(guid.Replace("\"", ""));
     }
-    
+
     protected async Task<(UserEntity, HttpClient)> CreateAuthorizedClient(string username, string password)
     {
         var factory = GetScopeFactory();
@@ -70,9 +70,13 @@ public class CreateEventTestsBase : TestWithRabbitMqBase
 
     protected static FileStream GetFileStream(string path) => File.OpenRead(path);
 
-    protected static MultipartFormDataContent GetEventCreationRequestMessage(Guid eventId, Guid ownerId, FileStream fileStream, string mediaType)
+    protected static MultipartFormDataContent GetEventCreationRequestMessage(
+        Guid eventId,
+        Guid ownerId,
+        FileStream fileStream,
+        string mediaType)
     {
-        var multiContent = new MultipartFormDataContent()
+        var multiContent = new MultipartFormDataContent
         {
             { new StringContent(eventId.ToString()), "Id" },
             { new StringContent(ownerId.ToString()), "OwnerId" },
@@ -85,17 +89,10 @@ public class CreateEventTestsBase : TestWithRabbitMqBase
         var fileStreamContent = GetFileStreamContent(fileStream, mediaType);
         var filename = fileStream.Name.Split(Path.PathSeparator).Last();
         multiContent.Add(fileStreamContent, "Photos", filename);
-        
+
         return multiContent;
     }
 
-    private static StreamContent GetFileStreamContent(FileStream fileStream, string mediaType)
-    {
-        var content = new StreamContent(fileStream);
-        content.Headers.ContentType = new MediaTypeHeaderValue(mediaType);
-        return content;
-    }
-    
     protected static HttpRequestMessage CreateDefaultRequestToId()
     {
         var request = new HttpRequestMessage();
@@ -105,5 +102,12 @@ public class CreateEventTestsBase : TestWithRabbitMqBase
             Path = $"{BaseRoute}/request-event-creation"
         }.Uri;
         return request;
+    }
+
+    private static StreamContent GetFileStreamContent(FileStream fileStream, string mediaType)
+    {
+        var content = new StreamContent(fileStream);
+        content.Headers.ContentType = new MediaTypeHeaderValue(mediaType);
+        return content;
     }
 }

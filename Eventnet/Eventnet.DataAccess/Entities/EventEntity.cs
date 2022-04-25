@@ -4,17 +4,18 @@ namespace Eventnet.DataAccess.Entities;
 
 public class EventEntity
 {
-    public Guid Id { get; private set; }
     public string Description { get; set; }
     public DateTime? EndDate { get; set; }
+
+    public Guid Id { get; private set; }
+
     public LocationEntity Location { get; set; } = new();
     public string Name { get; set; }
     public string OwnerId { get; }
     public DateTime StartDate { get; set; }
     public List<TagEntity> Tags { get; set; } = new();
-    public IReadOnlyCollection<SubscriptionEntity> Subscriptions { get; private set; } =
-        new List<SubscriptionEntity>(0);
-    public IReadOnlyCollection<MarkEntity> Marks { get; private set; } = new List<MarkEntity>(0);
+    public IReadOnlyCollection<SubscriptionEntity> Subscriptions { get; private set; } = new List<SubscriptionEntity>();
+    public IReadOnlyCollection<MarkEntity> Marks { get; private set; } = new List<MarkEntity>();
 
     private EventEntity(
         Guid id,
@@ -50,4 +51,8 @@ public class EventEntity
     {
         Tags.Add(tagEntity);
     }
+
+    public MarkEntity Like(UserEntity user) => new(user.Id, Id, true, DateTime.Now);
+
+    public MarkEntity Dislike(UserEntity user) => new(user.Id, Id, false, DateTime.Now);
 }

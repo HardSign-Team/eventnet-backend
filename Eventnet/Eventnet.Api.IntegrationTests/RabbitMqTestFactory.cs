@@ -2,9 +2,9 @@
 using System.Linq;
 using Eventnet.Api.IntegrationTests.Helpers;
 using Eventnet.Api.IntegrationTests.Mocks;
+using Eventnet.Api.Services.SaveServices;
 using Eventnet.DataAccess;
 using Eventnet.Infrastructure.PhotoServices;
-using Eventnet.Services.SaveServices;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -29,12 +29,11 @@ public class RabbitMqTestFactory<TStartup> : WebApplicationFactory<TStartup> whe
                 options.UseInMemoryDatabase("InMemoryDbForTesting");
             });
 
-            var rabbitConfig = services.SingleOrDefault(
-                d => d.ServiceType == typeof(RabbitMqConfig));
+            var rabbitConfig = services.SingleOrDefault(d => d.ServiceType == typeof(RabbitMqConfig));
             services.Remove(rabbitConfig!);
             var testRabbitMqConfig = new RabbitMqConfig { HostName = "localhost", Queue = "MyTestQueue" };
             services.AddSingleton(testRabbitMqConfig);
-            
+
             var photoToStorageSaveService = services.SingleOrDefault(
                 d => d.ServiceType == typeof(IPhotoToStorageSaveService));
             services.Remove(photoToStorageSaveService!);
@@ -54,8 +53,10 @@ public class RabbitMqTestFactory<TStartup> : WebApplicationFactory<TStartup> whe
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "An error occurred seeding the " +
-                    "database with test messages. Error: {Message}", ex.Message);
+                logger.LogError(ex,
+                    "An error occurred seeding the " +
+                    "database with test messages. Error: {Message}",
+                    ex.Message);
             }
         });
     }

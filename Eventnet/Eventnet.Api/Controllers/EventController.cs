@@ -4,20 +4,20 @@ using AutoMapper;
 using Eventnet.Api.Helpers;
 using Eventnet.Api.Models.Events;
 using Eventnet.Api.Models.Filtering;
+using Eventnet.Api.Models.Marks;
 using Eventnet.Api.Models.Tags;
 using Eventnet.Api.Services.Filters;
+using Eventnet.Api.Services.SaveServices;
 using Eventnet.DataAccess;
-using Eventnet.DataAccess.Entities;
 using Eventnet.Domain.Events;
 using Eventnet.Domain.Selectors;
 using Eventnet.Infrastructure;
-using Eventnet.Services.SaveServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using X.PagedList;
 
-namespace Eventnet.Controllers;
+namespace Eventnet.Api.Controllers;
 
 [Route("api/events")]
 public class EventController : Controller
@@ -70,7 +70,9 @@ public class EventController : Controller
                 x.EndDate,
                 x.Name,
                 x.Tags,
-                TotalSubscriptions = x.Subscriptions.Count()
+                TotalSubscriptions = x.Subscriptions.Count,
+                Likes = x.Marks.Count(mark => mark.IsLike),
+                Dislikes = x.Marks.Count(mark => !mark.IsLike)
             })
             .FirstOrDefaultAsync(x => x.Id == eventId);
         if (entity is null)
@@ -83,7 +85,8 @@ public class EventController : Controller
             entity.StartDate,
             entity.EndDate,
             entity.Tags.Select(mapper.Map<TagNameModel>).ToArray(),
-            entity.TotalSubscriptions);
+            entity.TotalSubscriptions,
+            new MarksCountViewModel(entity.Likes, entity.Dislikes));
         return Ok(eventViewModel);
     }
 
@@ -174,11 +177,11 @@ public class EventController : Controller
         var (saveStatus, exception) = eventSaveService.GetSaveEventResult(id);
         return saveStatus switch
         {
-            EventSaveStatus.Saved                    => Ok(),
-            EventSaveStatus.NotSavedDueToUserError   => BadRequest(exception),
+            EventSaveStatus.Saved => Ok(),
+            EventSaveStatus.NotSavedDueToUserError => BadRequest(exception),
             EventSaveStatus.NotSavedDueToServerError => BadRequest(exception),
-            EventSaveStatus.InProgress               => Accepted(Timeout),
-            _                                        => throw new ArgumentOutOfRangeException($"Unknown SaveState {saveStatus}")
+            EventSaveStatus.InProgress => Accepted(Timeout),
+            _ => throw new ArgumentOutOfRangeException($"Unknown SaveState {saveStatus}")
         };
     }
 
@@ -219,12 +222,12 @@ public class EventController : Controller
         var photosSize = photos.Sum(photo => photo.Length);
         return photosSize >= rabbitMqConfig.RecommendedMessageSizeInBytes;
     }
-    
+
     private bool IsSaveEventBeingHandling(Guid id) => eventSaveService.IsHandling(id);
 
     private async Task<bool> IsEventSaved(Guid id)
     {
-        var eventInDb =  await dbContext.Events.FindAsync(id);
+        var eventInDb = await dbContext.Events.FindAsync(id);
         return eventInDb is not null;
     }
 
