@@ -8,7 +8,7 @@ public static class SubscriptionEntityExtensions
     {
         return query.Where(x => x.UserId == user.Id);
     }
-    
+
     public static IQueryable<SubscriptionEntity> For(this IQueryable<SubscriptionEntity> query, EventEntity eventEntity)
     {
         return query.Where(x => x.EventId == eventEntity.Id);

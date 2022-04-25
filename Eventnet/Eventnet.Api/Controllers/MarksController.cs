@@ -64,14 +64,14 @@ public class MarksController : Controller
         var user = await currentUserService.GetCurrentUser();
         if (user is null)
             return Unauthorized();
-        
+
         if (eventId == Guid.Empty)
             return NotFound();
 
         var eventExists = await dbContext.Events.AnyAsync(x => x.Id == eventId);
         if (!eventExists)
             return NotFound();
-        
+
         var filtered = marks(dbContext).Of(user).For(eventId);
         dbContext.Marks.RemoveRange(filtered);
         await dbContext.SaveChangesAsync();
@@ -85,12 +85,12 @@ public class MarksController : Controller
         Action<MarkEntity> changeMark)
     {
         var user = await currentUserService.GetCurrentUser();
-        if (user is null) 
+        if (user is null)
             return Unauthorized();
-        
+
         if (eventId == Guid.Empty)
             return NotFound();
-        
+
         var mark = await dbContext.Marks.Of(user).For(eventId).FirstOrDefaultAsync();
         if (mark is null)
         {

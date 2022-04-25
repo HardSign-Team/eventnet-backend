@@ -38,7 +38,7 @@ public class GetSubscriptionsCountShould : SubscriptionsApiTestsBase
             }
 
             var subscriptionEntities = context.Users.Select(user => entity.Subscribe(user)).ToArray();
-            context.Subscriptions.AddRange(subscriptionEntities);        
+            context.Subscriptions.AddRange(subscriptionEntities);
             context.SaveChanges();
 
             return (entity, subscriptionEntities);
