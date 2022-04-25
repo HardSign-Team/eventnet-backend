@@ -10,7 +10,7 @@ public class MarksApiTestBase : TestsBase
     {
         var uri = new UriBuilder
         {
-            Path = $"{BaseRoute}/likes/add/{eventId}"
+            Path = $"{BaseRoute}/likes/{eventId}"
         };
         return uri.Uri;
     }
@@ -19,7 +19,7 @@ public class MarksApiTestBase : TestsBase
     {
         var uri = new UriBuilder
         {
-            Path = $"{BaseRoute}/likes/remove/{eventId}"
+            Path = $"{BaseRoute}/likes/{eventId}"
         };
         return uri.Uri;
     }
@@ -28,7 +28,7 @@ public class MarksApiTestBase : TestsBase
     {
         var uri = new UriBuilder
         {
-            Path = $"{BaseRoute}/dislikes/add/{eventId}"
+            Path = $"{BaseRoute}/dislikes/{eventId}"
         };
         return uri.Uri;
     }
@@ -37,7 +37,7 @@ public class MarksApiTestBase : TestsBase
     {
         var uri = new UriBuilder
         {
-            Path = $"{BaseRoute}/dislikes/remove/{eventId}"
+            Path = $"{BaseRoute}/dislikes/{eventId}"
         };
         return uri.Uri;
     }

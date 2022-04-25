@@ -112,5 +112,5 @@ public class AddLikeShould : MarksApiTestBase
         viewModel.Dislikes.Should().Be(0);
     }
 
-    private HttpRequestMessage BuildAddLikeRequest(Guid eventId) => new(HttpMethod.Post, BuildAddLikeUri(eventId));
+    private HttpRequestMessage BuildAddLikeRequest(Guid eventId) => new(HttpMethod.Put, BuildAddLikeUri(eventId));
 }

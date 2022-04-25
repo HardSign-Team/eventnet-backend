@@ -124,5 +124,5 @@ public class AddDislikeShould : MarksApiTestBase
     }
 
     private HttpRequestMessage BuildAddDislikeRequest(Guid eventId)
-        => new(HttpMethod.Post, BuildAddDislikeUri(eventId));
+        => new(HttpMethod.Put, BuildAddDislikeUri(eventId));
 }

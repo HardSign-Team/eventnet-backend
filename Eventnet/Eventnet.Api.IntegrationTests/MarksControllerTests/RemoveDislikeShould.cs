@@ -85,5 +85,5 @@ public class RemoveDislikeShould : MarksApiTestBase
     }
 
     private HttpRequestMessage BuildRemoveDislikeRequest(Guid eventId)
-        => new(HttpMethod.Post, BuildRemoveDislikeUri(eventId));
+        => new(HttpMethod.Delete, BuildRemoveDislikeUri(eventId));
 }
