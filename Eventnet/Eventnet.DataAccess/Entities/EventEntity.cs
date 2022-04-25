@@ -14,8 +14,8 @@ public class EventEntity
     public string OwnerId { get; }
     public DateTime StartDate { get; set; }
     public List<TagEntity> Tags { get; set; } = new();
-    public List<SubscriptionEntity> Subscriptions { get; set; } = new();
-    public IReadOnlyCollection<MarkEntity> Marks { get; private set; } = new List<MarkEntity>();
+    public IReadOnlyCollection<SubscriptionEntity> Subscriptions { get; private set; } = new List<SubscriptionEntity>();
+    public IReadOnlyCollection<MarkEntity> Marks { get; private set; } =  new List<MarkEntity>();
 
     private EventEntity(
         Guid id,
@@ -45,12 +45,7 @@ public class EventEntity
         Location = location;
     }
 
-    public SubscriptionEntity Subscribe(UserEntity user)
-    {
-        var subscription = new SubscriptionEntity(Id, user.Id, DateTime.Now);
-        Subscriptions.Add(subscription);
-        return subscription;
-    }
+    public SubscriptionEntity Subscribe(UserEntity user) => new(Id, user.Id, DateTime.Now);
 
     public void AddTag(TagEntity tagEntity)
     {

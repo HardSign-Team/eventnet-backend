@@ -127,5 +127,5 @@ public class SubscribeShould : SubscriptionsApiTestsBase
     }
 
     private HttpRequestMessage BuildSubscribeRequest(Guid entityId)
-        => new(HttpMethod.Post, BuildSubscribeQuery(entityId));
+        => new(HttpMethod.Put, BuildSubscribeQuery(entityId));
 }

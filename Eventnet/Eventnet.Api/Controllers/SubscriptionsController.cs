@@ -1,7 +1,7 @@
 ﻿using Eventnet.Api.Models.Subscriptions;
 using Eventnet.Api.Services;
 using Eventnet.DataAccess;
-using Eventnet.DataAccess.Entities;
+using Eventnet.DataAccess.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,9 +23,13 @@ public class SubscriptionsController : Controller
     }
 
     [Authorize]
-    [HttpPost("subscribe/{eventId:guid}")]
+    [HttpPut("{eventId:guid}")]
     public async Task<IActionResult> Subscribe(Guid eventId)
     {
+        var user = await currentUserService.GetCurrentUser();
+        if (user is null)
+            return Unauthorized();
+        
         if (eventId == Guid.Empty)
             return NotFound();
 
@@ -36,23 +40,25 @@ public class SubscriptionsController : Controller
         if (eventEntity.EndDate.GetValueOrDefault(eventEntity.StartDate) < DateTime.Now)
             return Conflict("Event had been ended.");
 
-        var user = await currentUserService.GetCurrentUser();
-        if (user is null)
-            return Unauthorized();
-
-        dbContext.Subscriptions.RemoveRange(
-            dbContext.Subscriptions.Where(x => x.EventId == eventId && x.UserId == user.Id));
-        var subscription = new SubscriptionEntity(eventId, user.Id, DateTime.Now);
-        dbContext.Subscriptions.Add(subscription);
+        var subscription = await dbContext.Subscriptions.Of(user).For(eventEntity).FirstOrDefaultAsync();
+        if (subscription is not null)
+        {
+            dbContext.Subscriptions.Remove(subscription);
+        }
+        await dbContext.Subscriptions.AddAsync(eventEntity.Subscribe(user));
         await dbContext.SaveChangesAsync();
 
         return await GetSubscriptionsCount(eventId);
     }
 
     [Authorize]
-    [HttpPost("unsubscribe/{eventId:guid}")]
+    [HttpDelete("{eventId:guid}")]
     public async Task<IActionResult> UnSubscribe(Guid eventId)
     {
+        var user = await currentUserService.GetCurrentUser();
+        if (user is null)
+            return Unauthorized();
+        
         if (eventId == Guid.Empty)
             return NotFound();
 
@@ -63,13 +69,13 @@ public class SubscriptionsController : Controller
         if (eventEntity.EndDate.GetValueOrDefault(eventEntity.StartDate) < DateTime.Now)
             return Conflict("Event had been ended.");
 
-        var user = await currentUserService.GetCurrentUser();
-        if (user is null)
-            return Unauthorized();
+        var subscription = await dbContext.Subscriptions.Of(user).For(eventEntity).FirstOrDefaultAsync();
+        if (subscription is not null)
+        {
+            dbContext.Subscriptions.Remove(subscription);
+            await dbContext.SaveChangesAsync();
+        }
 
-        dbContext.Subscriptions.RemoveRange(
-            dbContext.Subscriptions.Where(x => x.EventId == eventId && x.UserId == user.Id));
-        await dbContext.SaveChangesAsync();
 
         return await GetSubscriptionsCount(eventId);
     }

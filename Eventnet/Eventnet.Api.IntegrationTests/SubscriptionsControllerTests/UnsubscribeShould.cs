@@ -129,5 +129,5 @@ public class UnsubscribeShould : SubscriptionsApiTestsBase
     }
 
     private HttpRequestMessage BuildUnsubscribeRequest(Guid entityId)
-        => new(HttpMethod.Post, BuildUnsubscribeQuery(entityId));
+        => new(HttpMethod.Delete, BuildUnsubscribeQuery(entityId));
 }

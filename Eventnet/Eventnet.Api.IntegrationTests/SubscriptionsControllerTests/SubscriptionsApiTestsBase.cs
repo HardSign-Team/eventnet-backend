@@ -28,7 +28,7 @@ public class SubscriptionsApiTestsBase : TestsBase
     {
         var uriBuilder = new UriBuilder(Configuration.BaseUrl)
         {
-            Path = $"{BaseRoute}/subscribe/{HttpUtility.UrlEncode(eventId.ToString())}"
+            Path = $"{BaseRoute}/{HttpUtility.UrlEncode(eventId.ToString())}"
         };
         return uriBuilder.Uri;
     }
@@ -37,7 +37,7 @@ public class SubscriptionsApiTestsBase : TestsBase
     {
         var uriBuilder = new UriBuilder(Configuration.BaseUrl)
         {
-            Path = $"{BaseRoute}/unsubscribe/{HttpUtility.UrlEncode(eventId.ToString())}"
+            Path = $"{BaseRoute}/{HttpUtility.UrlEncode(eventId.ToString())}"
         };
         return uriBuilder.Uri;
     }
