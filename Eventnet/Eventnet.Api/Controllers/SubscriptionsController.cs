@@ -23,7 +23,7 @@ public class SubscriptionsController : Controller
     }
 
     [Authorize]
-    [HttpPost("subscribe/{eventId:guid}")]
+    [HttpPut("{eventId:guid}")]
     public async Task<IActionResult> Subscribe(Guid eventId)
     {
         var user = await currentUserService.GetCurrentUser();
@@ -52,7 +52,7 @@ public class SubscriptionsController : Controller
     }
 
     [Authorize]
-    [HttpPost("unsubscribe/{eventId:guid}")]
+    [HttpDelete("{eventId:guid}")]
     public async Task<IActionResult> UnSubscribe(Guid eventId)
     {
         var user = await currentUserService.GetCurrentUser();
