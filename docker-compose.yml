@@ -8,6 +8,7 @@ services:
       dockerfile: Eventnet.Api/Dockerfile
     environment:
       - ConnectionStrings__DefaultConnection=Server=db;Port=5432;Database=eventnet;User Id=postgres;Password=1234;
+      - RabbitMq__HostName=rabbitmq
     ports:
       - 5203:80
     depends_on:
