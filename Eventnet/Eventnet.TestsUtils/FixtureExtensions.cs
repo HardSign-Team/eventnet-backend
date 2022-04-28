@@ -31,13 +31,7 @@ public static class FixtureExtensions
 
     public static Event CreateEventWithOwner(this Fixture fixture, string ownerId)
     {
-        return new Event(Guid.NewGuid(),
-            ownerId,
-            fixture.Create<DateTime>(),
-            fixture.Create<DateTime?>(),
-            fixture.Create<string>(),
-            fixture.Create<string>(),
-            fixture.Create<Location>());
+        return fixture.Build<Event>().With(x=>x.OwnerId, ownerId).Create();
     }
 
     public static Event CreateEventWithTags(this Fixture fixture, Tag[] tags)
