@@ -32,7 +32,7 @@ public class TokenController : Controller
     [Produces(typeof(UserViewModel))]
     public async Task<IActionResult> GetCurrentUser()
     {
-        var user = await currentUserService.GetCurrentUser();
+        var user = await currentUserService.GetCurrentUserAsync();
 
         if (user == null)
             return NotFound();
@@ -45,7 +45,7 @@ public class TokenController : Controller
     [Produces(typeof(TokensViewModel))]
     public async Task<ActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
     {
-        var user = await currentUserService.GetCurrentUser();
+        var user = await currentUserService.GetCurrentUserAsync();
 
         if (user == null)
             return NotFound();

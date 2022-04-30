@@ -140,7 +140,7 @@ public class UserAccountController : Controller
         if (changePasswordModel.OldPassword == changePasswordModel.NewPassword)
             return UnprocessableEntity("Passwords should be different");
 
-        var user = await currentUserService.GetCurrentUser();
+        var user = await currentUserService.GetCurrentUserAsync();
 
         if (user is null)
             return NotFound();

@@ -26,7 +26,7 @@ public class SubscriptionsController : Controller
     [HttpPut("{eventId:guid}")]
     public async Task<IActionResult> Subscribe(Guid eventId)
     {
-        var user = await currentUserService.GetCurrentUser();
+        var user = await currentUserService.GetCurrentUserAsync();
         if (user is null)
             return Unauthorized();
 
@@ -56,7 +56,7 @@ public class SubscriptionsController : Controller
     [HttpDelete("{eventId:guid}")]
     public async Task<IActionResult> UnSubscribe(Guid eventId)
     {
-        var user = await currentUserService.GetCurrentUser();
+        var user = await currentUserService.GetCurrentUserAsync();
         if (user is null)
             return Unauthorized();
 
