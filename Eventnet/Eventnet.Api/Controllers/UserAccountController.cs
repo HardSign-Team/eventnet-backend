@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Eventnet.Api.Controllers;
 
@@ -181,9 +182,9 @@ public class UserAccountController : Controller
     /// <param name="code">Code from email redirect link</param>
     /// <returns></returns>
     [HttpPost("confirm-email", Name = nameof(ConfirmEmail))]
-    public async Task<IActionResult> ConfirmEmail(string userId, string code)
+    public async Task<IActionResult> ConfirmEmail(Guid userId, string code)
     {
-        var user = await userManager.FindByIdAsync(userId);
+        var user = await userManager.Users.FirstOrDefaultAsync(x => x.Id == userId);
         if (user is null)
             return NotFound();
 
@@ -276,7 +277,7 @@ public class UserAccountController : Controller
         if (clientAddress is null)
             throw new BadHttpRequestException("Origin header in request is required");
 
-        var query = new Dictionary<string, string> { { "userId", user.Id }, { "code", code } };
+        var query = new Dictionary<string, string> { { "userId", user.Id.ToString() }, { "code", code } };
         var uri = new Uri(QueryHelpers.AddQueryString(clientAddress + "/confirm", query!));
 
         await emailService.SendEmailAsync(user.Email,

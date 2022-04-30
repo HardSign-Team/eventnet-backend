@@ -18,7 +18,7 @@ public class AuthorizationHelper
     {
         var user = new UserEntity
         {
-            Id = Guid.NewGuid().ToString(),
+            Id = Guid.NewGuid(),
             UserName = registerModel.UserName,
             NormalizedUserName = registerModel.UserName,
             Email = registerModel.Email,

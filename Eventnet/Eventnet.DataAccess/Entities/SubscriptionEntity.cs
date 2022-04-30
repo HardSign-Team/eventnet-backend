@@ -3,10 +3,10 @@
 public class SubscriptionEntity
 {
     public Guid EventId { get; }
-    public string UserId { get; }
+    public Guid UserId { get; }
     public DateTime SubscriptionDate { get; }
 
-    public SubscriptionEntity(Guid eventId, string userId, DateTime subscriptionDate)
+    public SubscriptionEntity(Guid eventId, Guid userId, DateTime subscriptionDate)
     {
         EventId = eventId;
         UserId = userId;

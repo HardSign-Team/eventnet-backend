@@ -1,5 +1,6 @@
 ﻿using Eventnet.DataAccess.Configurations;
 using Eventnet.DataAccess.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Eventnet.DataAccess;
 
-public class ApplicationDbContext : IdentityDbContext<UserEntity>
+public class ApplicationDbContext : IdentityDbContext<UserEntity, UserRole, Guid>
 {
     public DbSet<EventEntity> Events { get; set; }
     public DbSet<PhotoEntity> Photos { get; set; }
