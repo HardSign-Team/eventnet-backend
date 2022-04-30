@@ -222,10 +222,10 @@ public class UserAccountController : Controller
     /// <param name="code"></param>
     /// <returns></returns>
     [HttpGet("password/forgot/code")]
-    [Produces(typeof(bool))]
+    [Produces(typeof(VerifyPasswordCodeResultModel))]
     public IActionResult VerifyUserCode(string email, string code)
     {
-        return Ok(new { Status = forgotPasswordService.VerifyCode(email, code) });
+        return Ok(new VerifyPasswordCodeResultModel(forgotPasswordService.VerifyCode(email, code)));
     }
 
     /// <summary>
