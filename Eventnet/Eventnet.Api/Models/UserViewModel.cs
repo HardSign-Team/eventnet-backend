@@ -3,6 +3,7 @@
 namespace Eventnet.Api.Models;
 
 public record UserViewModel(
+    string Id,
     string UserName,
     string Email,
     Gender Gender,
