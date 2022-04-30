@@ -78,7 +78,7 @@ public class GetEventByIdShould : EventApiTestsBase
             new LocationViewModel(eventEntity.Location.Latitude, eventEntity.Location.Longitude),
             eventEntity.StartDate,
             eventEntity.EndDate,
-            eventEntity.Tags.Select(x => new TagNameModel(x.Id, x.Name)).ToArray(),
+            eventEntity.Tags.Select(x => new TagNameViewModel(x.Id, x.Name)).ToArray(),
             eventEntity.Subscriptions.Count,
             new MarksCountViewModel(2, 1)));
     }

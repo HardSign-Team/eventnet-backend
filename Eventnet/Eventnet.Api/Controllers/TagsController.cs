@@ -21,7 +21,7 @@ public class TagsController : Controller
     }
 
     [HttpGet("search/name/{name}")]
-    [Produces(typeof(List<TagNameModel>))]
+    [Produces(typeof(List<TagNameViewModel>))]
     public IActionResult GetTagsByName(string name, [FromQuery(Name = "mc")] int maxCount = 30)
     {
         maxCount = NumberHelper.Normalize(maxCount, 1, 30);
@@ -33,6 +33,6 @@ public class TagsController : Controller
         var tagNames = mapper.ProjectTo<TagName>(context.Tags.AsNoTracking());
         var result = selector.Select(tagNames, maxCount);
 
-        return Ok(mapper.Map<List<TagNameModel>>(result));
+        return Ok(mapper.Map<List<TagNameViewModel>>(result));
     }
 }

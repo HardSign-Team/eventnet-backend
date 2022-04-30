@@ -57,7 +57,7 @@ public class GetTagsByNameShould : TagsApiTestsBase
         var response = await HttpClient.SendAsync(request);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var tags = response.ReadContentAs<List<TagNameModel>>();
+        var tags = response.ReadContentAs<List<TagNameViewModel>>();
         tags.Should().HaveCount(maxCount);
     }
 

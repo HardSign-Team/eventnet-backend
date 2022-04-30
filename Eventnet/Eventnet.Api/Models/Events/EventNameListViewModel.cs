@@ -2,4 +2,4 @@
 
 namespace Eventnet.Api.Models.Events;
 
-public record EventNameListModel(int TotalCount, EventName[] Models);
+public record EventNameListViewModel(int TotalCount, EventName[] Models);

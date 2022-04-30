@@ -15,7 +15,7 @@ public class ApplicationMappingProfile : Profile
     {
         CreateMap<EventEntity, Event>();
         CreateMap<EventEntity, EventName>();
-        CreateMap<Event, EventLocationModel>();
+        CreateMap<Event, EventLocationViewModel>();
         CreateMap<LocationEntity, Location>();
         CreateMap<Event, EventEntity>();
         CreateMap<Location, LocationEntity>();
@@ -23,8 +23,8 @@ public class ApplicationMappingProfile : Profile
         CreateMap<LocationEntity, LocationViewModel>();
         CreateMap<TagEntity, Tag>();
         CreateProjection<TagEntity, TagName>();
-        CreateMap<TagName, TagNameModel>();
-        CreateMap<TagEntity, TagNameModel>();
+        CreateMap<TagName, TagNameViewModel>();
+        CreateMap<TagEntity, TagNameViewModel>();
         CreateProjection<UserEntity, UserNameModel>();
         CreateMap<UserEntity, UserViewModel>();
         CreateMap<RegisterModel, UserEntity>()

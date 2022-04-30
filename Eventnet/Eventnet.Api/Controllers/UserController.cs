@@ -20,7 +20,7 @@ public class UserController : Controller
     }
 
     [HttpGet("search/prefix/{prefix:alpha:required}")]
-    [Produces(typeof(List<UserNameListModel>))]
+    [Produces(typeof(List<UserNameListViewModel>))]
     public async Task<IActionResult> GetUsers(string prefix, [FromQuery] int maxUsers = 100)
     {
         maxUsers = NumberHelper.Normalize(maxUsers, 10, 100);
@@ -31,6 +31,6 @@ public class UserController : Controller
             .Take(maxUsers);
         var result = await mapper.ProjectTo<UserNameModel>(query).ToArrayAsync();
 
-        return Ok(new UserNameListModel(result.Length, result));
+        return Ok(new UserNameListViewModel(result.Length, result));
     }
 }

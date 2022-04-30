@@ -85,14 +85,14 @@ public class EventController : Controller
             mapper.Map<LocationViewModel>(entity.Location),
             entity.StartDate,
             entity.EndDate,
-            entity.Tags.Select(mapper.Map<TagNameModel>).ToArray(),
+            entity.Tags.Select(mapper.Map<TagNameViewModel>).ToArray(),
             entity.TotalSubscriptions,
             new MarksCountViewModel(entity.Likes, entity.Dislikes));
         return Ok(eventViewModel);
     }
 
     [HttpGet("search/name/{eventName}")]
-    [Produces(typeof(EventNameListModel))]
+    [Produces(typeof(EventNameListViewModel))]
     public IActionResult GetEventsByName(string? eventName, [FromQuery(Name = "m")] int maxCount = 10)
     {
         eventName = eventName?.Trim();
@@ -109,11 +109,11 @@ public class EventController : Controller
             .Select(mapper.ProjectTo<EventName>(dbContext.Events).AsNoTracking().AsEnumerable(), maxCount)
             .ToArray();
 
-        return Ok(new EventNameListModel(result.Length, result));
+        return Ok(new EventNameListViewModel(result.Length, result));
     }
 
     [HttpGet(Name = nameof(GetEvents))]
-    [Produces(typeof(List<EventLocationModel>))]
+    [Produces(typeof(List<EventLocationViewModel>))]
     public IActionResult GetEvents(
         [FromQuery(Name = "f")] string? filterModelBase64,
         [FromQuery(Name = "p")] int pageNumber = 1,
@@ -146,7 +146,7 @@ public class EventController : Controller
 
         Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationHeader));
 
-        return Ok(mapper.Map<List<EventLocationModel>>(events));
+        return Ok(mapper.Map<List<EventLocationViewModel>>(events));
     }
 
     [HttpPost]
