@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Eventnet.Api.Helpers;
+using Eventnet.Api.Models.Tags;
 using Eventnet.DataAccess;
 using Eventnet.Domain.Selectors;
 using Microsoft.AspNetCore.Mvc;
@@ -31,6 +32,6 @@ public class TagsController : Controller
         var tagNames = mapper.ProjectTo<TagName>(context.Tags.AsNoTracking());
         var result = selector.Select(tagNames, maxCount);
 
-        return Ok(result);
+        return Ok(mapper.Map<List<TagNameModel>>(result));
     }
 }
