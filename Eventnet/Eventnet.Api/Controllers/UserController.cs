@@ -19,7 +19,7 @@ public class UserController : Controller
         this.mapper = mapper;
     }
 
-    [HttpGet("search-by-prefix/{prefix:alpha:required}")]
+    [HttpGet("search/prefix/{prefix:alpha:required}")]
     [Produces(typeof(List<UserNameListModel>))]
     public async Task<IActionResult> GetUsers(string prefix, [FromQuery] int maxUsers = 100)
     {
