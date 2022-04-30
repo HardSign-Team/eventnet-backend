@@ -42,9 +42,7 @@ public class SubscriptionsController : Controller
 
         var subscription = await dbContext.Subscriptions.Of(user).For(eventEntity).FirstOrDefaultAsync();
         if (subscription is not null)
-        {
             dbContext.Subscriptions.Remove(subscription);
-        }
 
         await dbContext.Subscriptions.AddAsync(eventEntity.Subscribe(user));
         await dbContext.SaveChangesAsync();

@@ -21,14 +21,10 @@ public static class Extensions
             Assert.Fail($"Should have only one '{headerName}' header");
 
         if (hasResponseHeader)
-        {
             return responseHeaderValues!.ToArray();
-        }
 
         if (hasContentHeader)
-        {
             return contentHeaderValues!.ToArray();
-        }
 
         Assert.Fail($"Should have '{headerName}' header");
         throw new InvalidOperationException();

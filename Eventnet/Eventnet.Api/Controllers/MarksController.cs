@@ -101,9 +101,7 @@ public class MarksController : Controller
             await dbContext.Marks.AddAsync(mark);
         }
         else
-        {
             changeMark(mark);
-        }
 
         await dbContext.SaveChangesAsync();
 

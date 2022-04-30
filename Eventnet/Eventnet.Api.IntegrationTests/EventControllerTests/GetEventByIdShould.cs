@@ -116,16 +116,12 @@ public class GetEventByIdShould : EventApiTestsBase
     private static void AddSubscribers(EventEntity eventEntity, IEnumerable<UserEntity> users)
     {
         foreach (var user in users)
-        {
             eventEntity.Subscribe(user);
-        }
     }
 
     private static void AddTags(EventEntity eventEntity, IEnumerable<TagEntity> tags)
     {
         foreach (var tag in tags)
-        {
             eventEntity.AddTag(tag);
-        }
     }
 }
