@@ -11,6 +11,6 @@ public record EventViewModel(
     LocationViewModel Location,
     DateTime StartDate,
     DateTime? EndDate,
-    TagNameModel[] Tags,
+    TagNameViewModel[] Tags,
     int TotalSubscriptions,
     MarksCountViewModel Marks);

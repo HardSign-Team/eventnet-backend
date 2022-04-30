@@ -5,6 +5,9 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Eventnet.Api.IntegrationTests.Helpers;
+using Eventnet.Api.Models.Events;
+using Eventnet.Api.Models.Marks;
+using Eventnet.Api.Models.Tags;
 using Eventnet.DataAccess.Entities;
 using FluentAssertions;
 using NUnit.Framework;
@@ -67,23 +70,17 @@ public class GetEventByIdShould : EventApiTestsBase
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         response.ShouldHaveHeader("Content-Type", "application/json; charset=utf-8");
-        response.ShouldHaveJsonContentEquivalentTo(new
-        {
-            id = eventEntity.Id,
-            ownerId = eventEntity.OwnerId,
-            name = eventEntity.Name,
-            description = eventEntity.Description,
-            startDate = eventEntity.StartDate,
-            endDate = eventEntity.EndDate,
-            location = eventEntity.Location,
-            tags = eventEntity.Tags,
-            totalSubscriptions = eventEntity.Subscriptions.Count,
-            marks = new
-            {
-                likes = 2,
-                dislikes = 1
-            }
-        });
+        var model = response.ReadContentAs<EventViewModel>();
+        model.Should().BeEquivalentTo(new EventViewModel(eventEntity.Id,
+            eventEntity.OwnerId,
+            eventEntity.Name,
+            eventEntity.Description,
+            new LocationViewModel(eventEntity.Location.Latitude, eventEntity.Location.Longitude),
+            eventEntity.StartDate,
+            eventEntity.EndDate,
+            eventEntity.Tags.Select(x => new TagNameViewModel(x.Id, x.Name)).ToArray(),
+            eventEntity.Subscriptions.Count,
+            new MarksCountViewModel(2, 1)));
     }
 
     private EventEntity GetTestEvent()

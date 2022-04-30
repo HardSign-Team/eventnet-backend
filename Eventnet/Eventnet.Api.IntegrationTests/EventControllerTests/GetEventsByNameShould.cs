@@ -66,7 +66,7 @@ public class GetEventsByNameShould : EventApiTestsBase
         var response = await HttpClient.SendAsync(request);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var result = await response.Content.ReadFromJsonAsync<EventNameListModel>() ?? throw new Exception();
+        var result = await response.Content.ReadFromJsonAsync<EventNameListViewModel>() ?? throw new Exception();
         result.TotalCount.Should().Be(maxCount);
         result.Models.Should().HaveCount(maxCount);
     }

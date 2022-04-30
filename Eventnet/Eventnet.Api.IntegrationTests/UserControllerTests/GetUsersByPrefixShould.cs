@@ -25,7 +25,7 @@ public class GetUsersByPrefixShould : UserApiTestsBase
         var response = await HttpClient.SendAsync(request);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        response.ShouldHaveJsonContentEquivalentTo(new UserNameListModel(0, Array.Empty<UserNameModel>()));
+        response.ShouldHaveJsonContentEquivalentTo(new UserNameListViewModel(0, Array.Empty<UserNameModel>()));
     }
 
     [Test]
@@ -58,7 +58,7 @@ public class GetUsersByPrefixShould : UserApiTestsBase
 
         var response = await HttpClient.SendAsync(request);
 
-        var result = JsonConvert.DeserializeObject<UserNameListModel>(response.Content.ReadAsStringAsync().Result);
+        var result = JsonConvert.DeserializeObject<UserNameListViewModel>(response.Content.ReadAsStringAsync().Result);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         result.Count.Should().Be(2);
         result.Models.Select(x => x.UserName).Should().Contain(names[1..3]);

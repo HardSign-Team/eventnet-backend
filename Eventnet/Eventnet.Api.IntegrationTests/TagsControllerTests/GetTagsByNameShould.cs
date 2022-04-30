@@ -1,11 +1,12 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Eventnet.Api.IntegrationTests.Helpers;
+using Eventnet.Api.Models.Tags;
 using Eventnet.DataAccess.Entities;
-using Eventnet.Domain.Selectors;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -56,7 +57,7 @@ public class GetTagsByNameShould : TagsApiTestsBase
         var response = await HttpClient.SendAsync(request);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var tags = response.ReadContentAs<TagName[]>();
+        var tags = response.ReadContentAs<List<TagNameViewModel>>();
         tags.Should().HaveCount(maxCount);
     }
 

@@ -50,6 +50,7 @@ public class EventController : Controller
     }
 
     [HttpGet("{eventId:guid}")]
+    [Produces(typeof(EventViewModel))]
     public async Task<IActionResult> GetEventById(Guid eventId)
     {
         if (Guid.Empty == eventId)
@@ -84,13 +85,14 @@ public class EventController : Controller
             mapper.Map<LocationViewModel>(entity.Location),
             entity.StartDate,
             entity.EndDate,
-            entity.Tags.Select(mapper.Map<TagNameModel>).ToArray(),
+            entity.Tags.Select(mapper.Map<TagNameViewModel>).ToArray(),
             entity.TotalSubscriptions,
             new MarksCountViewModel(entity.Likes, entity.Dislikes));
         return Ok(eventViewModel);
     }
 
     [HttpGet("search/name/{eventName}")]
+    [Produces(typeof(EventNameListViewModel))]
     public IActionResult GetEventsByName(string? eventName, [FromQuery(Name = "m")] int maxCount = 10)
     {
         eventName = eventName?.Trim();
@@ -107,10 +109,11 @@ public class EventController : Controller
             .Select(mapper.ProjectTo<EventName>(dbContext.Events).AsNoTracking().AsEnumerable(), maxCount)
             .ToArray();
 
-        return Ok(new EventNameListModel(result.Length, result));
+        return Ok(new EventNameListViewModel(result.Length, result));
     }
 
     [HttpGet(Name = nameof(GetEvents))]
+    [Produces(typeof(List<EventLocationViewModel>))]
     public IActionResult GetEvents(
         [FromQuery(Name = "f")] string? filterModelBase64,
         [FromQuery(Name = "p")] int pageNumber = 1,
@@ -143,7 +146,7 @@ public class EventController : Controller
 
         Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationHeader));
 
-        return Ok(mapper.Map<IEnumerable<EventLocationModel>>(events));
+        return Ok(mapper.Map<List<EventLocationViewModel>>(events));
     }
 
     [HttpPost]
@@ -205,6 +208,7 @@ public class EventController : Controller
 
     [HttpGet("request-event-creation")]
     [Authorize]
+    [Produces(typeof(Guid))]
     public IActionResult RequestEventCreation()
     {
         var id = Guid.NewGuid();

@@ -14,7 +14,7 @@ public class UserApiTestsBase : TestsBase
         var qb = new QueryBuilder { { "maxUsers", maxUsers.ToString() } };
         var uriBuilder = new UriBuilder(Configuration.BaseUrl)
         {
-            Path = $"{BaseRoute}/search-by-prefix/{HttpUtility.UrlEncode(prefix)}",
+            Path = $"{BaseRoute}/search/prefix/{HttpUtility.UrlEncode(prefix)}",
             Query = qb.ToString()
         };
         return uriBuilder.Uri;
