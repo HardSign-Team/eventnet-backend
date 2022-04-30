@@ -50,6 +50,7 @@ public class EventController : Controller
     }
 
     [HttpGet("{eventId:guid}")]
+    [Produces(typeof(EventViewModel))]
     public async Task<IActionResult> GetEventById(Guid eventId)
     {
         if (Guid.Empty == eventId)
@@ -91,6 +92,7 @@ public class EventController : Controller
     }
 
     [HttpGet("search/name/{eventName}")]
+    [Produces(typeof(EventNameListModel))]
     public IActionResult GetEventsByName(string? eventName, [FromQuery(Name = "m")] int maxCount = 10)
     {
         eventName = eventName?.Trim();
@@ -111,6 +113,7 @@ public class EventController : Controller
     }
 
     [HttpGet(Name = nameof(GetEvents))]
+    [Produces(typeof(List<EventLocationModel>))]
     public IActionResult GetEvents(
         [FromQuery(Name = "f")] string? filterModelBase64,
         [FromQuery(Name = "p")] int pageNumber = 1,
@@ -143,7 +146,7 @@ public class EventController : Controller
 
         Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationHeader));
 
-        return Ok(mapper.Map<IEnumerable<EventLocationModel>>(events));
+        return Ok(mapper.Map<List<EventLocationModel>>(events));
     }
 
     [HttpPost]
@@ -205,6 +208,7 @@ public class EventController : Controller
 
     [HttpGet("request-event-creation")]
     [Authorize]
+    [Produces(typeof(Guid))]
     public IActionResult RequestEventCreation()
     {
         var id = Guid.NewGuid();

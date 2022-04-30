@@ -24,6 +24,7 @@ public class SubscriptionsController : Controller
 
     [Authorize]
     [HttpPut("{eventId:guid}")]
+    [Produces(typeof(SubscriptionsCountViewModel))]
     public async Task<IActionResult> Subscribe(Guid eventId)
     {
         var user = await currentUserService.GetCurrentUser();
@@ -54,6 +55,7 @@ public class SubscriptionsController : Controller
 
     [Authorize]
     [HttpDelete("{eventId:guid}")]
+    [Produces(typeof(SubscriptionsCountViewModel))]
     public async Task<IActionResult> UnSubscribe(Guid eventId)
     {
         var user = await currentUserService.GetCurrentUser();
@@ -81,6 +83,7 @@ public class SubscriptionsController : Controller
     }
 
     [HttpGet("count/{eventId:guid}")]
+    [Produces(typeof(SubscriptionsCountViewModel))]
     public async Task<IActionResult> GetSubscriptionsCount(Guid eventId)
     {
         if (eventId == Guid.Empty)

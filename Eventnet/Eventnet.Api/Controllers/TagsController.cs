@@ -21,6 +21,7 @@ public class TagsController : Controller
     }
 
     [HttpGet("search/name/{name}")]
+    [Produces(typeof(List<TagNameModel>))]
     public IActionResult GetTagsByName(string name, [FromQuery(Name = "mc")] int maxCount = 30)
     {
         maxCount = NumberHelper.Normalize(maxCount, 1, 30);

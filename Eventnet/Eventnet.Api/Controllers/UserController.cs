@@ -20,6 +20,7 @@ public class UserController : Controller
     }
 
     [HttpGet("search-by-prefix/{prefix:alpha:required}")]
+    [Produces(typeof(List<UserNameListModel>))]
     public async Task<IActionResult> GetUsers(string prefix, [FromQuery] int maxUsers = 100)
     {
         maxUsers = NumberHelper.Normalize(maxUsers, 10, 100);
