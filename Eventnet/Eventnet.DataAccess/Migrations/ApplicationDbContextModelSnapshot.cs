@@ -213,15 +213,15 @@ namespace Eventnet.DataAccess.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("30a9be68-7de8-4d2a-b2b0-bb3d4133e7dd"),
-                            ConcurrencyStamp = "1c76728e-d43a-43aa-9749-26f77ac63ad6",
+                            Id = new Guid("f59f64ed-2a8c-4b25-ad53-e55b0a0bae62"),
+                            ConcurrencyStamp = "cec31ad0-5ddf-47cf-8053-5f196f8ae9a0",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = new Guid("23bff346-9021-4716-8f8c-89c78e8f131b"),
-                            ConcurrencyStamp = "47b0b302-7d30-4aac-9829-89f158697aa5",
+                            Id = new Guid("dac318e9-dbc8-4deb-9701-7c5617a997ab"),
+                            ConcurrencyStamp = "08655e69-0473-41b5-a1fb-533a8d0088bc",
                             Name = "User",
                             NormalizedName = "USER"
                         });
