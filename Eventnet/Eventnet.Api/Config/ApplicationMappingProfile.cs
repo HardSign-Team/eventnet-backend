@@ -27,6 +27,7 @@ public class ApplicationMappingProfile : Profile
         CreateMap<TagEntity, TagNameModel>();
         CreateProjection<UserEntity, UserNameModel>();
         CreateMap<UserEntity, UserViewModel>();
+        CreateMap<UpdateUserForm, UserEntity>();
         CreateMap<RegisterModel, UserEntity>()
             .ForSourceMember(x => x.Password,
                 opt => opt.DoNotValidate());
