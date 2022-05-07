@@ -1,5 +1,7 @@
 ﻿using System.Text.Json;
 using AutoMapper;
+using Eventnet.Api.Config;
+using Eventnet.Api.Extensions;
 using Eventnet.Api.Helpers;
 using Eventnet.Api.Models.Events;
 using Eventnet.Api.Models.Filtering;
@@ -59,7 +61,7 @@ public class EventController : Controller
             .FirstOrDefaultAsync(x => x.Id == eventId);
         if (entity is null)
             return NotFound();
-        
+
         return Ok(entity);
     }
 
@@ -96,19 +98,19 @@ public class EventController : Controller
             return BadRequest("Cannot parse filter model");
         if (!TryValidateModel(filterModel))
             return UnprocessableEntity(ModelState);
-        
+
         var pageInfo = new PageInfo(pageNumber, pageSize);
         var query = mapper.ProjectTo<Event>(dbContext.Events).AsNoTracking();
         var events = eventsFilterService.GetEvents(query.AsEnumerable(), filterModel, pageInfo);
         var paginationHeader = events.ToPaginationHeader(GenerateEventsPageLink(filterModelBase64));
-        
+
         Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationHeader));
-        
+
         return Ok(mapper.Map<List<EventLocationViewModel>>(events));
     }
 
-    [HttpPost]
     [Authorize]
+    [HttpPost]
     public async Task<IActionResult> CreateEvent([FromForm] CreateEventModel createModel)
     {
         var photos = createModel.Photos;
@@ -116,23 +118,22 @@ public class EventController : Controller
         if (!IsContentTypesSupported(photos))
             return BadRequest("Not supported ContentType");
 
-        if (!IsPhotosSizeLessThanRecommended(photos))
-        {
-            var recommendedSizeInMb = rabbitMqConfig.RecommendedMessageSizeInBytes / 1024 / 1024;
-            return BadRequest($"Too large images. Recommended size of all images is {recommendedSizeInMb}Mb.");
-        }
+        if (!rabbitMqConfig.IsPhotosSizeLessThanRecommended(photos))
+            return BadRequest(
+                $"Too large images. Recommended size of all images is {rabbitMqConfig.RecommendedMessageSizeInMb()}Mb.");
 
-        var isSaved = await IsEventSaved(createModel.Id);
-        if (IsSaveEventBeingHandling(createModel.Id) || isSaved)
+        var isSaved = await dbContext.Events.AnyAsync(x => x.Id == createModel.Id);
+        if (eventSaveService.IsHandling(createModel.Id) || isSaved)
             return BadRequest("One event id provided two times");
 
         var createdEvent = mapper.Map<Event>(createModel);
         await eventSaveService.RequestSave(createdEvent, photos);
+        
         return Accepted();
     }
 
-    [HttpGet("is-created")]
     [Authorize]
+    [HttpGet("is-created")]
     public IActionResult IsCreated(Guid id)
     {
         var (saveStatus, exception) = eventSaveService.GetSaveEventResult(id);
@@ -164,14 +165,10 @@ public class EventController : Controller
         return Ok(new { eventId });
     }
 
-    [HttpGet("request-event-creation")]
     [Authorize]
+    [HttpGet("request-event-creation")]
     [Produces(typeof(Guid))]
-    public IActionResult RequestEventCreation()
-    {
-        var id = Guid.NewGuid();
-        return Ok(id);
-    }
+    public IActionResult RequestEventCreation() => Ok(Guid.NewGuid());
 
     private static bool IsContentTypesSupported(IFormFile[] files)
     {
@@ -179,23 +176,10 @@ public class EventController : Controller
         return contentTypes.All(SupportedContentTypes.Contains);
     }
 
-    private bool IsPhotosSizeLessThanRecommended(IFormFile[] photos)
-    {
-        var photosSize = photos.Sum(photo => photo.Length);
-        return photosSize >= rabbitMqConfig.RecommendedMessageSizeInBytes;
-    }
-
-    private bool IsSaveEventBeingHandling(Guid id) => eventSaveService.IsHandling(id);
-
-    private async Task<bool> IsEventSaved(Guid id)
-    {
-        var eventInDb = await dbContext.Events.FindAsync(id);
-        return eventInDb is not null;
-    }
-
     private Func<int, int, string?> GenerateEventsPageLink(string filterModelBase64)
     {
-        return (pageNumber, pageSize) => linkGenerator.GetUriByRouteValues(HttpContext, nameof(GetEvents), 
+        return (pageNumber, pageSize) => linkGenerator.GetUriByRouteValues(HttpContext,
+            nameof(GetEvents),
             new { f = filterModelBase64, p = pageNumber, ps = pageSize });
     }
 }
