@@ -13,7 +13,7 @@ namespace Eventnet.Api.IntegrationTests.MarksControllerTests;
 public class AddLikeShould : MarksApiTestBase
 {
     [Test]
-    public async Task Response400_WhenNotAuthorized()
+    public async Task Response401_WhenNotAuthorized()
     {
         var entity = ApplyToDb(context =>
         {

@@ -152,6 +152,7 @@ public class EventController : Controller
     public IActionResult UpdateEvent(Guid eventId, [FromBody] UpdateEventModel updateModel) =>
         throw new NotImplementedException();
 
+    [Authorize]
     [HttpDelete("{eventId:guid}")]
     public async Task<IActionResult> DeleteEvent(Guid eventId)
     {
