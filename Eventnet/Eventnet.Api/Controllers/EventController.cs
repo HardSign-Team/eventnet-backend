@@ -154,6 +154,7 @@ public class EventController : Controller
 
     [Authorize]
     [HttpDelete("{eventId:guid}")]
+    [Produces(typeof(Guid))]
     public async Task<IActionResult> DeleteEvent(Guid eventId)
     {
         var eventEntity = await dbContext.Events.FirstOrDefaultAsync(x => x.Id == eventId);
@@ -163,7 +164,7 @@ public class EventController : Controller
         dbContext.Events.Remove(eventEntity);
         await dbContext.SaveChangesAsync();
 
-        return Ok(new { eventId });
+        return Ok(eventId);
     }
 
     [Authorize]
