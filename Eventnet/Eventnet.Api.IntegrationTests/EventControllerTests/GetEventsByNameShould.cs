@@ -44,7 +44,7 @@ public class GetEventsByNameShould : EventApiTestsBase
     }
 
     [Test]
-    public async Task ResponseCode200_WhenNotFoundSimilarEvents()
+    public async Task ResponseCode200_WhenFoundSimilarEvents()
     {
         const int maxCount = 3;
         var fixture = new Fixture();
@@ -66,9 +66,8 @@ public class GetEventsByNameShould : EventApiTestsBase
         var response = await HttpClient.SendAsync(request);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var result = await response.Content.ReadFromJsonAsync<EventNameListViewModel>() ?? throw new Exception();
-        result.TotalCount.Should().Be(maxCount);
-        result.Models.Should().HaveCount(maxCount);
+        var result = response.ReadContentAs<List<EventNameViewModel>>();
+        result.Should().HaveCount(maxCount);
     }
 
     private void SaveEvents(IEnumerable<EventEntity> events)

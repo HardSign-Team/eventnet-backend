@@ -15,6 +15,7 @@ using Eventnet.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging.Debug;
 using X.PagedList;
 
 namespace Eventnet.Api.Controllers;
@@ -92,7 +93,7 @@ public class EventController : Controller
     }
 
     [HttpGet("search/name/{eventName}")]
-    [Produces(typeof(EventNameListViewModel))]
+    [Produces(typeof(List<EventNameViewModel>))]
     public IActionResult GetEventsByName(string? eventName, [FromQuery(Name = "m")] int maxCount = 10)
     {
         eventName = eventName?.Trim();
@@ -106,10 +107,9 @@ public class EventController : Controller
 
         var selector = new EventsByNameSelector(eventName);
         var result = selector
-            .Select(mapper.ProjectTo<EventName>(dbContext.Events).AsNoTracking().AsEnumerable(), maxCount)
-            .ToArray();
-
-        return Ok(new EventNameListViewModel(result.Length, result));
+            .Select(mapper.ProjectTo<EventName>(dbContext.Events).AsNoTracking().AsEnumerable(), maxCount);
+        var viewModel = mapper.Map<List<EventNameViewModel>>(result);
+        return Ok(viewModel);
     }
 
     [HttpGet(Name = nameof(GetEvents))]
@@ -146,7 +146,7 @@ public class EventController : Controller
 
         Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationHeader));
 
-        return Ok(mapper.Map<List<EventLocationViewModel>>(events));
+        return Ok(mapper.Map<List<EventLocationViewModel>>(events.AsEnumerable()));
     }
 
     [HttpPost]
@@ -240,10 +240,10 @@ public class EventController : Controller
         try
         {
             var bytes = Convert.FromBase64String(base64Model);
-            var json = Encoding.Default.GetString(bytes);
+            var json = Encoding.UTF8.GetString(bytes);
             return JsonSerializer.Deserialize<EventsFilterModel>(json);
         }
-        catch (Exception)
+        catch (Exception e)
         {
             return null;
         }

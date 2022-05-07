@@ -1,5 +1,3 @@
-﻿using Eventnet.Domain.Events;
+﻿namespace Eventnet.Api.Models.Events;
 
-namespace Eventnet.Api.Models.Events;
-
-public record EventLocationViewModel(Guid Id, Location Location, string Name);
+public record EventLocationViewModel(Guid Id, LocationViewModel Location, string Name);

@@ -163,7 +163,7 @@ public class GetEventsShould : EventApiTestsBase
         pagination.PreviousPageLink.Should().BeNull();
         pagination.TotalCount.Should().Be(6);
         pagination.TotalPages.Should().Be(2);
-        var resultEvents = await response.Content.ReadFromJsonAsync<EventLocationViewModel[]>() ?? throw new Exception();
+        var resultEvents = response.ReadContentAs<EventLocationViewModel[]>();
         resultEvents.Should().NotBeEmpty();
         resultEvents.Should().HaveCount(3);
     }
