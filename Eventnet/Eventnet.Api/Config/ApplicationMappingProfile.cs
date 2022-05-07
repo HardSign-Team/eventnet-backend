@@ -13,24 +13,39 @@ public class ApplicationMappingProfile : Profile
 {
     public ApplicationMappingProfile()
     {
-        CreateMap<EventEntity, Event>();
-        CreateMap<EventEntity, EventName>();
-        CreateMap<Event, EventLocationViewModel>();
-        CreateMap<LocationEntity, Location>();
-        CreateMap<Event, EventEntity>();
-        CreateMap<EventName, EventNameViewModel>();
-        CreateMap<Location, LocationEntity>();
+        CreateEventsMap();
+        CreateLocationMap();
+        CreateTagsMap();
         CreateMap<CreateEventModel, Event>();
-        CreateMap<LocationEntity, LocationViewModel>();
-        CreateMap<Location, LocationViewModel>();
-        CreateMap<TagEntity, Tag>();
-        CreateProjection<TagEntity, TagName>();
-        CreateMap<TagName, TagNameViewModel>();
-        CreateMap<TagEntity, TagNameViewModel>();
         CreateProjection<UserEntity, UserNameModel>();
         CreateMap<UserEntity, UserViewModel>();
         CreateMap<RegisterModel, UserEntity>()
             .ForSourceMember(x => x.Password,
                 opt => opt.DoNotValidate());
+    }
+
+    private void CreateEventsMap()
+    {
+        CreateMap<EventEntity, Event>();
+        CreateMap<EventEntity, EventName>();
+        CreateMap<Event, EventLocationViewModel>();
+        CreateMap<Event, EventEntity>();
+        CreateMap<EventName, EventNameViewModel>();
+    }
+
+    private void CreateTagsMap()
+    {
+        CreateMap<TagEntity, Tag>();
+        CreateProjection<TagEntity, TagName>();
+        CreateMap<TagName, TagNameViewModel>();
+        CreateMap<TagEntity, TagNameViewModel>();
+    }
+
+    private void CreateLocationMap()
+    {
+        CreateMap<LocationEntity, Location>();
+        CreateMap<Location, LocationEntity>();
+        CreateMap<LocationEntity, LocationViewModel>();
+        CreateMap<Location, LocationViewModel>();
     }
 }
