@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using System.Text.Json;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Eventnet.Api.Helpers;
 using Eventnet.Api.Models.Events;
 using Eventnet.Api.Models.Filtering;
@@ -15,7 +16,6 @@ using Eventnet.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging.Debug;
 using X.PagedList;
 
 namespace Eventnet.Api.Controllers;
@@ -62,34 +62,12 @@ public class EventController : Controller
 
         var entity = await dbContext.Events
             .AsNoTracking()
-            .Select(x => new
-            {
-                x.Id,
-                x.OwnerId,
-                x.Description,
-                x.Location,
-                x.StartDate,
-                x.EndDate,
-                x.Name,
-                x.Tags,
-                TotalSubscriptions = x.Subscriptions.Count,
-                Likes = x.Marks.Count(mark => mark.IsLike),
-                Dislikes = x.Marks.Count(mark => !mark.IsLike)
-            })
+            .ProjectTo<EventViewModel>(mapper.ConfigurationProvider)
             .FirstOrDefaultAsync(x => x.Id == eventId);
         if (entity is null)
             return NotFound();
-        var eventViewModel = new EventViewModel(entity.Id,
-            entity.OwnerId,
-            entity.Name,
-            entity.Description,
-            mapper.Map<LocationViewModel>(entity.Location),
-            entity.StartDate,
-            entity.EndDate,
-            entity.Tags.Select(mapper.Map<TagNameViewModel>).ToArray(),
-            entity.TotalSubscriptions,
-            new MarksCountViewModel(entity.Likes, entity.Dislikes));
-        return Ok(eventViewModel);
+        
+        return Ok(entity);
     }
 
     [HttpGet("search/name/{eventName}")]
@@ -243,7 +221,7 @@ public class EventController : Controller
             var json = Encoding.UTF8.GetString(bytes);
             return JsonSerializer.Deserialize<EventsFilterModel>(json);
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return null;
         }

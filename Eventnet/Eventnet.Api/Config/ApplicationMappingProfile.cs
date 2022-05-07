@@ -2,6 +2,7 @@
 using Eventnet.Api.Models;
 using Eventnet.Api.Models.Authentication;
 using Eventnet.Api.Models.Events;
+using Eventnet.Api.Models.Marks;
 using Eventnet.Api.Models.Tags;
 using Eventnet.DataAccess.Entities;
 using Eventnet.Domain.Events;
@@ -27,6 +28,14 @@ public class ApplicationMappingProfile : Profile
     private void CreateEventsMap()
     {
         CreateMap<EventEntity, Event>();
+        CreateMap<EventEntity, EventViewModel>()
+            .ForMember(x => x.TotalSubscriptions, 
+                expression => expression.MapFrom(x => x.Subscriptions.Count))
+            .ForMember(x => x.Marks, 
+                e => 
+                    e.MapFrom(x => new MarksCountViewModel(
+                                 x.Marks.Count(mark => mark.IsLike), 
+                                 x.Marks.Count(mark => !mark.IsLike))));
         CreateMap<EventEntity, EventName>();
         CreateMap<Event, EventLocationViewModel>();
         CreateMap<Event, EventEntity>();

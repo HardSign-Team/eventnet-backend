@@ -6,13 +6,8 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Eventnet.Api.IntegrationTests.Helpers;
-using Eventnet.Api.Models.Authentication;
-using Eventnet.DataAccess.Entities;
-using Eventnet.DataAccess.Models;
 using Eventnet.Domain.Events;
 using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 
 namespace Eventnet.Api.IntegrationTests.EventControllerTests.CreateEventTests;
@@ -41,31 +36,6 @@ public class CreateEventTestsBase : TestWithRabbitMqBase
         var response = await client.SendAsync(request);
         var guid = await response.Content.ReadAsStringAsync();
         return Guid.Parse(guid.Replace("\"", ""));
-    }
-
-    protected async Task<(UserEntity, HttpClient)> CreateAuthorizedClient(string username, string password)
-    {
-        var factory = GetScopeFactory();
-        using var scope = factory.CreateScope();
-        var userManager = scope.ServiceProvider.GetService<UserManager<UserEntity>>()!;
-        var user = await userManager.FindByNameAsync(username);
-        if (user is null)
-        {
-            var registerModel = new RegisterModel
-            {
-                UserName = username,
-                Email = $"{username}@test.com",
-                Password = password,
-                ConfirmPassword = password,
-                Gender = Gender.Male,
-                PhoneNumber = null
-            };
-
-            user = await AuthorizationHelper.RegisterUserAsync(userManager, registerModel);
-        }
-
-        var client = await AuthorizationHelper.AuthorizeClient(HttpClient, username, password);
-        return (user, client);
     }
 
     protected static FileStream GetFileStream(string path) => File.OpenRead(path);
