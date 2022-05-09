@@ -63,10 +63,7 @@ public class DeleteEventShould : EventApiTestsBase
         var response = await client.SendAsync(request);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        response.ShouldHaveJsonContentEquivalentTo(new
-        {
-            eventId = eventEntity.Id
-        });
+        response.ReadContentAs<Guid>().Should().Be(eventEntity.Id);
         ApplyToDb(context => context.Events.ToArray()).Should().BeEmpty();
     }
 
