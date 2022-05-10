@@ -31,7 +31,7 @@ public class UnsubscribeShould : SubscriptionsApiTestsBase
     [Test]
     public async Task Response404_WhenEventNotFound()
     {
-        var (_, client) = await CreateAuthorizedClient("TestUser", "TestPassword");
+        var (_, client) = await CreateAuthorizedClient();
         var request = BuildUnsubscribeRequest(Guid.Empty);
 
         var response = await client.SendAsync(request);
@@ -42,7 +42,7 @@ public class UnsubscribeShould : SubscriptionsApiTestsBase
     [Test]
     public async Task Response409_WhenEventHasNotEndDate()
     {
-        var (_, client) = await CreateAuthorizedClient("TestUser", "TestPassword");
+        var (_, client) = await CreateAuthorizedClient();
         var entity = ApplyToDb(context =>
         {
             context.AddUsers();
@@ -62,7 +62,7 @@ public class UnsubscribeShould : SubscriptionsApiTestsBase
     [Test]
     public async Task Response409_WhenEventEnded()
     {
-        var (_, client) = await CreateAuthorizedClient("TestUser", "TestPassword");
+        var (_, client) = await CreateAuthorizedClient();
         var entity = ApplyToDb(context =>
         {
             context.AddUsers();
@@ -85,7 +85,7 @@ public class UnsubscribeShould : SubscriptionsApiTestsBase
     [TestCase(10)]
     public async Task Response200_WhenUnsubscribeNTimes(int n)
     {
-        var (user, client) = await CreateAuthorizedClient("TestUser", "TestPassword");
+        var (user, client) = await CreateAuthorizedClient();
         var entity = ApplyToDb(context =>
         {
             context.AddUsers();
@@ -111,7 +111,7 @@ public class UnsubscribeShould : SubscriptionsApiTestsBase
     [Test]
     public async Task Response200_WhenWasNotSubscribed()
     {
-        var (_, client) = await CreateAuthorizedClient("TestUser", "TestPassword");
+        var (_, client) = await CreateAuthorizedClient();
         var entity = ApplyToDb(context =>
         {
             context.AddUsers();

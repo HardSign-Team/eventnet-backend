@@ -31,7 +31,7 @@ public class RemoveDislikeShould : MarksApiTestBase
     [Test]
     public async Task Response404_WhenEventNotFound()
     {
-        var (_, client) = await CreateAuthorizedClient("TestUser", "TestPassword");
+        var (_, client) = await CreateAuthorizedClient();
         var request = BuildRemoveDislikeRequest(Guid.Empty);
 
         var response = await client.SendAsync(request);
@@ -42,7 +42,7 @@ public class RemoveDislikeShould : MarksApiTestBase
     [Test]
     public async Task Response200_WhenRemoveSingleTime()
     {
-        var (_, client) = await CreateAuthorizedClient("TestUser", "TestPassword");
+        var (_, client) = await CreateAuthorizedClient();
         var entity = ApplyToDb(context =>
         {
             context.AddUsers();
@@ -63,7 +63,7 @@ public class RemoveDislikeShould : MarksApiTestBase
     [TestCase(10)]
     public async Task Response200_WhenRemoveSeveralTimes(int n)
     {
-        var (_, client) = await CreateAuthorizedClient("TestUser", "TestPassword");
+        var (_, client) = await CreateAuthorizedClient();
         var entity = ApplyToDb(context =>
         {
             context.AddUsers();

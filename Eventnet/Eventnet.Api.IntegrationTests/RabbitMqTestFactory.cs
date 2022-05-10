@@ -3,7 +3,6 @@ using System.Linq;
 using Eventnet.Api.Config;
 using Eventnet.Api.IntegrationTests.Helpers;
 using Eventnet.Api.IntegrationTests.Mocks;
-using Eventnet.Api.Services.SaveServices;
 using Eventnet.DataAccess;
 using Eventnet.Infrastructure.PhotoServices;
 using Microsoft.AspNetCore.Hosting;

@@ -32,7 +32,7 @@ public class SubscribeShould : SubscriptionsApiTestsBase
     [Test]
     public async Task Response404_WhenEventNotFound()
     {
-        var (_, client) = await CreateAuthorizedClient("TestUser", "TestPassword");
+        var (_, client) = await CreateAuthorizedClient();
         var request = BuildSubscribeRequest(Guid.Empty);
 
         var response = await client.SendAsync(request);
@@ -43,7 +43,7 @@ public class SubscribeShould : SubscriptionsApiTestsBase
     [Test]
     public async Task Response409_WhenEventHasNotEndDate()
     {
-        var (_, client) = await CreateAuthorizedClient("TestUser", "TestPassword");
+        var (_, client) = await CreateAuthorizedClient();
         var entity = ApplyToDb(context =>
         {
             context.AddUsers();
@@ -63,7 +63,7 @@ public class SubscribeShould : SubscriptionsApiTestsBase
     [Test]
     public async Task Response409_WhenEventEnded()
     {
-        var (_, client) = await CreateAuthorizedClient("TestUser", "TestPassword");
+        var (_, client) = await CreateAuthorizedClient();
         var entity = ApplyToDb(context =>
         {
             context.AddUsers();
@@ -86,7 +86,7 @@ public class SubscribeShould : SubscriptionsApiTestsBase
     [TestCase(10)]
     public async Task Response200_WhenSubscribeNTimes(int n)
     {
-        var (_, client) = await CreateAuthorizedClient("TestUser", "TestPassword");
+        var (_, client) = await CreateAuthorizedClient();
         var entity = ApplyToDb(context =>
         {
             context.AddUsers();
@@ -109,7 +109,7 @@ public class SubscribeShould : SubscriptionsApiTestsBase
     [Test]
     public async Task Response200_AndUpdateLastSubscriptionDate_WhenSubscribeSeveralTimes()
     {
-        var (_, client) = await CreateAuthorizedClient("TestUser", "TestPassword");
+        var (_, client) = await CreateAuthorizedClient();
         var entity = ApplyToDb(context =>
         {
             context.AddUsers();
