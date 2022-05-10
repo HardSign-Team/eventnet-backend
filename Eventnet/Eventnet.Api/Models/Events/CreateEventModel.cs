@@ -10,4 +10,5 @@ public record CreateEventModel(
     string Name,
     string? Description,
     Location Location,
+    string[] Tags,
     IFormFile[] Photos);

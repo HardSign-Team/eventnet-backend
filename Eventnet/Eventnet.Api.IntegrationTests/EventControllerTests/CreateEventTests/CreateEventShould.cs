@@ -6,9 +6,12 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Eventnet.Api.IntegrationTests.Helpers;
 using Eventnet.Api.Models.Events;
+using Eventnet.DataAccess.Entities;
+using Eventnet.DataAccess.Extensions;
 using Eventnet.Domain.Events;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 
 namespace Eventnet.Api.IntegrationTests.EventControllerTests.CreateEventTests;
@@ -70,12 +73,18 @@ public class CreateEventShould : CreateEventTestsBase
     [Test]
     public async Task SaveEvent_WhenAllCorrect()
     {
-        var (_, client) = await CreateAuthorizedClient();
-        var photo = GetFileStream(PathToPhoto);
+        var (user, client) = await CreateAuthorizedClient();
+        await using var photo = GetFileStream(PathToPhoto);
 
         var eventId = await GetEventGuid(client);
 
-        await PostAsync(client, eventId, Guid.NewGuid(), photo, ImageMediaTypePng);
+        var model = CreateDefaultCreateEventModel() with
+        {
+            Id = eventId,
+            OwnerId = Guid.NewGuid().ToString(),
+            Photos = new[] { CreateFormFile(photo, ImageMediaTypePng) }
+        };
+        await PostAsync(client, model);
         await Task.Delay(1000);
 
         var request = GetIsCreatedRequest(eventId);
@@ -84,12 +93,11 @@ public class CreateEventShould : CreateEventTestsBase
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var eventEntity = ApplyToDb(context => context.Events.Find(eventId));
-        eventEntity.Should().NotBeNull();
-        eventEntity!.Id.Should().Be(eventId);
-
-        var photoEntities = ApplyToDb(context => context.Photos.ToList()).Where(x => x.EventId == eventId);
-        photoEntities.Should().NotBeNull();
+        var eventEntity = ApplyToDb(context => context.Events.Include(x => x.Tags)
+            .FirstOrDefault(x => x.Id == eventId));
+        AssertSave(eventEntity ?? throw new Exception(), user, model);
+        var photoEntities = ApplyToDb(context => context.Photos.ForEvent(eventId).ToList());
+        photoEntities.Should().NotBeEmpty();
     }
 
     [Test]
@@ -126,25 +134,40 @@ public class CreateEventShould : CreateEventTestsBase
         FileStream fileStream,
         string mediaType)
     {
-        IFormFile formFile = new FormFile(fileStream,
+        var model = CreateDefaultCreateEventModel() with
+        {
+            Id = eventId,
+            OwnerId = ownerId.ToString(),
+            Photos = new[] { CreateFormFile(fileStream, mediaType) }
+        };
+        return await PostAsync(client, model);
+    }
+
+    private static IFormFile CreateFormFile(FileStream stream, string mediaType)
+    {
+        IFormFile formFile = new FormFile(stream,
             0,
-            fileStream.Length,
+            stream.Length,
             nameof(CreateEventModel.Photos),
-            fileStream.Name.Split(Path.PathSeparator).Last())
+            stream.Name.Split(Path.PathSeparator).Last())
         {
             Headers = new HeaderDictionary(),
             ContentType = mediaType
         };
-        var photos = new[] { formFile };
-        var model = new CreateEventModel(eventId,
-            ownerId.ToString(),
+        return formFile;
+    }
+
+    private static CreateEventModel CreateDefaultCreateEventModel()
+    {
+        return new CreateEventModel(Guid.NewGuid(),
+            Guid.NewGuid().ToString(),
             DateTime.Now,
             DateTime.Now,
             "Test",
             "Description",
             new Location(0, 0),
-            photos);
-        return await PostAsync(client, model);
+            new[] { "Tag1", "Tag2", "Tag3" },
+            Array.Empty<IFormFile>());
     }
     
     private async Task<HttpResponseMessage> PostAsync(HttpClient client, CreateEventModel model)
@@ -152,5 +175,17 @@ public class CreateEventShould : CreateEventTestsBase
         var multipart = GetEventCreationRequestMessage(model);
         var uri = new UriBuilder(Configuration.BaseUrl) { Path = BaseRoute }.Uri;
         return await client.PostAsync(uri, multipart);
+    }
+    
+    
+    private static void AssertSave(EventEntity eventEntity, UserEntity owner, CreateEventModel model)
+    {
+        eventEntity.Id.Should().Be(model.Id);
+        eventEntity.Name.Should().Be(model.Name);
+        eventEntity.Description.Should().Be(model.Description);
+        eventEntity.Tags.Select(x => x.Name).OrderBy(x => x).Should().Equal(model.Tags.OrderBy(x => x));
+        eventEntity.StartDate.Should().Be(model.StartDate);
+        eventEntity.EndDate.Should().Be(model.EndDate);
+        eventEntity.OwnerId.Should().Be(owner.Id);
     }
 }

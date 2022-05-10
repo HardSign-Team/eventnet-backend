@@ -1,4 +1,5 @@
 ﻿using Eventnet.Domain;
+using Eventnet.Domain.Events;
 using Eventnet.Infrastructure.Validators;
 
 namespace Eventnet.Infrastructure;
@@ -22,21 +23,18 @@ public class RabbitMqMessageHandler : IRabbitMqMessageHandler
     public void Handle(RabbitMqMessage rabbitMqMessage)
     {
         var (eventForSave, binaryPhotos) = rabbitMqMessage;
-        var id = eventForSave.Id;
         var errorMessage = string.Empty;
         EventSaveStatus status;
         try
         {
             var photos = GetPhotos(binaryPhotos);
-            var result = validator.Validate(photos, eventForSave);
-            errorMessage = result.ErrorMessage;
-            if (result.IsOk)
+            (var isOk, errorMessage) = validator.Validate(photos, eventForSave);
+            if (isOk)
             {
-                saveToDbService.SaveEvent(eventForSave);
-                saveToDbService.SavePhotos(photos, id);
+                SaveEvent(eventForSave, photos);
             }
 
-            status = result.IsOk ? EventSaveStatus.Saved : EventSaveStatus.NotSavedDueToUserError;
+            status = isOk ? EventSaveStatus.Saved : EventSaveStatus.NotSavedDueToUserError;
         }
         catch (Exception e)
         {
@@ -45,10 +43,16 @@ public class RabbitMqMessageHandler : IRabbitMqMessageHandler
             Console.WriteLine(e); // TODO: add logger
         }
 
-        eventSaveHandler.Update(id, new SaveEventResult(status, errorMessage));
+        eventSaveHandler.Update(eventForSave.Id, new SaveEventResult(status, errorMessage));
     }
 
-    private static List<Photo> GetPhotos(List<RabbitMqPhoto> rabbitMqPhotos) =>
+    private void SaveEvent(Event eventForSave, List<Photo> photos)
+    {
+        saveToDbService.SaveEventAsync(eventForSave);
+        saveToDbService.SavePhotosAsync(photos, eventForSave.Id);
+    }
+
+    private static List<Photo> GetPhotos(IEnumerable<RabbitMqPhoto> rabbitMqPhotos) =>
         rabbitMqPhotos
             .Select(rabbitMqPhoto => new Photo(rabbitMqPhoto.PhotoInBytes, rabbitMqPhoto.ContentType))
             .ToList();

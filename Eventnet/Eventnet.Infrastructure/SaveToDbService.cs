@@ -4,6 +4,7 @@ using Eventnet.DataAccess.Entities;
 using Eventnet.Domain;
 using Eventnet.Domain.Events;
 using Eventnet.Infrastructure.PhotoServices;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Eventnet.Infrastructure;
@@ -21,7 +22,7 @@ public class SaveToDbService : ISaveToDbService
         this.mapper = mapper;
     }
 
-    public async Task SavePhotos(List<Photo> photos, Guid eventId)
+    public async Task SavePhotosAsync(List<Photo> photos, Guid eventId)
     {
         foreach (var photo in photos)
         {
@@ -32,12 +33,29 @@ public class SaveToDbService : ISaveToDbService
         }
     }
 
-    public async Task SaveEvent(Event eventForSave)
+    public async Task SaveEventAsync(Event eventForSave)
     {
         await using var dbContext = factory.CreateScope().ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var eventEntity = mapper.Map<EventEntity>(eventForSave);
         dbContext.Events.Add(eventEntity);
+        await SaveTagsAsync(eventEntity, eventForSave.Tags.Select(x => x.Name).ToArray(), dbContext);
         await dbContext.SaveChangesAsync();
+    }
+
+    private static async Task SaveTagsAsync(EventEntity eventEntity, string[] tags, ApplicationDbContext dbContext)
+    {
+        var exists = await dbContext.Tags
+            .Where(x => tags.Contains(x.Name))
+            .ToDictionaryAsync(x => x.Name, x => x);
+
+        var notExists = tags
+            .Where(name => exists.ContainsKey(name))
+            .Select(name => new TagEntity(0, name))
+            .ToList();
+        await dbContext.Tags.AddRangeAsync(notExists);
+        await dbContext.SaveChangesAsync();
+
+        eventEntity.AddTags(exists.Values.Concat(notExists));
     }
 
     private async Task SavePhotoToDbAsync(PhotoEntity photoEntity)
