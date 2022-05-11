@@ -1,17 +1,14 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
 using Eventnet.Api.IntegrationTests.Helpers;
 using Eventnet.Api.Models.Events;
 using Eventnet.Domain.Events;
 using Microsoft.AspNetCore.Http.Extensions;
-using Newtonsoft.Json;
 
 namespace Eventnet.Api.IntegrationTests.EventControllerTests.CreateEventTests;
 
@@ -75,18 +72,20 @@ public class CreateEventTestsBase : TestWithRabbitMqBase
     private static IEnumerable<(HttpContent, string)> GetInfoContent(EventInfoModel eventInfo)
     {
         yield return (new StringContent(eventInfo.EventId.ToString()), nameof(EventInfoModel.EventId));
-        
-        yield return (new StringContent(eventInfo.StartDate.ToString(CultureInfo.CurrentCulture)), nameof(EventInfoModel.StartDate));
-        
-        if (eventInfo.EndDate is {} endDate)
-            yield return (new StringContent(endDate.ToString(CultureInfo.CurrentCulture)), nameof(EventInfoModel.EndDate));
-        
+
+        yield return (new StringContent(eventInfo.StartDate.ToString(CultureInfo.CurrentCulture)),
+            nameof(EventInfoModel.StartDate));
+
+        if (eventInfo.EndDate is { } endDate)
+            yield return (new StringContent(endDate.ToString(CultureInfo.CurrentCulture)),
+                nameof(EventInfoModel.EndDate));
+
         yield return (new StringContent(eventInfo.Name), nameof(EventInfoModel.Name));
-        
-        if (eventInfo.Description is {} description)
+
+        if (eventInfo.Description is { } description)
             yield return (new StringContent(description), nameof(EventInfoModel.Description));
-        
-        foreach(var tag in eventInfo.Tags)
+
+        foreach (var tag in eventInfo.Tags)
             yield return (new StringContent(tag), nameof(EventInfoModel.Tags));
 
         const string locationName = nameof(EventInfoModel.Location);

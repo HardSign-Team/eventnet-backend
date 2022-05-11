@@ -117,7 +117,8 @@ public class EventController : Controller
     public async Task<IActionResult> CreateEvent([FromForm] CreateEventModel createModel)
     {
         var (eventInfoModel, photos) = createModel;
-
+        photos ??= Array.Empty<IFormFile>();
+        
         var user = await currentUserService.GetCurrentUser();
         if (user is null)
             return Unauthorized();

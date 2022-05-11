@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -20,7 +21,11 @@ namespace Eventnet.Api.IntegrationTests.EventControllerTests.CreateEventTests;
 [Explicit]
 public class CreateEventShould : CreateEventTestsBase
 {
-    private const string PathToPhoto = "test.png";
+    private static readonly string[] PathToPhotos = {
+        "test.png",
+        "test2.png",
+        "test3.png"
+    };
     private const string PathToText = "notImage.txt";
     private const string ImageMediaTypePng = "image/png";
     private const string TextMediaType = "text/plain";
@@ -40,7 +45,7 @@ public class CreateEventShould : CreateEventTestsBase
     public async Task ResponseCode202_WhenEventIsCorrect()
     {
         var (_, client) = await CreateAuthorizedClient();
-        var photo = GetFileStream(PathToPhoto);
+        var photo = GetFileStream(PathToPhotos[0]);
 
         var response = await PostAsync(client, Guid.NewGuid(), photo, ImageMediaTypePng);
 
@@ -62,7 +67,7 @@ public class CreateEventShould : CreateEventTestsBase
     public async Task ResponseCode400_WhenSameIdProvidedTwoTimes()
     {
         var (_, client) = await CreateAuthorizedClient();
-        var photo = GetFileStream(PathToPhoto);
+        var photo = GetFileStream(PathToPhotos[0]);
 
         var id = Guid.NewGuid();
         await PostAsync(client, id, photo, ImageMediaTypePng);
@@ -70,19 +75,28 @@ public class CreateEventShould : CreateEventTestsBase
 
         response2.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
-
+    
     [Test]
-    public async Task SaveEvent_WhenAllCorrect()
+    public async Task ResponseCode401_WhenNotAuthorized()
+    {
+        var photo = GetFileStream(PathToPhotos[0]);
+
+        var response = await PostAsync(HttpClient, Guid.NewGuid(), photo, ImageMediaTypePng);
+
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    [TestCaseSource(nameof(GetPhotosTestCases))]
+    public async Task Response200_WhenAllCorrect_WithSingleImage(IFormFile[] formFiles)
     {
         var (user, client) = await CreateAuthorizedClient();
-        await using var photo = GetFileStream(PathToPhoto);
 
         var eventId = await GetEventGuid(client);
 
-        var info = CreateDefaultEventInfo() with {EventId = eventId };
-        var model = new CreateEventModel(info, new[] { CreateFormFile(photo, ImageMediaTypePng) });
+        var info = CreateDefaultEventInfo() with { EventId = eventId };
+        var model = new CreateEventModel(info, formFiles);
         await PostAsync(client, model);
-        await Task.Delay(3000);
+        await Task.Delay(1000);
 
         var request = GetIsCreatedRequest(eventId);
 
@@ -91,18 +105,39 @@ public class CreateEventShould : CreateEventTestsBase
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var eventEntity = ApplyToDb(context => context.Events.Include(x => x.Tags)
-            .FirstOrDefault(x => x.Id == eventId)) ?? throw new Exception();
+            .First(x => x.Id == eventId));
         AssertSave(eventEntity, user, model);
         var photoEntities = ApplyToDb(context => context.Photos.ForEvent(eventId).ToList());
-        photoEntities.Should().NotBeEmpty();
+        photoEntities.Should().HaveCount(model.Photos?.Length ?? 0);
     }
+
+    public static IEnumerable<TestCaseData> GetPhotosTestCases()
+    {
+        var photos = PathToPhotos.Select(GetFileStream).ToArray();
+        
+        yield return new TestCaseData(new object?[] 
+        {
+            Array.Empty<IFormFile>()
+        });
+        
+        yield return new TestCaseData(new object?[]
+        {
+            new[] { CreateFormFile(photos[0], ImageMediaTypePng) }
+        });
+        
+        yield return new TestCaseData(new object?[]
+        {
+            photos.Select(p => CreateFormFile(p, ImageMediaTypePng)).ToArray()
+        });
+    }
+
 
     [Test]
     public async Task IsCreatedResponseCode202_WhenNotSaveYet()
     {
         var (_, client) = await CreateAuthorizedClient();
         var eventId = Guid.NewGuid();
-        await using var photo = GetFileStream(PathToPhoto);
+        await using var photo = GetFileStream(PathToPhotos[0]);
 
         var r = await PostAsync(client, eventId, photo, ImageMediaTypePng);
         r.StatusCode.Should().Be(HttpStatusCode.Accepted);
