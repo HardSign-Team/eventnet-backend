@@ -22,14 +22,14 @@ public class RabbitMqConsumeEventService : IConsumeEventService
         channel.QueueDeclare(queue, true, false, false);
     }
 
-    public void ConsumeAndHandle(Action<RabbitMqMessage> handle)
+    public void ConsumeAndHandle(Func<RabbitMqMessage, Task> handle)
     {
         var consumer = new EventingBasicConsumer(channel);
-        consumer.Received += (_, ea) =>
+        consumer.Received += async (_, ea) =>
         {
             var content = Encoding.UTF8.GetString(ea.Body.ToArray());
             var message = JsonSerializer.Deserialize<RabbitMqMessage>(content);
-            handle(message!);
+            await handle(message!);
             channel.BasicAck(ea.DeliveryTag, false);
         };
 

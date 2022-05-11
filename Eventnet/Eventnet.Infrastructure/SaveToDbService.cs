@@ -5,21 +5,23 @@ using Eventnet.Domain;
 using Eventnet.Domain.Events;
 using Eventnet.Infrastructure.PhotoServices;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Eventnet.Infrastructure;
 
 public class SaveToDbService : ISaveToDbService
 {
     private readonly IMapper mapper;
+    private readonly ApplicationDbContext dbContext;
     private readonly IPhotoToStorageSaveService storageSaveService;
-    private readonly IServiceScopeFactory factory;
 
-    public SaveToDbService(IPhotoToStorageSaveService storageSaveService, IServiceScopeFactory factory, IMapper mapper)
+    public SaveToDbService(
+        IPhotoToStorageSaveService storageSaveService,
+        IMapper mapper,
+        ApplicationDbContext dbContext)
     {
         this.storageSaveService = storageSaveService;
-        this.factory = factory;
         this.mapper = mapper;
+        this.dbContext = dbContext;
     }
 
     public async Task SavePhotosAsync(List<Photo> photos, Guid eventId)
@@ -35,7 +37,6 @@ public class SaveToDbService : ISaveToDbService
 
     public async Task SaveEventAsync(EventInfo info)
     {
-        await using var dbContext = factory.CreateScope().ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var eventEntity = new EventEntity(info.EventId,
             info.OwnerId,
             info.StartDate,
@@ -66,7 +67,6 @@ public class SaveToDbService : ISaveToDbService
 
     private async Task SavePhotoToDbAsync(PhotoEntity photoEntity)
     {
-        await using var dbContext = factory.CreateScope().ServiceProvider.GetRequiredService<ApplicationDbContext>();
         dbContext.Photos.Add(photoEntity);
         await dbContext.SaveChangesAsync();
     }
