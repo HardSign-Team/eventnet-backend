@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Eventnet.DataAccess.Entities;
 
-public class UserEntity : IdentityUser
+public class UserEntity : IdentityUser<Guid>
 {
     // ReSharper disable once UnusedAutoPropertyAccessor.Global
     public Gender Gender { get; set; }

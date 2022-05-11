@@ -33,9 +33,7 @@ public class GetSubscriptionsCountShould : SubscriptionsApiTestsBase
 
             var entity = context.Events.First();
             foreach (var user in context.Users)
-            {
                 entity.Subscribe(user);
-            }
 
             var subscriptionEntities = context.Users.Select(user => entity.Subscribe(user)).ToArray();
             context.Subscriptions.AddRange(subscriptionEntities);

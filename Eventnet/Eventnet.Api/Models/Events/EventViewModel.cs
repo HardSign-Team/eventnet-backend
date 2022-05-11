@@ -5,7 +5,7 @@ namespace Eventnet.Api.Models.Events;
 
 public record EventViewModel(
     Guid Id,
-    string OwnerId,
+    Guid OwnerId,
     string Name,
     string Description,
     LocationViewModel Location,
