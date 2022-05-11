@@ -33,15 +33,14 @@ public class ApplicationMappingProfile : Profile
                 expression => expression.MapFrom(x => x.Subscriptions.Count))
             .ForMember(x => x.Marks,
                 e =>
-                    e.MapFrom(x => new MarksCountViewModel(
-                        x.Marks.Count(mark => mark.IsLike), 
+                    e.MapFrom(x => new MarksCountViewModel(x.Marks.Count(mark => mark.IsLike),
                         x.Marks.Count(mark => !mark.IsLike))));
         CreateMap<EventEntity, EventName>();
         CreateMap<Event, EventLocationViewModel>();
         CreateMap<Event, EventEntity>();
         CreateMap<EventName, EventNameViewModel>();
         CreateMap<EventInfoModel, EventInfo>()
-            .ForMember(x => x.OwnerId, 
+            .ForMember(x => x.OwnerId,
                 opt => opt.MapFrom(x => ""));
     }
 

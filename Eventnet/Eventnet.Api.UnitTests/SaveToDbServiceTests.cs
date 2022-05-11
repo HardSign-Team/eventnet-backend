@@ -16,8 +16,6 @@ namespace Eventnet.Api.UnitTests;
 
 public class SaveToDbServiceTests : BaseTests<SaveToDbServiceTests>
 {
-
-
     [SetUp]
     public void Setup()
     {
@@ -25,10 +23,10 @@ public class SaveToDbServiceTests : BaseTests<SaveToDbServiceTests>
         context.Database.EnsureDeleted();
         context.Database.EnsureCreated();
     }
- 
+
     [TestCase(new string[0], new string[0])]
-    [TestCase(new[] { "tag1", "tag2", "tag3"}, new string[0])]
-    [TestCase(new[] { "tag1", "tag2", "tag3"}, new[] { "tag1", "tag2", "tags4" })]
+    [TestCase(new[] { "tag1", "tag2", "tag3" }, new string[0])]
+    [TestCase(new[] { "tag1", "tag2", "tag3" }, new[] { "tag1", "tag2", "tags4" })]
     public async Task SaveEventAsync_ShouldSaveTags_WhenHasTags(string[] tagsInModel, string[] tagsInDb)
     {
         await using var context = CreateDbContext();
@@ -43,7 +41,7 @@ public class SaveToDbServiceTests : BaseTests<SaveToDbServiceTests>
         entity.Tags.Select(x => x.Name).ToHashSet().Should().Equal(tagsInModel.ToHashSet());
     }
 
-    private ISaveToDbService CreateSut(ApplicationDbContext context) => 
+    private ISaveToDbService CreateSut(ApplicationDbContext context) =>
         new SaveToDbService(Mock.Of<IPhotoToStorageSaveService>(), CreateMapper(), context);
 
     private static async Task SaveTags(IEnumerable<string> tagsInDb, ApplicationDbContext context)

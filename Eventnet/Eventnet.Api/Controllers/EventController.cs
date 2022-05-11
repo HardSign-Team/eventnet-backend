@@ -118,11 +118,11 @@ public class EventController : Controller
     {
         var (eventInfoModel, photos) = createModel;
         photos ??= Array.Empty<IFormFile>();
-        
+
         var user = await currentUserService.GetCurrentUser();
         if (user is null)
             return Unauthorized();
-            
+
         if (!IsContentTypesSupported(photos))
             return BadRequest("Not supported ContentType");
 
@@ -137,7 +137,7 @@ public class EventController : Controller
 
         var eventInfo = mapper.Map<EventInfo>(eventInfoModel) with { OwnerId = user.Id };
         await eventSaveService.RequestSave(eventInfo, photos);
-        
+
         return Accepted();
     }
 

@@ -49,12 +49,12 @@ public class EventEntity
     {
         Tags.Add(tagEntity);
     }
-    
+
     public void AddTags(IEnumerable<TagEntity> tags)
     {
-        Tags.AddRange(tags);   
+        Tags.AddRange(tags);
     }
-    
+
     public MarkEntity Like(UserEntity user) => new(user.Id, Id, true, DateTime.Now);
 
     public MarkEntity Dislike(UserEntity user) => new(user.Id, Id, false, DateTime.Now);

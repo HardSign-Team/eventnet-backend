@@ -33,8 +33,8 @@ public class RabbitMqTestFactory<TStartup> : WebApplicationFactory<TStartup> whe
             services.Remove(rabbitConfig!);
             var testRabbitMqConfig = new RabbitMqConfig
             {
-                HostName = "localhost", 
-                Queue = "MyTestQueue", 
+                HostName = "localhost",
+                Queue = "MyTestQueue",
                 Port = 5672,
                 RecommendedMessageSizeInBytes = 128 * 1024 * 1024
             };

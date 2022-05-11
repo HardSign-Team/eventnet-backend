@@ -7,9 +7,10 @@ namespace Eventnet.Api.UnitTests;
 
 public class BaseTests<T>
 {
-    private readonly DbContextOptions<ApplicationDbContext> contextOptions = new DbContextOptionsBuilder<ApplicationDbContext>()
-        .UseInMemoryDatabase(nameof(T) + "-db")
-        .Options;
+    private readonly DbContextOptions<ApplicationDbContext> contextOptions =
+        new DbContextOptionsBuilder<ApplicationDbContext>()
+            .UseInMemoryDatabase(nameof(T) + "-db")
+            .Options;
 
     protected IMapper CreateMapper()
     {

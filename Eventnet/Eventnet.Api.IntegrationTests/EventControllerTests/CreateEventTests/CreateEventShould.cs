@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Eventnet.Api.IntegrationTests.Helpers;
 using Eventnet.Api.Models.Events;
@@ -21,14 +20,16 @@ namespace Eventnet.Api.IntegrationTests.EventControllerTests.CreateEventTests;
 [Explicit]
 public class CreateEventShould : CreateEventTestsBase
 {
-    private static readonly string[] PathToPhotos = {
+    private const string PathToText = "notImage.txt";
+    private const string ImageMediaTypePng = "image/png";
+    private const string TextMediaType = "text/plain";
+
+    private static readonly string[] PathToPhotos =
+    {
         "test.png",
         "test2.png",
         "test3.png"
     };
-    private const string PathToText = "notImage.txt";
-    private const string ImageMediaTypePng = "image/png";
-    private const string TextMediaType = "text/plain";
 
     [Test]
     public async Task TestGetId()
@@ -75,7 +76,7 @@ public class CreateEventShould : CreateEventTestsBase
 
         response2.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
-    
+
     [Test]
     public async Task ResponseCode401_WhenNotAuthorized()
     {
@@ -114,23 +115,22 @@ public class CreateEventShould : CreateEventTestsBase
     public static IEnumerable<TestCaseData> GetPhotosTestCases()
     {
         var photos = PathToPhotos.Select(GetFileStream).ToArray();
-        
-        yield return new TestCaseData(new object?[] 
+
+        yield return new TestCaseData(new object?[]
         {
             Array.Empty<IFormFile>()
         });
-        
+
         yield return new TestCaseData(new object?[]
         {
             new[] { CreateFormFile(photos[0], ImageMediaTypePng) }
         });
-        
+
         yield return new TestCaseData(new object?[]
         {
             photos.Select(p => CreateFormFile(p, ImageMediaTypePng)).ToArray()
         });
     }
-
 
     [Test]
     public async Task IsCreatedResponseCode202_WhenNotSaveYet()
@@ -141,7 +141,7 @@ public class CreateEventShould : CreateEventTestsBase
 
         var r = await PostAsync(client, eventId, photo, ImageMediaTypePng);
         r.StatusCode.Should().Be(HttpStatusCode.Accepted);
-        
+
         var request = GetIsCreatedRequest(eventId);
 
         var response = await client.SendAsync(request);
@@ -196,18 +196,17 @@ public class CreateEventShould : CreateEventTestsBase
             new Location(0, 0),
             new[] { "Tag1", "Tag2", "Tag3" });
     }
-    
+
     private static async Task<HttpResponseMessage> PostAsync(HttpClient client, CreateEventModel model)
     {
         var multipart = GetEventCreationRequestMessage(model);
         var uri = new UriBuilder(Configuration.BaseUrl) { Path = BaseRoute }.Uri;
         return await client.PostAsync(uri, multipart);
     }
-    
-    
+
     private static void AssertSave(EventEntity eventEntity, UserEntity owner, CreateEventModel model)
     {
-        eventEntity.Should().BeEquivalentTo(model.Info, 
+        eventEntity.Should().BeEquivalentTo(model.Info,
             opt => opt
                 .Excluding(x => x.EventId)
                 .Excluding(x => x.Tags)
@@ -215,7 +214,7 @@ public class CreateEventShould : CreateEventTestsBase
                 .Excluding(x => x.EndDate));
         eventEntity.Id.Should().Be(model.Info.EventId);
         eventEntity.StartDate.Should().BeCloseTo(model.Info.StartDate, TimeSpan.FromSeconds(30));
-        if (model.Info.EndDate is {} endDate)
+        if (model.Info.EndDate is { } endDate)
             eventEntity.EndDate.Should().BeCloseTo(endDate, TimeSpan.FromSeconds(30));
         else
             eventEntity.EndDate.Should().BeNull();

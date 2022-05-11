@@ -10,6 +10,6 @@ public static class RabbitMqConfigExtensions
         return photosSize < config.RecommendedMessageSizeInBytes;
     }
 
-    public static int RecommendedMessageSizeInMb(this RabbitMqConfig config) => 
+    public static int RecommendedMessageSizeInMb(this RabbitMqConfig config) =>
         config.RecommendedMessageSizeInBytes / (1024 * 1024);
 }

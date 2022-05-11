@@ -59,11 +59,14 @@ public class CreateEventTestsBase : TestWithRabbitMqBase
             multiContent.Add(content, $"{nameof(CreateEventModel.Info)}.{name}");
         }
 
-        foreach (var photo in formFiles)
+        if (formFiles is not null)
         {
-            var fs = photo.OpenReadStream();
-            var fileStreamContent = GetFileStreamContent(fs, photo.Headers.ContentType[0] ?? throw new Exception());
-            multiContent.Add(fileStreamContent, "Photos", photo.FileName);
+            foreach (var photo in formFiles)
+            {
+                var fs = photo.OpenReadStream();
+                var fileStreamContent = GetFileStreamContent(fs, photo.Headers.ContentType[0] ?? throw new Exception());
+                multiContent.Add(fileStreamContent, "Photos", photo.FileName);
+            }
         }
 
         return multiContent;
