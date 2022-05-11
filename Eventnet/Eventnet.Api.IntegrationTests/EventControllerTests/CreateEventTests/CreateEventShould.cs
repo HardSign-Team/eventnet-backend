@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Eventnet.Api.IntegrationTests.Helpers;
 using Eventnet.Api.Models.Events;
@@ -41,7 +42,7 @@ public class CreateEventShould : CreateEventTestsBase
         var (_, client) = await CreateAuthorizedClient();
         var photo = GetFileStream(PathToPhoto);
 
-        var response = await PostAsync(client, Guid.NewGuid(), Guid.NewGuid(), photo, ImageMediaTypePng);
+        var response = await PostAsync(client, Guid.NewGuid(), photo, ImageMediaTypePng);
 
         response.StatusCode.Should().Be(HttpStatusCode.Accepted);
     }
@@ -52,7 +53,7 @@ public class CreateEventShould : CreateEventTestsBase
         var (_, client) = await CreateAuthorizedClient();
         var text = GetFileStream(PathToText);
 
-        var response = await PostAsync(client, Guid.NewGuid(), Guid.NewGuid(), text, TextMediaType);
+        var response = await PostAsync(client, Guid.NewGuid(), text, TextMediaType);
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
@@ -64,8 +65,8 @@ public class CreateEventShould : CreateEventTestsBase
         var photo = GetFileStream(PathToPhoto);
 
         var id = Guid.NewGuid();
-        await PostAsync(client, id, Guid.NewGuid(), photo, ImageMediaTypePng);
-        var response2 = await PostAsync(client, id, Guid.NewGuid(), photo, ImageMediaTypePng);
+        await PostAsync(client, id, photo, ImageMediaTypePng);
+        var response2 = await PostAsync(client, id, photo, ImageMediaTypePng);
 
         response2.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
@@ -78,14 +79,10 @@ public class CreateEventShould : CreateEventTestsBase
 
         var eventId = await GetEventGuid(client);
 
-        var model = CreateDefaultCreateEventModel() with
-        {
-            Id = eventId,
-            OwnerId = Guid.NewGuid().ToString(),
-            Photos = new[] { CreateFormFile(photo, ImageMediaTypePng) }
-        };
+        var info = CreateDefaultEventInfo() with {EventId = eventId };
+        var model = new CreateEventModel(info, new[] { CreateFormFile(photo, ImageMediaTypePng) });
         await PostAsync(client, model);
-        await Task.Delay(1000);
+        await Task.Delay(3000);
 
         var request = GetIsCreatedRequest(eventId);
 
@@ -94,8 +91,8 @@ public class CreateEventShould : CreateEventTestsBase
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var eventEntity = ApplyToDb(context => context.Events.Include(x => x.Tags)
-            .FirstOrDefault(x => x.Id == eventId));
-        AssertSave(eventEntity ?? throw new Exception(), user, model);
+            .FirstOrDefault(x => x.Id == eventId)) ?? throw new Exception();
+        AssertSave(eventEntity, user, model);
         var photoEntities = ApplyToDb(context => context.Photos.ForEvent(eventId).ToList());
         photoEntities.Should().NotBeEmpty();
     }
@@ -107,7 +104,9 @@ public class CreateEventShould : CreateEventTestsBase
         var eventId = Guid.NewGuid();
         await using var photo = GetFileStream(PathToPhoto);
 
-        await PostAsync(client, eventId, Guid.NewGuid(), photo, ImageMediaTypePng);
+        var r = await PostAsync(client, eventId, photo, ImageMediaTypePng);
+        r.StatusCode.Should().Be(HttpStatusCode.Accepted);
+        
         var request = GetIsCreatedRequest(eventId);
 
         var response = await client.SendAsync(request);
@@ -130,16 +129,11 @@ public class CreateEventShould : CreateEventTestsBase
     private async Task<HttpResponseMessage> PostAsync(
         HttpClient client,
         Guid eventId,
-        Guid ownerId,
         FileStream fileStream,
         string mediaType)
     {
-        var model = CreateDefaultCreateEventModel() with
-        {
-            Id = eventId,
-            OwnerId = ownerId.ToString(),
-            Photos = new[] { CreateFormFile(fileStream, mediaType) }
-        };
+        var info = CreateDefaultEventInfo() with { EventId = eventId };
+        var model = new CreateEventModel(info, new[] { CreateFormFile(fileStream, mediaType) });
         return await PostAsync(client, model);
     }
 
@@ -157,20 +151,18 @@ public class CreateEventShould : CreateEventTestsBase
         return formFile;
     }
 
-    private static CreateEventModel CreateDefaultCreateEventModel()
+    private static EventInfoModel CreateDefaultEventInfo()
     {
-        return new CreateEventModel(Guid.NewGuid(),
-            Guid.NewGuid().ToString(),
+        return new EventInfoModel(Guid.NewGuid(),
             DateTime.Now,
-            DateTime.Now,
+            DateTime.Now.AddDays(3),
             "Test",
             "Description",
             new Location(0, 0),
-            new[] { "Tag1", "Tag2", "Tag3" },
-            Array.Empty<IFormFile>());
+            new[] { "Tag1", "Tag2", "Tag3" });
     }
     
-    private async Task<HttpResponseMessage> PostAsync(HttpClient client, CreateEventModel model)
+    private static async Task<HttpResponseMessage> PostAsync(HttpClient client, CreateEventModel model)
     {
         var multipart = GetEventCreationRequestMessage(model);
         var uri = new UriBuilder(Configuration.BaseUrl) { Path = BaseRoute }.Uri;
@@ -180,12 +172,19 @@ public class CreateEventShould : CreateEventTestsBase
     
     private static void AssertSave(EventEntity eventEntity, UserEntity owner, CreateEventModel model)
     {
-        eventEntity.Id.Should().Be(model.Id);
-        eventEntity.Name.Should().Be(model.Name);
-        eventEntity.Description.Should().Be(model.Description);
-        eventEntity.Tags.Select(x => x.Name).OrderBy(x => x).Should().Equal(model.Tags.OrderBy(x => x));
-        eventEntity.StartDate.Should().Be(model.StartDate);
-        eventEntity.EndDate.Should().Be(model.EndDate);
+        eventEntity.Should().BeEquivalentTo(model.Info, 
+            opt => opt
+                .Excluding(x => x.EventId)
+                .Excluding(x => x.Tags)
+                .Excluding(x => x.StartDate)
+                .Excluding(x => x.EndDate));
+        eventEntity.Id.Should().Be(model.Info.EventId);
+        eventEntity.StartDate.Should().BeCloseTo(model.Info.StartDate, TimeSpan.FromSeconds(30));
+        if (model.Info.EndDate is {} endDate)
+            eventEntity.EndDate.Should().BeCloseTo(endDate, TimeSpan.FromSeconds(30));
+        else
+            eventEntity.EndDate.Should().BeNull();
         eventEntity.OwnerId.Should().Be(owner.Id);
+        eventEntity.Tags.Select(x => x.Name).OrderBy(x => x).Should().Equal(model.Info.Tags.OrderBy(x => x));
     }
 }

@@ -31,7 +31,13 @@ public class RabbitMqTestFactory<TStartup> : WebApplicationFactory<TStartup> whe
 
             var rabbitConfig = services.SingleOrDefault(d => d.ServiceType == typeof(RabbitMqConfig));
             services.Remove(rabbitConfig!);
-            var testRabbitMqConfig = new RabbitMqConfig { HostName = "localhost", Queue = "MyTestQueue", Port = 5672 };
+            var testRabbitMqConfig = new RabbitMqConfig
+            {
+                HostName = "localhost", 
+                Queue = "MyTestQueue", 
+                Port = 5672,
+                RecommendedMessageSizeInBytes = 128 * 1024 * 1024
+            };
             services.AddSingleton(testRabbitMqConfig);
 
             var photoToStorageSaveService = services.SingleOrDefault(

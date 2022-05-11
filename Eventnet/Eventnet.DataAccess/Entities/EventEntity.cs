@@ -4,11 +4,9 @@ namespace Eventnet.DataAccess.Entities;
 
 public class EventEntity
 {
+    public Guid Id { get; private set; }
     public string Description { get; set; }
     public DateTime? EndDate { get; set; }
-
-    public Guid Id { get; private set; }
-
     public LocationEntity Location { get; set; } = new();
     public string Name { get; set; }
     public string OwnerId { get; }

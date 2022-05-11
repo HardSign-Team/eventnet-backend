@@ -4,5 +4,5 @@ namespace Eventnet.Infrastructure.Validators;
 
 public interface IEventValidator
 {
-    EventCreationValidationResult Validate(Event eventForValidation);
+    EventCreationValidationResult Validate(EventInfo info);
 }

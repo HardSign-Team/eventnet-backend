@@ -15,10 +15,10 @@ public class EventSaveService : IEventSaveService
         this.eventSaveHandler = eventSaveHandler;
     }
 
-    public async Task RequestSave(Event eventForSave, IFormFile[] photos)
+    public async Task RequestSave(EventInfo eventForSave, IFormFile[] photos)
     {
         var saveEventResult = new SaveEventResult(EventSaveStatus.InProgress, string.Empty);
-        eventSaveHandler.Update(eventForSave.Id, saveEventResult);
+        eventSaveHandler.Update(eventForSave.EventId, saveEventResult);
         try
         {
             var rabbitMqPhotos = await GetRabbitMqPhotosAsync(photos);
@@ -28,7 +28,7 @@ public class EventSaveService : IEventSaveService
         catch (Exception e)
         {
             saveEventResult = new SaveEventResult(EventSaveStatus.NotSavedDueToServerError, string.Empty);
-            eventSaveHandler.Update(eventForSave.Id, saveEventResult);
+            eventSaveHandler.Update(eventForSave.EventId, saveEventResult);
             Console.WriteLine(e); // TODO: add logger
             throw;
         }

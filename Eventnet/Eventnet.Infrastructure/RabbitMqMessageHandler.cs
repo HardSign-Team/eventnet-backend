@@ -43,13 +43,13 @@ public class RabbitMqMessageHandler : IRabbitMqMessageHandler
             Console.WriteLine(e); // TODO: add logger
         }
 
-        eventSaveHandler.Update(eventForSave.Id, new SaveEventResult(status, errorMessage));
+        eventSaveHandler.Update(eventForSave.EventId, new SaveEventResult(status, errorMessage));
     }
 
-    private void SaveEvent(Event eventForSave, List<Photo> photos)
+    private void SaveEvent(EventInfo info, List<Photo> photos)
     {
-        saveToDbService.SaveEventAsync(eventForSave);
-        saveToDbService.SavePhotosAsync(photos, eventForSave.Id);
+        saveToDbService.SaveEventAsync(info);
+        saveToDbService.SavePhotosAsync(photos, info.EventId);
     }
 
     private static List<Photo> GetPhotos(IEnumerable<RabbitMqPhoto> rabbitMqPhotos) =>

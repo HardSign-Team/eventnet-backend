@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 using Eventnet.Api.IntegrationTests.Helpers;
 using Eventnet.Api.Models.Events;
@@ -28,7 +31,7 @@ public class CreateEventTestsBase : TestWithRabbitMqBase
         }.Uri;
         return request;
     }
-    
+
     protected static HttpRequestMessage CreateDefaultRequestToId()
     {
         var request = new HttpRequestMessage();
@@ -51,37 +54,46 @@ public class CreateEventTestsBase : TestWithRabbitMqBase
 
     protected static MultipartFormDataContent GetEventCreationRequestMessage(CreateEventModel model)
     {
-        var multiContent = new MultipartFormDataContent
+        var (eventInfo, formFiles) = model;
+        var multiContent = new MultipartFormDataContent();
+
+        foreach (var (content, name) in GetInfoContent(eventInfo))
         {
-            { new StringContent(model.Id.ToString()), nameof(CreateEventModel.Id) },
-            { new StringContent(model.OwnerId), nameof(CreateEventModel.OwnerId) },
-            {
-                new StringContent(model.StartDate.ToString(CultureInfo.InvariantCulture)),
-                nameof(CreateEventModel.StartDate)
-            },
-            { new StringContent(model.Name), nameof(CreateEventModel.Name) },
-            { new StringContent(JsonConvert.SerializeObject(new Location(0, 0))), nameof(CreateEventModel.Location) }
-        };
-        if (model.EndDate is { } endDate)
-        {
-            multiContent.Add(new StringContent(endDate.ToString(CultureInfo.InvariantCulture)),
-                nameof(CreateEventModel.EndDate));
+            multiContent.Add(content, $"{nameof(CreateEventModel.Info)}.{name}");
         }
 
-        if (model.Description is { } description)
-        {
-            multiContent.Add(new StringContent(description), nameof(CreateEventModel.Description));
-        }
-
-        foreach (var photo in model.Photos)
+        foreach (var photo in formFiles)
         {
             var fs = photo.OpenReadStream();
             var fileStreamContent = GetFileStreamContent(fs, photo.Headers.ContentType[0] ?? throw new Exception());
-            multiContent.Add(fileStreamContent, photo.Name, photo.FileName);
+            multiContent.Add(fileStreamContent, "Photos", photo.FileName);
         }
 
-
         return multiContent;
+    }
+
+    private static IEnumerable<(HttpContent, string)> GetInfoContent(EventInfoModel eventInfo)
+    {
+        yield return (new StringContent(eventInfo.EventId.ToString()), nameof(EventInfoModel.EventId));
+        
+        yield return (new StringContent(eventInfo.StartDate.ToString(CultureInfo.CurrentCulture)), nameof(EventInfoModel.StartDate));
+        
+        if (eventInfo.EndDate is {} endDate)
+            yield return (new StringContent(endDate.ToString(CultureInfo.CurrentCulture)), nameof(EventInfoModel.EndDate));
+        
+        yield return (new StringContent(eventInfo.Name), nameof(EventInfoModel.Name));
+        
+        if (eventInfo.Description is {} description)
+            yield return (new StringContent(description), nameof(EventInfoModel.Description));
+        
+        foreach(var tag in eventInfo.Tags)
+            yield return (new StringContent(tag), nameof(EventInfoModel.Tags));
+
+        const string locationName = nameof(EventInfoModel.Location);
+        yield return (new StringContent(eventInfo.Location.Latitude.ToString(CultureInfo.InvariantCulture)),
+            $"{locationName}.{nameof(Location.Latitude)}");
+        yield return (new StringContent(eventInfo.Location.Longitude.ToString(CultureInfo.InvariantCulture)),
+            $"{locationName}.{nameof(Location.Longitude)}");
     }
 
     private static StreamContent GetFileStreamContent(Stream fileStream, string mediaType)

@@ -33,12 +33,18 @@ public class SaveToDbService : ISaveToDbService
         }
     }
 
-    public async Task SaveEventAsync(Event eventForSave)
+    public async Task SaveEventAsync(EventInfo info)
     {
         await using var dbContext = factory.CreateScope().ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        var eventEntity = mapper.Map<EventEntity>(eventForSave);
+        var eventEntity = new EventEntity(info.EventId,
+            info.OwnerId,
+            info.StartDate,
+            info.EndDate,
+            info.Name,
+            info.Description ?? "",
+            mapper.Map<LocationEntity>(info.Location));
         dbContext.Events.Add(eventEntity);
-        await SaveTagsAsync(eventEntity, eventForSave.Tags.Select(x => x.Name).ToArray(), dbContext);
+        await SaveTagsAsync(eventEntity, info.Tags, dbContext);
         await dbContext.SaveChangesAsync();
     }
 
@@ -49,7 +55,7 @@ public class SaveToDbService : ISaveToDbService
             .ToDictionaryAsync(x => x.Name, x => x);
 
         var notExists = tags
-            .Where(name => exists.ContainsKey(name))
+            .Where(name => !exists.ContainsKey(name))
             .Select(name => new TagEntity(0, name))
             .ToList();
         await dbContext.Tags.AddRangeAsync(notExists);

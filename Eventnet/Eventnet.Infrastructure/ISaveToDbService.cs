@@ -6,5 +6,5 @@ namespace Eventnet.Infrastructure;
 public interface ISaveToDbService
 {
     Task SavePhotosAsync(List<Photo> photos, Guid eventId);
-    Task SaveEventAsync(Event eventForSave);
+    Task SaveEventAsync(EventInfo info);
 }

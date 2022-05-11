@@ -5,5 +5,5 @@ namespace Eventnet.Infrastructure.Validators;
 
 public interface IEventCreationValidator
 {
-    EventCreationValidationResult Validate(List<Photo> photos, Event eventForValidation);
+    EventCreationValidationResult Validate(List<Photo> photos, EventInfo info);
 }
