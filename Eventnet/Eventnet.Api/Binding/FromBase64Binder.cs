@@ -4,19 +4,6 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Eventnet.Api.Binding;
 
-public class Base64ModelBinderProvider<TModel> : IModelBinderProvider
-{
-    public IModelBinder? GetBinder(ModelBinderProviderContext context)
-    {
-        if (context == null)
-        {
-            throw new ArgumentNullException(nameof(context));
-        }
-
-        return context.Metadata.ModelType == typeof(TModel) ? new FromBase64Binder() : null;
-    }
-}
-
 public class FromBase64Binder : IModelBinder
 {
     public Task BindModelAsync(ModelBindingContext bindingContext)
