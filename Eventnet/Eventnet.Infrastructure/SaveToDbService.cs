@@ -12,14 +12,14 @@ public class SaveToDbService : ISaveToDbService
 {
     private readonly IMapper mapper;
     private readonly ApplicationDbContext dbContext;
-    private readonly IPhotoToStorageSaveService storageSaveService;
+    private readonly IPhotoStorageService storageService;
 
     public SaveToDbService(
-        IPhotoToStorageSaveService storageSaveService,
+        IPhotoStorageService storageService,
         IMapper mapper,
         ApplicationDbContext dbContext)
     {
-        this.storageSaveService = storageSaveService;
+        this.storageService = storageService;
         this.mapper = mapper;
         this.dbContext = dbContext;
     }
@@ -29,7 +29,7 @@ public class SaveToDbService : ISaveToDbService
         foreach (var photo in photos)
         {
             var photoId = Guid.NewGuid();
-            storageSaveService.Save(photo, photoId);
+            storageService.Save(photo, photoId);
             var photoEntity = new PhotoEntity(photoId, eventId);
             await SavePhotoToDbAsync(photoEntity);
         }

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
 using Eventnet.Api.Config;
-using Eventnet.Api.IntegrationTests.Helpers;
 using Eventnet.Api.IntegrationTests.Mocks;
+using Eventnet.Api.UnitTests.Helpers;
 using Eventnet.DataAccess;
 using Eventnet.Infrastructure.PhotoServices;
 using Microsoft.AspNetCore.Hosting;
@@ -40,10 +40,10 @@ public class RabbitMqTestFactory<TStartup> : WebApplicationFactory<TStartup> whe
             };
             services.AddSingleton(testRabbitMqConfig);
 
-            var photoToStorageSaveService = services.SingleOrDefault(
-                d => d.ServiceType == typeof(IPhotoToStorageSaveService));
+            var photoToStorageSaveService =
+                services.SingleOrDefault(d => d.ServiceType == typeof(IPhotoStorageService));
             services.Remove(photoToStorageSaveService!);
-            services.AddSingleton<IPhotoToStorageSaveService, PhotoToStorageSaveServiceMock>();
+            services.AddSingleton<IPhotoStorageService, PhotoStorageServiceMock>();
 
             var sp = services.BuildServiceProvider();
 
