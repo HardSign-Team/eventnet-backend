@@ -118,8 +118,6 @@ public class UserAccountController : Controller
 
         var result = await userManager.CreateAsync(user, registerModel.Password);
 
-        await userManager.AddToRoleAsync(user, UserRoles.User);
-
         if (!result.Succeeded)
             return BadRequest("User creation failed");
 

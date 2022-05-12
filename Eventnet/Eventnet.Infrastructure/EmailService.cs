@@ -1,5 +1,6 @@
 ﻿using Eventnet.Domain;
 using MailKit.Net.Smtp;
+using MailKit.Security;
 using MimeKit;
 using MimeKit.Text;
 
@@ -13,7 +14,7 @@ public class EmailService : IEmailService
     public EmailService(EmailConfiguration emailConfiguration)
     {
         this.emailConfiguration = emailConfiguration;
-        senderAddress = new MailboxAddress("Администрация сайта", emailConfiguration.Login);
+        senderAddress = new MailboxAddress("Администрация сайта", emailConfiguration.CompanyAddress);
     }
 
     public async Task SendEmailAsync(string userEmail, string subject, string message)
@@ -29,7 +30,7 @@ public class EmailService : IEmailService
         };
 
         using var client = new SmtpClient();
-        await client.ConnectAsync(emailConfiguration.Host, emailConfiguration.Port);
+        await client.ConnectAsync(emailConfiguration.Host, emailConfiguration.Port, SecureSocketOptions.StartTls);
         await client.AuthenticateAsync(emailConfiguration.Login, emailConfiguration.Password);
         await client.SendAsync(emailMessage);
 
