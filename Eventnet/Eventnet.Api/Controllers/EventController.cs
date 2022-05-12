@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Eventnet.Api.Config;
 using Eventnet.Api.Extensions;
 using Eventnet.Api.Helpers;
@@ -66,6 +67,22 @@ public class EventController : Controller
             return NotFound();
 
         return Ok(entity);
+    }
+    
+    [HttpGet("full")]
+    [Produces(typeof(List<EventViewModel>))]
+    public async Task<IActionResult> GetEventsByIds([FromQuery(Name="events")][ModelBinder] EventIdsListModel? listModel)
+    {
+        if (listModel is null)
+            return BadRequest($"{nameof(listModel)} was null");
+        
+        var ids = listModel.Ids;
+        var viewModels = await dbContext.Events
+            .ProjectTo<EventViewModel>(mapper.ConfigurationProvider)
+            .AsNoTracking()
+            .Where(x => ids.Contains(x.Id))
+            .ToListAsync();
+        return Ok(viewModels);
     }
 
     [HttpGet("search/name/{eventName}")]

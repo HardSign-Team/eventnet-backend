@@ -21,7 +21,7 @@ public class GetEventByIdShould : EventApiTestsBase
     {
         var request = new HttpRequestMessage();
         request.Method = HttpMethod.Get;
-        request.RequestUri = BuildEventsByIdUri("trash");
+        request.RequestUri = BuildEventByIdUri("trash");
         request.Headers.Add("Accept", "application/json");
 
         var response = await HttpClient.SendAsync(request);
@@ -35,7 +35,7 @@ public class GetEventByIdShould : EventApiTestsBase
     {
         var request = new HttpRequestMessage();
         request.Method = HttpMethod.Get;
-        request.RequestUri = BuildEventsByIdUri(Guid.NewGuid());
+        request.RequestUri = BuildEventByIdUri(Guid.NewGuid());
         request.Headers.Add("Accept", "application/json");
 
         var response = await HttpClient.SendAsync(request);
@@ -49,7 +49,7 @@ public class GetEventByIdShould : EventApiTestsBase
     {
         var request = new HttpRequestMessage();
         request.Method = HttpMethod.Get;
-        request.RequestUri = BuildEventsByIdUri(Guid.Empty);
+        request.RequestUri = BuildEventByIdUri(Guid.Empty);
         request.Headers.Add("Accept", "application/json");
 
         var response = await HttpClient.SendAsync(request);
@@ -63,7 +63,7 @@ public class GetEventByIdShould : EventApiTestsBase
         var eventEntity = GetTestEvent();
         var request = new HttpRequestMessage();
         request.Method = HttpMethod.Get;
-        request.RequestUri = BuildEventsByIdUri(eventEntity.Id);
+        request.RequestUri = BuildEventByIdUri(eventEntity.Id);
         request.Headers.Add("Accept", "application/json");
 
         var response = await HttpClient.SendAsync(request);
