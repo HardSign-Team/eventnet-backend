@@ -1,4 +1,6 @@
-﻿namespace Eventnet.DataAccess.Extensions;
+﻿using Eventnet.DataAccess.Entities;
+
+namespace Eventnet.DataAccess.Extensions;
 
 public static class PhotoEntityExtensions
 {

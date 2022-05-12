@@ -1,6 +1,6 @@
 ﻿// ReSharper disable AutoPropertyCanBeMadeGetOnly.Local EFCORE
 
-namespace Eventnet.DataAccess;
+namespace Eventnet.DataAccess.Entities;
 
 public class PhotoEntity
 {

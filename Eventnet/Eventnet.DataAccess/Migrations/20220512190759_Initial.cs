@@ -274,8 +274,8 @@ namespace Eventnet.DataAccess.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { new Guid("dac318e9-dbc8-4deb-9701-7c5617a997ab"), "08655e69-0473-41b5-a1fb-533a8d0088bc", "User", "USER" },
-                    { new Guid("f59f64ed-2a8c-4b25-ad53-e55b0a0bae62"), "cec31ad0-5ddf-47cf-8053-5f196f8ae9a0", "Admin", "ADMIN" }
+                    { new Guid("1053eba5-3f1f-46a2-8a8a-11c868d7c8a3"), "07312cc5-a009-4624-9751-c1e3c112dbb8", "Admin", "ADMIN" },
+                    { new Guid("3f6abaa6-0e0a-4ece-9b64-9a70d79e1fba"), "dfb43980-667b-470c-a883-4cc080a4763c", "User", "USER" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -339,6 +339,12 @@ namespace Eventnet.DataAccess.Migrations
                 name: "IX_Tags_EventEntityId",
                 table: "Tags",
                 column: "EventEntityId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tags_Name",
+                table: "Tags",
+                column: "Name",
+                unique: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

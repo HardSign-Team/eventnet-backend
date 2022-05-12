@@ -73,6 +73,22 @@ namespace Eventnet.DataAccess.Migrations
                     b.ToTable("Marks");
                 });
 
+            modelBuilder.Entity("Eventnet.DataAccess.Entities.PhotoEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("EventId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.ToTable("Photos");
+                });
+
             modelBuilder.Entity("Eventnet.DataAccess.Entities.SubscriptionEntity", b =>
                 {
                     b.Property<Guid>("EventId")
@@ -187,26 +203,11 @@ namespace Eventnet.DataAccess.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("Eventnet.DataAccess.PhotoEntity", b =>
-            {
-                b.Property<Guid>("Id")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("uuid");
-
-                b.Property<Guid>("EventId")
-                    .HasColumnType("uuid");
-
-                b.HasKey("Id");
-
-                b.HasIndex("EventId");
-
-                b.ToTable("Photos");
-            });
             modelBuilder.Entity("Eventnet.DataAccess.Entities.UserRole", b =>
-            {
-                b.Property<Guid>("Id")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("uuid");
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -231,15 +232,15 @@ namespace Eventnet.DataAccess.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "da2e7979-2df8-4686-b80d-b466b18f1a05",
-                            ConcurrencyStamp = "91734f54-f050-4644-8610-aad734ae4e3b",
+                            Id = new Guid("1053eba5-3f1f-46a2-8a8a-11c868d7c8a3"),
+                            ConcurrencyStamp = "07312cc5-a009-4624-9751-c1e3c112dbb8",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "ba1ecd9c-0e1c-4a3d-a08f-89896a03a452",
-                            ConcurrencyStamp = "bc70577a-01dc-4733-a874-ac3ea747bb12",
+                            Id = new Guid("3f6abaa6-0e0a-4ece-9b64-9a70d79e1fba"),
+                            ConcurrencyStamp = "dfb43980-667b-470c-a883-4cc080a4763c",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -394,6 +395,15 @@ namespace Eventnet.DataAccess.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Eventnet.DataAccess.Entities.PhotoEntity", b =>
+                {
+                    b.HasOne("Eventnet.DataAccess.Entities.EventEntity", null)
+                        .WithMany()
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Eventnet.DataAccess.Entities.SubscriptionEntity", b =>
                 {
                     b.HasOne("Eventnet.DataAccess.Entities.EventEntity", null)
@@ -414,15 +424,6 @@ namespace Eventnet.DataAccess.Migrations
                     b.HasOne("Eventnet.DataAccess.Entities.EventEntity", null)
                         .WithMany("Tags")
                         .HasForeignKey("EventEntityId");
-                });
-
-            modelBuilder.Entity("Eventnet.DataAccess.PhotoEntity", b =>
-                {
-                    b.HasOne("Eventnet.DataAccess.Entities.EventEntity", null)
-                        .WithMany()
-                        .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
