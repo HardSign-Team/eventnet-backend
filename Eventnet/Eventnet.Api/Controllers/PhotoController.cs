@@ -33,13 +33,13 @@ public class PhotoController : Controller
     {
         if (eventId == Guid.Empty)
             return BadRequest();
-    
+
         var basePath = GetBaseUrl();
         var urls = await photoService.GetPhotoUrls(basePath, eventId);
 
         return Ok(urls);
     }
-    
+
     private string GetBaseUrl()
     {
         var sb = new StringBuilder();

@@ -21,7 +21,7 @@ public class PhotoService : IPhotoService
         return await dbContext.Photos
             .GroupBy(x => x.EventId)
             .Where(x => eventIds.Contains(x.Key))
-            .Select(x => new { EventId = x.Key, PhotoId = x.Select(y=> y.Id).FirstOrDefault() })
+            .Select(x => new { EventId = x.Key, PhotoId = x.Select(y => y.Id).FirstOrDefault() })
             .Select(x => new PhotoViewModel(x.EventId, GetPhotoPath(basePath, x.PhotoId)))
             .ToListAsync();
     }

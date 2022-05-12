@@ -24,7 +24,7 @@ public class BaseTests<T>
         using var context = CreateDbContext();
         action(context);
     }
-    
+
     protected TType ApplyToDb<TType>(Func<ApplicationDbContext, TType> action)
     {
         using var context = CreateDbContext();

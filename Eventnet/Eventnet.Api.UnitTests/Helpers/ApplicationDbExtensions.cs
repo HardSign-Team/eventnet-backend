@@ -79,8 +79,7 @@ public static class ApplicationDbExtensions
         db.Events.AddRange(events);
         db.SaveChanges();
     }
-    
-    
+
     public static void AddPhotos(this ApplicationDbContext db, List<EventEntity> events)
     {
         var photos = events.Select(ev => new PhotoEntity(Guid.NewGuid(), ev.Id));
