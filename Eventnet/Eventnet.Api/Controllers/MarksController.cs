@@ -61,7 +61,7 @@ public class MarksController : Controller
         Guid eventId,
         Func<ApplicationDbContext, IQueryable<MarkEntity>> marks)
     {
-        var user = await currentUserService.GetCurrentUser();
+        var user = await currentUserService.GetCurrentUserAsync();
         if (user is null)
             return Unauthorized();
 
@@ -84,7 +84,7 @@ public class MarksController : Controller
         Func<EventEntity, UserEntity, MarkEntity> createMark,
         Action<MarkEntity> changeMark)
     {
-        var user = await currentUserService.GetCurrentUser();
+        var user = await currentUserService.GetCurrentUserAsync();
         if (user is null)
             return Unauthorized();
 
@@ -101,9 +101,7 @@ public class MarksController : Controller
             await dbContext.Marks.AddAsync(mark);
         }
         else
-        {
             changeMark(mark);
-        }
 
         await dbContext.SaveChangesAsync();
 
