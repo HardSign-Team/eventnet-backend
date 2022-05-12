@@ -85,7 +85,7 @@ services.AddCors(options =>
         });
 });
 
-services.AddIdentity<UserEntity, IdentityRole>(options =>
+services.AddIdentity<UserEntity, UserRole>(options =>
     {
         options.Password.RequireDigit = false;
         options.Password.RequireNonAlphanumeric = false;

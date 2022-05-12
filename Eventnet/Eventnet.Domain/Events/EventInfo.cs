@@ -2,7 +2,7 @@
 
 public record EventInfo(
     Guid EventId,
-    string OwnerId,
+    Guid OwnerId,
     DateTime StartDate,
     DateTime? EndDate,
     string Name,
@@ -12,7 +12,7 @@ public record EventInfo(
 {
     // ReSharper disable once UnusedMember.Local
     private EventInfo() : this(Guid.Empty,
-        string.Empty,
+        Guid.Empty,
         DateTime.Now,
         DateTime.Now,
         string.Empty,

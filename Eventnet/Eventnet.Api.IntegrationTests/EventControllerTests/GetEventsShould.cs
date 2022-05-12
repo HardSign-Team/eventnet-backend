@@ -248,7 +248,7 @@ public class GetEventsShould : EventApiTestsBase
     private EventEntity GenerateEventAt(Location location)
     {
         return new EventEntity(Guid.NewGuid(),
-            "",
+            Guid.Empty,
             DateTime.Today,
             DateTime.Today.AddDays(1),
             Guid.NewGuid().ToString(),

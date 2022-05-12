@@ -5,7 +5,7 @@ namespace Eventnet.Api.Models.Events;
 
 public record EventViewModel(
     Guid Id,
-    string OwnerId,
+    Guid OwnerId,
     string Name,
     string Description,
     LocationViewModel Location,
@@ -20,7 +20,7 @@ public record EventViewModel(
     // ReSharper disable once UnusedMember.Local Used for AutoMapper
     private EventViewModel(
         Guid id,
-        string ownerId,
+        Guid ownerId,
         string name,
         string description,
         LocationViewModel location,

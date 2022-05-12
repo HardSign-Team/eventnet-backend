@@ -137,7 +137,7 @@ public class EventController : Controller
         var (eventInfoModel, photos) = createModel;
         photos ??= Array.Empty<IFormFile>();
 
-        var user = await currentUserService.GetCurrentUser();
+        var user = await currentUserService.GetCurrentUserAsync();
         if (user is null)
             return Unauthorized();
 
