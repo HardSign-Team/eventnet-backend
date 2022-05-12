@@ -2,5 +2,5 @@
 
 public interface IRabbitMqMessageHandler
 {
-    void Handle(RabbitMqMessage rabbitMqMessage);
+    Task HandleAsync(RabbitMqMessage rabbitMqMessage);
 }

@@ -11,7 +11,7 @@ public class EventsFilterModel
     public OwnerFilterModel? Owner { get; init; }
     public LocationFilterModel? RadiusLocation { get; init; }
     public TagsFilterModel? Tags { get; init; }
-    
+
     public static bool TryParse(string base64Model, [NotNullWhen(true)] out EventsFilterModel? result)
     {
         try

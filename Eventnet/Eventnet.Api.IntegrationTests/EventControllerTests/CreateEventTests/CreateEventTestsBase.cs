@@ -1,14 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Eventnet.Api.IntegrationTests.Helpers;
+using Eventnet.Api.Models.Events;
 using Eventnet.Domain.Events;
 using Microsoft.AspNetCore.Http.Extensions;
-using Newtonsoft.Json;
 
 namespace Eventnet.Api.IntegrationTests.EventControllerTests.CreateEventTests;
 
@@ -29,40 +29,6 @@ public class CreateEventTestsBase : TestWithRabbitMqBase
         return request;
     }
 
-    protected async Task<Guid> GetEventGuid()
-    {
-        var (_, client) = await CreateAuthorizedClient("TestUser", "123456");
-        var request = CreateDefaultRequestToId();
-        var response = await client.SendAsync(request);
-        var guid = await response.Content.ReadAsStringAsync();
-        return Guid.Parse(guid.Replace("\"", ""));
-    }
-
-    protected static FileStream GetFileStream(string path) => File.OpenRead(path);
-
-    protected static MultipartFormDataContent GetEventCreationRequestMessage(
-        Guid eventId,
-        Guid ownerId,
-        FileStream fileStream,
-        string mediaType)
-    {
-        var multiContent = new MultipartFormDataContent
-        {
-            { new StringContent(eventId.ToString()), "Id" },
-            { new StringContent(ownerId.ToString()), "OwnerId" },
-            { new StringContent(DateTime.Now.ToString(CultureInfo.InvariantCulture)), "StartDate" },
-            { new StringContent(DateTime.Now.ToString(CultureInfo.InvariantCulture)), "EndDate" },
-            { new StringContent("TestEvent"), "Name" },
-            { new StringContent("TestDescription"), "Description" },
-            { new StringContent(JsonConvert.SerializeObject(new Location(0, 0))), "Location" }
-        };
-        var fileStreamContent = GetFileStreamContent(fileStream, mediaType);
-        var filename = fileStream.Name.Split(Path.PathSeparator).Last();
-        multiContent.Add(fileStreamContent, "Photos", filename);
-
-        return multiContent;
-    }
-
     protected static HttpRequestMessage CreateDefaultRequestToId()
     {
         var request = new HttpRequestMessage();
@@ -74,7 +40,65 @@ public class CreateEventTestsBase : TestWithRabbitMqBase
         return request;
     }
 
-    private static StreamContent GetFileStreamContent(FileStream fileStream, string mediaType)
+    protected async Task<Guid> GetEventGuid(HttpClient client)
+    {
+        var request = CreateDefaultRequestToId();
+        var response = await client.SendAsync(request);
+        return response.ReadContentAs<Guid>();
+    }
+
+    protected static FileStream GetFileStream(string path) => File.OpenRead(path);
+
+    protected static MultipartFormDataContent GetEventCreationRequestMessage(CreateEventModel model)
+    {
+        var (eventInfo, formFiles) = model;
+        var multiContent = new MultipartFormDataContent();
+
+        foreach (var (content, name) in GetInfoContent(eventInfo))
+        {
+            multiContent.Add(content, $"{nameof(CreateEventModel.Info)}.{name}");
+        }
+
+        if (formFiles is not null)
+        {
+            foreach (var photo in formFiles)
+            {
+                var fs = photo.OpenReadStream();
+                var fileStreamContent = GetFileStreamContent(fs, photo.Headers.ContentType[0] ?? throw new Exception());
+                multiContent.Add(fileStreamContent, "Photos", photo.FileName);
+            }
+        }
+
+        return multiContent;
+    }
+
+    private static IEnumerable<(HttpContent, string)> GetInfoContent(EventInfoModel eventInfo)
+    {
+        yield return (new StringContent(eventInfo.EventId.ToString()), nameof(EventInfoModel.EventId));
+
+        yield return (new StringContent(eventInfo.StartDate.ToString(CultureInfo.CurrentCulture)),
+            nameof(EventInfoModel.StartDate));
+
+        if (eventInfo.EndDate is { } endDate)
+            yield return (new StringContent(endDate.ToString(CultureInfo.CurrentCulture)),
+                nameof(EventInfoModel.EndDate));
+
+        yield return (new StringContent(eventInfo.Name), nameof(EventInfoModel.Name));
+
+        if (eventInfo.Description is { } description)
+            yield return (new StringContent(description), nameof(EventInfoModel.Description));
+
+        foreach (var tag in eventInfo.Tags)
+            yield return (new StringContent(tag), nameof(EventInfoModel.Tags));
+
+        const string locationName = nameof(EventInfoModel.Location);
+        yield return (new StringContent(eventInfo.Location.Latitude.ToString(CultureInfo.InvariantCulture)),
+            $"{locationName}.{nameof(Location.Latitude)}");
+        yield return (new StringContent(eventInfo.Location.Longitude.ToString(CultureInfo.InvariantCulture)),
+            $"{locationName}.{nameof(Location.Longitude)}");
+    }
+
+    private static StreamContent GetFileStreamContent(Stream fileStream, string mediaType)
     {
         var content = new StreamContent(fileStream);
         content.Headers.ContentType = new MediaTypeHeaderValue(mediaType);

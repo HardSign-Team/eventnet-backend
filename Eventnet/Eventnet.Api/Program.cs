@@ -48,10 +48,9 @@ services.AddMemoryCache();
 services.AddSingleton<IConsumeEventService, RabbitMqConsumeEventService>();
 services.AddSingleton<IEventSaveService, EventSaveService>();
 services.AddSingleton<IPhotoValidator, PhotoValidator>();
-services.AddSingleton<IPhotoToStorageSaveService, PhotoToStorageSaveService>();
-services.AddSingleton<ISaveToDbService, SaveToDbService>();
+services.AddScoped<IPhotoToStorageSaveService, PhotoToStorageSaveService>();
+services.AddScoped<ISaveToDbService, SaveToDbService>();
 services.AddSingleton<IEventValidator, EventValidator>();
-services.AddSingleton<IPhotoValidator, PhotoValidator>();
 services.AddSingleton<IEventCreationValidator, EventCreationValidator>();
 services.AddSingleton<IRabbitMqMessageHandler, RabbitMqMessageHandler>();
 

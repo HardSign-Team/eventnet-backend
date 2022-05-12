@@ -28,5 +28,4 @@ public class EventsFilterService
 
         return events;
     }
-
 }

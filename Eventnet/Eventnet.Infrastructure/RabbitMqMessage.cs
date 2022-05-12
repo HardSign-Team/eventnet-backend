@@ -2,4 +2,4 @@
 
 namespace Eventnet.Infrastructure;
 
-public record RabbitMqMessage(Event Event, List<RabbitMqPhoto> Photos);
+public record RabbitMqMessage(EventInfo EventInfo, List<RabbitMqPhoto> Photos);

@@ -14,10 +14,10 @@ public class EventCreationValidator : IEventCreationValidator
         this.eventValidator = eventValidator;
     }
 
-    public EventCreationValidationResult Validate(List<Photo> photos, Event eventForValidation)
+    public EventCreationValidationResult Validate(List<Photo> photos, EventInfo info)
     {
         var (photoValidationResult, photoValidationErrorMessage) = photoValidator.Validate(photos);
-        var (eventValidationResult, eventValidationErrorMessage) = eventValidator.Validate(eventForValidation);
+        var (eventValidationResult, eventValidationErrorMessage) = eventValidator.Validate(info);
         return new EventCreationValidationResult(photoValidationResult && eventValidationResult,
             FormatException(photoValidationErrorMessage, eventValidationErrorMessage));
     }

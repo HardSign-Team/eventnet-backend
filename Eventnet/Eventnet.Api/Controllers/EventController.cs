@@ -25,6 +25,7 @@ public class EventController : Controller
     private static readonly string[] SupportedContentTypes = { "image/bmp", "image/png", "image/jpeg" };
     private readonly ApplicationDbContext dbContext;
     private readonly IEventSaveService eventSaveService;
+    private readonly CurrentUserService currentUserService;
     private readonly LinkGenerator linkGenerator;
     private readonly EventsFilterService eventsFilterService;
     private readonly RabbitMqConfig rabbitMqConfig;
@@ -34,6 +35,7 @@ public class EventController : Controller
         ApplicationDbContext dbContext,
         IMapper mapper,
         IEventSaveService eventSaveService,
+        CurrentUserService currentUserService,
         LinkGenerator linkGenerator,
         EventsFilterService eventsFilterService,
         RabbitMqConfig rabbitMqConfig)
@@ -41,6 +43,7 @@ public class EventController : Controller
         this.dbContext = dbContext;
         this.mapper = mapper;
         this.eventSaveService = eventSaveService;
+        this.currentUserService = currentUserService;
         this.linkGenerator = linkGenerator;
         this.eventsFilterService = eventsFilterService;
         this.rabbitMqConfig = rabbitMqConfig;
@@ -113,7 +116,12 @@ public class EventController : Controller
     [HttpPost]
     public async Task<IActionResult> CreateEvent([FromForm] CreateEventModel createModel)
     {
-        var photos = createModel.Photos;
+        var (eventInfoModel, photos) = createModel;
+        photos ??= Array.Empty<IFormFile>();
+
+        var user = await currentUserService.GetCurrentUserAsync();
+        if (user is null)
+            return Unauthorized();
 
         if (!IsContentTypesSupported(photos))
             return BadRequest("Not supported ContentType");
@@ -122,13 +130,14 @@ public class EventController : Controller
             return BadRequest(
                 $"Too large images. Recommended size of all images is {rabbitMqConfig.RecommendedMessageSizeInMb()}Mb.");
 
-        var isSaved = await dbContext.Events.AnyAsync(x => x.Id == createModel.Id);
-        if (eventSaveService.IsHandling(createModel.Id) || isSaved)
+        var eventId = eventInfoModel.EventId;
+        var isSaved = await dbContext.Events.AnyAsync(x => x.Id == eventId);
+        if (eventSaveService.IsHandling(eventId) || isSaved)
             return BadRequest("One event id provided two times");
 
-        var createdEvent = mapper.Map<Event>(createModel);
-        await eventSaveService.RequestSave(createdEvent, photos);
-        
+        var eventInfo = mapper.Map<EventInfo>(eventInfoModel) with { OwnerId = user.Id };
+        await eventSaveService.RequestSave(eventInfo, photos);
+
         return Accepted();
     }
 

@@ -4,11 +4,9 @@ namespace Eventnet.DataAccess.Entities;
 
 public class EventEntity
 {
+    public Guid Id { get; private set; }
     public string Description { get; set; }
     public DateTime? EndDate { get; set; }
-
-    public Guid Id { get; private set; }
-
     public LocationEntity Location { get; set; } = new();
     public string Name { get; set; }
     public Guid OwnerId { get; }
@@ -50,6 +48,11 @@ public class EventEntity
     public void AddTag(TagEntity tagEntity)
     {
         Tags.Add(tagEntity);
+    }
+
+    public void AddTags(IEnumerable<TagEntity> tags)
+    {
+        Tags.AddRange(tags);
     }
 
     public MarkEntity Like(UserEntity user) => new(user.Id, Id, true, DateTime.Now);

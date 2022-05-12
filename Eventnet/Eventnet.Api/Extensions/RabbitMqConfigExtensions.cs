@@ -7,9 +7,9 @@ public static class RabbitMqConfigExtensions
     public static bool IsPhotosSizeLessThanRecommended(this RabbitMqConfig config, IEnumerable<IFormFile> photos)
     {
         var photosSize = photos.Sum(photo => photo.Length);
-        return photosSize >= config.RecommendedMessageSizeInBytes;
+        return photosSize < config.RecommendedMessageSizeInBytes;
     }
 
-    public static int RecommendedMessageSizeInMb(this RabbitMqConfig config) => 
+    public static int RecommendedMessageSizeInMb(this RabbitMqConfig config) =>
         config.RecommendedMessageSizeInBytes / (1024 * 1024);
 }

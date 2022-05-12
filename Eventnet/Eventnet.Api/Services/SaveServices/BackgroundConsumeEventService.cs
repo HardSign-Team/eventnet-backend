@@ -24,7 +24,7 @@ public class BackgroundConsumeEventService : BackgroundService
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
         stoppingToken.ThrowIfCancellationRequested();
-        consumeEventService.ConsumeAndHandle(rabbitMqMessageHandler.Handle);
+        consumeEventService.ConsumeAndHandle(rabbitMqMessageHandler.HandleAsync);
         return Task.CompletedTask;
     }
 }

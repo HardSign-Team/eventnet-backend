@@ -3,7 +3,6 @@ using System.Linq;
 using Eventnet.Api.Config;
 using Eventnet.Api.IntegrationTests.Helpers;
 using Eventnet.Api.IntegrationTests.Mocks;
-using Eventnet.Api.Services.SaveServices;
 using Eventnet.DataAccess;
 using Eventnet.Infrastructure.PhotoServices;
 using Microsoft.AspNetCore.Hosting;
@@ -32,7 +31,13 @@ public class RabbitMqTestFactory<TStartup> : WebApplicationFactory<TStartup> whe
 
             var rabbitConfig = services.SingleOrDefault(d => d.ServiceType == typeof(RabbitMqConfig));
             services.Remove(rabbitConfig!);
-            var testRabbitMqConfig = new RabbitMqConfig { HostName = "localhost", Queue = "MyTestQueue", Port = 5672 };
+            var testRabbitMqConfig = new RabbitMqConfig
+            {
+                HostName = "localhost",
+                Queue = "MyTestQueue",
+                Port = 5672,
+                RecommendedMessageSizeInBytes = 128 * 1024 * 1024
+            };
             services.AddSingleton(testRabbitMqConfig);
 
             var photoToStorageSaveService = services.SingleOrDefault(

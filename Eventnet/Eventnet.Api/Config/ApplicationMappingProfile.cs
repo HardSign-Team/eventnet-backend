@@ -30,17 +30,19 @@ public class ApplicationMappingProfile : Profile
     {
         CreateMap<EventEntity, Event>();
         CreateMap<EventEntity, EventViewModel>()
-            .ForMember(x => x.TotalSubscriptions, 
+            .ForMember(x => x.TotalSubscriptions,
                 expression => expression.MapFrom(x => x.Subscriptions.Count))
-            .ForMember(x => x.Marks, 
-                e => 
-                    e.MapFrom(x => new MarksCountViewModel(
-                                 x.Marks.Count(mark => mark.IsLike), 
-                                 x.Marks.Count(mark => !mark.IsLike))));
+            .ForMember(x => x.Marks,
+                e =>
+                    e.MapFrom(x => new MarksCountViewModel(x.Marks.Count(mark => mark.IsLike),
+                        x.Marks.Count(mark => !mark.IsLike))));
         CreateMap<EventEntity, EventName>();
         CreateMap<Event, EventLocationViewModel>();
         CreateMap<Event, EventEntity>();
         CreateMap<EventName, EventNameViewModel>();
+        CreateMap<EventInfoModel, EventInfo>()
+            .ForMember(x => x.OwnerId,
+                opt => opt.MapFrom(x => Guid.Empty));
     }
 
     private void CreateTagsMap()
