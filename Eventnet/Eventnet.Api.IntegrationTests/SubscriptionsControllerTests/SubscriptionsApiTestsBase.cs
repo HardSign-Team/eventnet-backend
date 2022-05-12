@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Web;
 using Eventnet.Api.IntegrationTests.Helpers;
-using Eventnet.Api.UnitTests.Helpers;
 using NUnit.Framework;
 
 namespace Eventnet.Api.IntegrationTests.SubscriptionsControllerTests;

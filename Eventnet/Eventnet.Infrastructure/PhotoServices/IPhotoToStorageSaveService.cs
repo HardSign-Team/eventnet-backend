@@ -2,8 +2,7 @@
 
 namespace Eventnet.Infrastructure.PhotoServices;
 
-public interface IPhotoStorageService
+public interface IPhotoToStorageSaveService
 {
     void Save(Photo photo, Guid photoId);
-    string GetPhotoPath(Guid arg);
 }

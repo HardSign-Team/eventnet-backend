@@ -4,7 +4,7 @@ using System.Linq;
 using Eventnet.DataAccess;
 using Eventnet.DataAccess.Entities;
 
-namespace Eventnet.Api.UnitTests.Helpers;
+namespace Eventnet.Api.IntegrationTests.Helpers;
 
 public static class ApplicationDbExtensions
 {
@@ -77,13 +77,6 @@ public static class ApplicationDbExtensions
                 new LocationEntity(56.81787873103509, 60.54074620394152))
         };
         db.Events.AddRange(events);
-        db.SaveChanges();
-    }
-
-    public static void AddPhotos(this ApplicationDbContext db, List<EventEntity> events)
-    {
-        var photos = events.Select(ev => new PhotoEntity(Guid.NewGuid(), ev.Id));
-        db.Photos.AddRange(photos);
         db.SaveChanges();
     }
 

@@ -1,5 +1,4 @@
-﻿using System;
-using AutoMapper;
+﻿using AutoMapper;
 using Eventnet.Api.Config;
 using Eventnet.DataAccess;
 using Microsoft.EntityFrameworkCore;
@@ -17,18 +16,6 @@ public class BaseTests<T>
     {
         var config = new MapperConfiguration(opt => opt.AddProfile<ApplicationMappingProfile>());
         return config.CreateMapper();
-    }
-
-    protected void ApplyToDb(Action<ApplicationDbContext> action)
-    {
-        using var context = CreateDbContext();
-        action(context);
-    }
-
-    protected TType ApplyToDb<TType>(Func<ApplicationDbContext, TType> action)
-    {
-        using var context = CreateDbContext();
-        return action(context);
     }
 
     protected ApplicationDbContext CreateDbContext() => new(contextOptions);
