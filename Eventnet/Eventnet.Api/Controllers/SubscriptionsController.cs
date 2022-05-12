@@ -27,7 +27,7 @@ public class SubscriptionsController : Controller
     [Produces(typeof(SubscriptionsCountViewModel))]
     public async Task<IActionResult> Subscribe(Guid eventId)
     {
-        var user = await currentUserService.GetCurrentUser();
+        var user = await currentUserService.GetCurrentUserAsync();
         if (user is null)
             return Unauthorized();
 
@@ -43,9 +43,7 @@ public class SubscriptionsController : Controller
 
         var subscription = await dbContext.Subscriptions.Of(user).For(eventEntity).FirstOrDefaultAsync();
         if (subscription is not null)
-        {
             dbContext.Subscriptions.Remove(subscription);
-        }
 
         await dbContext.Subscriptions.AddAsync(eventEntity.Subscribe(user));
         await dbContext.SaveChangesAsync();
@@ -58,7 +56,7 @@ public class SubscriptionsController : Controller
     [Produces(typeof(SubscriptionsCountViewModel))]
     public async Task<IActionResult> UnSubscribe(Guid eventId)
     {
-        var user = await currentUserService.GetCurrentUser();
+        var user = await currentUserService.GetCurrentUserAsync();
         if (user is null)
             return Unauthorized();
 

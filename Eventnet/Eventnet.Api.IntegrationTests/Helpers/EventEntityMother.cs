@@ -12,7 +12,7 @@ public class EventEntityMother
         return fixture.Create<EventEntity>();
     }
 
-    public static EventEntity CreateEventEntity(string userId, DateTime startDate, DateTime? endDate = null)
+    public static EventEntity CreateEventEntity(Guid userId, DateTime startDate, DateTime? endDate = null)
     {
         var fixture = new Fixture();
         return new EventEntity(Guid.NewGuid(),
