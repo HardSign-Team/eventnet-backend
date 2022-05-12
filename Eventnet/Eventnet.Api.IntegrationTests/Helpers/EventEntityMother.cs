@@ -2,7 +2,7 @@
 using AutoFixture;
 using Eventnet.DataAccess.Entities;
 
-namespace Eventnet.Api.UnitTests.Helpers;
+namespace Eventnet.Api.IntegrationTests.Helpers;
 
 public class EventEntityMother
 {

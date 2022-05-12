@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using Eventnet.Api.IntegrationTests.Helpers;
 using Eventnet.Api.Models.Events;
 using Eventnet.Api.Models.Filtering;
-using Eventnet.Api.UnitTests.Helpers;
 using Eventnet.DataAccess.Entities;
 using Eventnet.Domain.Events;
 using FluentAssertions;

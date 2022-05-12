@@ -4,7 +4,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Eventnet.Api.IntegrationTests.Helpers;
 using Eventnet.Api.Models.Subscriptions;
-using Eventnet.Api.UnitTests.Helpers;
 using FluentAssertions;
 using NUnit.Framework;
 

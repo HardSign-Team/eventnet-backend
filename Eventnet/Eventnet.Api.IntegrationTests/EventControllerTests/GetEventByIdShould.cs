@@ -8,7 +8,6 @@ using Eventnet.Api.IntegrationTests.Helpers;
 using Eventnet.Api.Models.Events;
 using Eventnet.Api.Models.Marks;
 using Eventnet.Api.Models.Tags;
-using Eventnet.Api.UnitTests.Helpers;
 using Eventnet.DataAccess.Entities;
 using FluentAssertions;
 using NUnit.Framework;
