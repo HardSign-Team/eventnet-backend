@@ -42,7 +42,7 @@ public class SaveToDbServiceTests : BaseTests<SaveToDbServiceTests>
     }
 
     private ISaveToDbService CreateSut(ApplicationDbContext context) =>
-        new SaveToDbService(Mock.Of<IPhotoToStorageSaveService>(), CreateMapper(), context);
+        new SaveToDbService(Mock.Of<IPhotoStorageService>(), CreateMapper(), context);
 
     private static async Task SaveTags(IEnumerable<string> tagsInDb, ApplicationDbContext context)
     {

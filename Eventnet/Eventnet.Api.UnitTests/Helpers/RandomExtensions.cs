@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Eventnet.Api.IntegrationTests.Helpers;
+namespace Eventnet.Api.UnitTests.Helpers;
 
 public static class RandomExtensions
 {
