@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json;
+using Eventnet.Api.Config;
 using Eventnet.Infrastructure;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -24,7 +25,7 @@ public class RabbitMqConsumeEventService : IConsumeEventService
     public void ConsumeAndHandle(Action<RabbitMqMessage> handle)
     {
         var consumer = new EventingBasicConsumer(channel);
-        consumer.Received += (ch, ea) =>
+        consumer.Received += (_, ea) =>
         {
             var content = Encoding.UTF8.GetString(ea.Body.ToArray());
             var message = JsonSerializer.Deserialize<RabbitMqMessage>(content);

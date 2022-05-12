@@ -43,6 +43,7 @@ services.AddSingleton<IEventFilterFactory, TagsFilterFactory>();
 services.AddSingleton<IEventFilterMapper, EventFilterMapper>();
 services.AddSingleton<IPublishEventService, PublishEventService>();
 services.AddSingleton<EventSaveHandler>();
+services.AddSingleton<EventsFilterService>();
 services.AddMemoryCache();
 services.AddSingleton<IConsumeEventService, RabbitMqConsumeEventService>();
 services.AddSingleton<IEventSaveService, EventSaveService>();

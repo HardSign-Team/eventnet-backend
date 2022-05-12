@@ -1,7 +1,7 @@
 ﻿#pragma warning disable CS8618
 // Used for Configuration
 
-namespace Eventnet.Api.Services.SaveServices;
+namespace Eventnet.Api.Config;
 
 public class RabbitMqConfig
 {

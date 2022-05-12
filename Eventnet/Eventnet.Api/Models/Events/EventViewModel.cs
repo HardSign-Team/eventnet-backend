@@ -11,6 +11,31 @@ public record EventViewModel(
     LocationViewModel Location,
     DateTime StartDate,
     DateTime? EndDate,
-    TagNameViewModel[] Tags,
+    List<TagNameViewModel> Tags,
     int TotalSubscriptions,
-    MarksCountViewModel Marks);
+    MarksCountViewModel Marks)
+{
+    private static readonly MarksCountViewModel MarksCountViewModel = new(0, 0);
+
+    // ReSharper disable once UnusedMember.Local Used for AutoMapper
+    private EventViewModel(
+        Guid id,
+        string ownerId,
+        string name,
+        string description,
+        LocationViewModel location,
+        DateTime startDate,
+        DateTime? endDate,
+        List<TagNameViewModel> tags) : this(id,
+        ownerId,
+        name,
+        description,
+        location,
+        startDate,
+        endDate,
+        tags,
+        0,
+        MarksCountViewModel)
+    {
+    }
+}

@@ -1,12 +1,12 @@
-﻿using System.Text;
-using System.Text.Json;
+﻿using System.Text.Json;
 using AutoMapper;
+using Eventnet.Api.Config;
+using Eventnet.Api.Extensions;
 using Eventnet.Api.Helpers;
 using Eventnet.Api.Models.Events;
 using Eventnet.Api.Models.Filtering;
-using Eventnet.Api.Models.Marks;
-using Eventnet.Api.Models.Tags;
-using Eventnet.Api.Services.Filters;
+using Eventnet.Api.Models.Pages;
+using Eventnet.Api.Services;
 using Eventnet.Api.Services.SaveServices;
 using Eventnet.DataAccess;
 using Eventnet.Domain.Events;
@@ -15,37 +15,34 @@ using Eventnet.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using X.PagedList;
 
 namespace Eventnet.Api.Controllers;
 
 [Route("api/events")]
 public class EventController : Controller
 {
-    public const int MaxPageSize = 20;
-    public const int DefaultPageSize = 10;
     private const int Timeout = 20;
     private static readonly string[] SupportedContentTypes = { "image/bmp", "image/png", "image/jpeg" };
-    private readonly IEventFilterMapper filterMapper;
     private readonly ApplicationDbContext dbContext;
     private readonly IEventSaveService eventSaveService;
-    private readonly RabbitMqConfig rabbitMqConfig;
     private readonly LinkGenerator linkGenerator;
+    private readonly EventsFilterService eventsFilterService;
+    private readonly RabbitMqConfig rabbitMqConfig;
     private readonly IMapper mapper;
 
     public EventController(
-        IEventFilterMapper filterMapper,
         ApplicationDbContext dbContext,
         IMapper mapper,
-        LinkGenerator linkGenerator,
         IEventSaveService eventSaveService,
+        LinkGenerator linkGenerator,
+        EventsFilterService eventsFilterService,
         RabbitMqConfig rabbitMqConfig)
     {
-        this.filterMapper = filterMapper;
         this.dbContext = dbContext;
         this.mapper = mapper;
-        this.linkGenerator = linkGenerator;
         this.eventSaveService = eventSaveService;
+        this.linkGenerator = linkGenerator;
+        this.eventsFilterService = eventsFilterService;
         this.rabbitMqConfig = rabbitMqConfig;
     }
 
@@ -59,40 +56,17 @@ public class EventController : Controller
             return UnprocessableEntity(ModelState);
         }
 
-        var entity = await dbContext.Events
+        var entity = await mapper.ProjectTo<EventViewModel>(dbContext.Events)
             .AsNoTracking()
-            .Select(x => new
-            {
-                x.Id,
-                x.OwnerId,
-                x.Description,
-                x.Location,
-                x.StartDate,
-                x.EndDate,
-                x.Name,
-                x.Tags,
-                TotalSubscriptions = x.Subscriptions.Count,
-                Likes = x.Marks.Count(mark => mark.IsLike),
-                Dislikes = x.Marks.Count(mark => !mark.IsLike)
-            })
             .FirstOrDefaultAsync(x => x.Id == eventId);
         if (entity is null)
             return NotFound();
-        var eventViewModel = new EventViewModel(entity.Id,
-            entity.OwnerId,
-            entity.Name,
-            entity.Description,
-            mapper.Map<LocationViewModel>(entity.Location),
-            entity.StartDate,
-            entity.EndDate,
-            entity.Tags.Select(mapper.Map<TagNameViewModel>).ToArray(),
-            entity.TotalSubscriptions,
-            new MarksCountViewModel(entity.Likes, entity.Dislikes));
-        return Ok(eventViewModel);
+
+        return Ok(entity);
     }
 
     [HttpGet("search/name/{eventName}")]
-    [Produces(typeof(EventNameListViewModel))]
+    [Produces(typeof(List<EventNameViewModel>))]
     public IActionResult GetEventsByName(string? eventName, [FromQuery(Name = "m")] int maxCount = 10)
     {
         eventName = eventName?.Trim();
@@ -105,11 +79,10 @@ public class EventController : Controller
         }
 
         var selector = new EventsByNameSelector(eventName);
-        var result = selector
-            .Select(mapper.ProjectTo<EventName>(dbContext.Events).AsNoTracking().AsEnumerable(), maxCount)
-            .ToArray();
-
-        return Ok(new EventNameListViewModel(result.Length, result));
+        var query = mapper.ProjectTo<EventName>(dbContext.Events).AsNoTracking();
+        var result = selector.Select(query.AsEnumerable(), maxCount);
+        var viewModel = mapper.Map<List<EventNameViewModel>>(result);
+        return Ok(viewModel);
     }
 
     [HttpGet(Name = nameof(GetEvents))]
@@ -117,40 +90,27 @@ public class EventController : Controller
     public IActionResult GetEvents(
         [FromQuery(Name = "f")] string? filterModelBase64,
         [FromQuery(Name = "p")] int pageNumber = 1,
-        [FromQuery(Name = "ps")] int pageSize = DefaultPageSize)
+        [FromQuery(Name = "ps")] int pageSize = 10)
     {
         if (filterModelBase64 is null)
             return BadRequest($"{nameof(filterModelBase64)} was null");
-        var filterModel = ParseEventsFilterModel(filterModelBase64);
-        if (filterModel is null)
+        if (!EventsFilterModel.TryParse(filterModelBase64, out var filterModel))
             return BadRequest("Cannot parse filter model");
-
-        TryValidateModel(filterModel);
-
-        if (!ModelState.IsValid)
+        if (!TryValidateModel(filterModel))
             return UnprocessableEntity(ModelState);
 
-        pageNumber = NumberHelper.Normalize(pageNumber, 1);
-        pageSize = NumberHelper.Normalize(pageSize, 1, MaxPageSize);
-
-        var query = dbContext.Events
-            .AsNoTracking()
-            .AsEnumerable()
-            .Select(x => mapper.Map<Event>(x));
-        var filter = filterMapper.Map(filterModel);
-        var filteredEvents = filter.Filter(query);
-
-        var events = new PagedList<Event>(filteredEvents, pageNumber, pageSize);
-        var paginationHeader = events
-            .ToPaginationHeader((p, ps) => GenerateEventsPageLink(filterModelBase64, p, ps));
+        var pageInfo = new PageInfo(pageNumber, pageSize);
+        var query = mapper.ProjectTo<Event>(dbContext.Events).AsNoTracking();
+        var events = eventsFilterService.GetEvents(query.AsEnumerable(), filterModel, pageInfo);
+        var paginationHeader = events.ToPaginationHeader(GenerateEventsPageLink(filterModelBase64));
 
         Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationHeader));
 
         return Ok(mapper.Map<List<EventLocationViewModel>>(events));
     }
 
-    [HttpPost]
     [Authorize]
+    [HttpPost]
     public async Task<IActionResult> CreateEvent([FromForm] CreateEventModel createModel)
     {
         var photos = createModel.Photos;
@@ -158,23 +118,22 @@ public class EventController : Controller
         if (!IsContentTypesSupported(photos))
             return BadRequest("Not supported ContentType");
 
-        if (!IsPhotosSizeLessThanRecommended(photos))
-        {
-            var recommendedSizeInMb = rabbitMqConfig.RecommendedMessageSizeInBytes / 1024 / 1024;
-            return BadRequest($"Too large images. Recommended size of all images is {recommendedSizeInMb}Mb.");
-        }
+        if (!rabbitMqConfig.IsPhotosSizeLessThanRecommended(photos))
+            return BadRequest(
+                $"Too large images. Recommended size of all images is {rabbitMqConfig.RecommendedMessageSizeInMb()}Mb.");
 
-        var isSaved = await IsEventSaved(createModel.Id);
-        if (IsSaveEventBeingHandling(createModel.Id) || isSaved)
+        var isSaved = await dbContext.Events.AnyAsync(x => x.Id == createModel.Id);
+        if (eventSaveService.IsHandling(createModel.Id) || isSaved)
             return BadRequest("One event id provided two times");
 
         var createdEvent = mapper.Map<Event>(createModel);
         await eventSaveService.RequestSave(createdEvent, photos);
+        
         return Accepted();
     }
 
-    [HttpGet("is-created")]
     [Authorize]
+    [HttpGet("is-created")]
     public IActionResult IsCreated(Guid id)
     {
         var (saveStatus, exception) = eventSaveService.GetSaveEventResult(id);
@@ -193,7 +152,9 @@ public class EventController : Controller
     public IActionResult UpdateEvent(Guid eventId, [FromBody] UpdateEventModel updateModel) =>
         throw new NotImplementedException();
 
+    [Authorize]
     [HttpDelete("{eventId:guid}")]
+    [Produces(typeof(Guid))]
     public async Task<IActionResult> DeleteEvent(Guid eventId)
     {
         var eventEntity = await dbContext.Events.FirstOrDefaultAsync(x => x.Id == eventId);
@@ -203,17 +164,13 @@ public class EventController : Controller
         dbContext.Events.Remove(eventEntity);
         await dbContext.SaveChangesAsync();
 
-        return Ok(new { eventId });
+        return Ok(eventId);
     }
 
-    [HttpGet("request-event-creation")]
     [Authorize]
+    [HttpGet("request-event-creation")]
     [Produces(typeof(Guid))]
-    public IActionResult RequestEventCreation()
-    {
-        var id = Guid.NewGuid();
-        return Ok(id);
-    }
+    public IActionResult RequestEventCreation() => Ok(Guid.NewGuid());
 
     private static bool IsContentTypesSupported(IFormFile[] files)
     {
@@ -221,37 +178,10 @@ public class EventController : Controller
         return contentTypes.All(SupportedContentTypes.Contains);
     }
 
-    private bool IsPhotosSizeLessThanRecommended(IFormFile[] photos)
+    private Func<int, int, string?> GenerateEventsPageLink(string filterModelBase64)
     {
-        var photosSize = photos.Sum(photo => photo.Length);
-        return photosSize >= rabbitMqConfig.RecommendedMessageSizeInBytes;
-    }
-
-    private bool IsSaveEventBeingHandling(Guid id) => eventSaveService.IsHandling(id);
-
-    private async Task<bool> IsEventSaved(Guid id)
-    {
-        var eventInDb = await dbContext.Events.FindAsync(id);
-        return eventInDb is not null;
-    }
-
-    private static EventsFilterModel? ParseEventsFilterModel(string base64Model)
-    {
-        try
-        {
-            var bytes = Convert.FromBase64String(base64Model);
-            var json = Encoding.Default.GetString(bytes);
-            return JsonSerializer.Deserialize<EventsFilterModel>(json);
-        }
-        catch (Exception)
-        {
-            return null;
-        }
-    }
-
-    private string? GenerateEventsPageLink(string filterModelBase64, int pageNumber, int pageSize)
-    {
-        var values = new { f = filterModelBase64, p = pageNumber, ps = pageSize };
-        return linkGenerator.GetUriByRouteValues(HttpContext, nameof(GetEvents), values);
+        return (pageNumber, pageSize) => linkGenerator.GetUriByRouteValues(HttpContext,
+            nameof(GetEvents),
+            new { f = filterModelBase64, p = pageNumber, ps = pageSize });
     }
 }

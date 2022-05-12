@@ -6,7 +6,6 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
-using Eventnet.Api.Controllers;
 using Eventnet.Api.IntegrationTests.Helpers;
 using Eventnet.Api.Models.Events;
 using Eventnet.Api.Models.Filtering;
@@ -20,8 +19,8 @@ namespace Eventnet.Api.IntegrationTests.EventControllerTests;
 
 public class GetEventsShould : EventApiTestsBase
 {
-    public const int DefaultPageSize = EventController.DefaultPageSize;
-    public const int MaxPageSize = EventController.MaxPageSize;
+    public const int DefaultPageSize = 10;
+    public const int MaxPageSize = 20;
 
     [SetUp]
     public void Setup()
@@ -163,7 +162,7 @@ public class GetEventsShould : EventApiTestsBase
         pagination.PreviousPageLink.Should().BeNull();
         pagination.TotalCount.Should().Be(6);
         pagination.TotalPages.Should().Be(2);
-        var resultEvents = await response.Content.ReadFromJsonAsync<EventLocationViewModel[]>() ?? throw new Exception();
+        var resultEvents = response.ReadContentAs<EventLocationViewModel[]>();
         resultEvents.Should().NotBeEmpty();
         resultEvents.Should().HaveCount(3);
     }
