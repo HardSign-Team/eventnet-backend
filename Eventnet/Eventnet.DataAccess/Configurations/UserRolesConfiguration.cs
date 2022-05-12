@@ -1,21 +1,23 @@
-﻿using Eventnet.DataAccess.Models;
-using Microsoft.AspNetCore.Identity;
+﻿using Eventnet.DataAccess.Entities;
+using Eventnet.DataAccess.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Eventnet.DataAccess.Configurations;
 
-public class UserRolesConfiguration : IEntityTypeConfiguration<IdentityRole>
+public class UserRolesConfiguration : IEntityTypeConfiguration<UserRole>
 {
-    public void Configure(EntityTypeBuilder<IdentityRole> builder)
+    public void Configure(EntityTypeBuilder<UserRole> builder)
     {
-        builder.HasData(new IdentityRole(UserRoles.Admin)
+        builder.HasData(new UserRole(UserRoles.Admin)
             {
+                Id = Guid.NewGuid(),
                 NormalizedName = UserRoles.Admin.ToUpper(),
                 ConcurrencyStamp = Guid.NewGuid().ToString()
             },
-            new IdentityRole(UserRoles.User)
+            new UserRole(UserRoles.User)
             {
+                Id = Guid.NewGuid(),
                 NormalizedName = UserRoles.User.ToUpper(),
                 ConcurrencyStamp = Guid.NewGuid().ToString()
             });

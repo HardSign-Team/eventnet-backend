@@ -51,7 +51,7 @@ public class SaveToDbServiceTests : BaseTests<SaveToDbServiceTests>
     }
 
     private EventInfo CreateEventInfo() => new(Guid.NewGuid(),
-        "",
+        Guid.NewGuid(),
         DateTime.Now,
         DateTime.Now.AddDays(3),
         "Event",

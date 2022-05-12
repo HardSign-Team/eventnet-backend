@@ -9,7 +9,7 @@ public class EventEntity
     public DateTime? EndDate { get; set; }
     public LocationEntity Location { get; set; } = new();
     public string Name { get; set; }
-    public string OwnerId { get; }
+    public Guid OwnerId { get; }
     public DateTime StartDate { get; set; }
     public List<TagEntity> Tags { get; set; } = new();
     public IReadOnlyCollection<SubscriptionEntity> Subscriptions { get; private set; } = new List<SubscriptionEntity>();
@@ -17,7 +17,7 @@ public class EventEntity
 
     private EventEntity(
         Guid id,
-        string ownerId,
+        Guid ownerId,
         DateTime startDate,
         DateTime? endDate,
         string name,
@@ -33,7 +33,7 @@ public class EventEntity
 
     public EventEntity(
         Guid id,
-        string ownerId,
+        Guid ownerId,
         DateTime startDate,
         DateTime? endDate,
         string name,

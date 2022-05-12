@@ -17,7 +17,7 @@ public class CurrentUserService
         this.userManager = userManager;
     }
 
-    public async Task<UserEntity?> GetCurrentUser()
+    public async Task<UserEntity?> GetCurrentUserAsync()
     {
         var userName = GetCurrentUserName();
 

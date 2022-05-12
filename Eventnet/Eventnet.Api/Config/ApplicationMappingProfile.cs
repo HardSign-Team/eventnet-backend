@@ -20,6 +20,7 @@ public class ApplicationMappingProfile : Profile
         CreateMap<CreateEventModel, Event>();
         CreateProjection<UserEntity, UserNameModel>();
         CreateMap<UserEntity, UserViewModel>();
+        CreateMap<UpdateUserForm, UserEntity>();
         CreateMap<RegisterModel, UserEntity>()
             .ForSourceMember(x => x.Password,
                 opt => opt.DoNotValidate());
@@ -41,7 +42,7 @@ public class ApplicationMappingProfile : Profile
         CreateMap<EventName, EventNameViewModel>();
         CreateMap<EventInfoModel, EventInfo>()
             .ForMember(x => x.OwnerId,
-                opt => opt.MapFrom(x => ""));
+                opt => opt.MapFrom(x => Guid.Empty));
     }
 
     private void CreateTagsMap()
