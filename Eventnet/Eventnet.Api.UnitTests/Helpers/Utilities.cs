@@ -1,6 +1,6 @@
 ﻿using Eventnet.DataAccess;
 
-namespace Eventnet.Api.IntegrationTests.Helpers;
+namespace Eventnet.Api.UnitTests.Helpers;
 
 public class Utilities
 {

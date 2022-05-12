@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Eventnet.Api.IntegrationTests.Helpers;
 using Eventnet.Api.Models.Events;
+using Eventnet.Api.UnitTests.Helpers;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -18,16 +19,16 @@ public class GetEventsByIdsShould : EventApiTestsBase
     {
         var request = new HttpRequestMessage();
         request.Method = HttpMethod.Get;
-        request.RequestUri = BuildEventsByIdsUri(new [] {Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() });
+        request.RequestUri = BuildEventsByIdsUri(new[] { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() });
         request.Headers.Add("Accept", "application/json");
 
         var response = await HttpClient.SendAsync(request);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var result = response.ReadContentAs < List<EventViewModel>>();
+        var result = response.ReadContentAs<List<EventViewModel>>();
         result.Should().BeEmpty();
     }
-    
+
     [Test]
     public async Task ResponseCode200_WhenMultipleIds()
     {
@@ -58,7 +59,7 @@ public class GetEventsByIdsShould : EventApiTestsBase
         var result = response.ReadContentAs<List<EventViewModel>>();
         result.Should().HaveCount(guids.Length);
     }
-    
+
     private void AddEvents()
     {
         ApplyToDb(context =>

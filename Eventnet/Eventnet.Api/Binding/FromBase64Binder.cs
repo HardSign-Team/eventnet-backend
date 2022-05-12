@@ -28,7 +28,8 @@ public class FromBase64Binder : IModelBinder
         {
             var bytes = Convert.FromBase64String(value);
             var json = Encoding.UTF8.GetString(bytes);
-            bindingContext.Result = ModelBindingResult.Success(JsonSerializer.Deserialize(json, bindingContext.ModelType));
+            bindingContext.Result =
+                ModelBindingResult.Success(JsonSerializer.Deserialize(json, bindingContext.ModelType));
         }
         catch (Exception)
         {
