@@ -1,12 +1,13 @@
-﻿using Eventnet.Domain.Events;
+﻿using System.ComponentModel.DataAnnotations;
+using Eventnet.Domain.Events;
 
 namespace Eventnet.Api.Models.Events;
 
 public record EventInfoModel(
-    Guid EventId,
-    DateTime StartDate,
+    [Required] Guid EventId,
+    [Required] DateTime StartDate,
     DateTime? EndDate,
-    string Name,
+    [Required] string Name,
     string? Description,
-    Location Location,
-    string[] Tags);
+    [Required] Location Location,
+    [Required] string[] Tags);

@@ -15,6 +15,7 @@ using Eventnet.Domain.Selectors;
 using Eventnet.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 
 namespace Eventnet.Api.Controllers;
@@ -136,10 +137,13 @@ public class EventController : Controller
     {
         var (eventInfoModel, photos) = createModel;
         photos ??= Array.Empty<IFormFile>();
-
+                
         var user = await currentUserService.GetCurrentUserAsync();
         if (user is null)
             return Unauthorized();
+        
+        if (!ModelState.IsValid)
+            return UnprocessableEntity(ModelState);
 
         if (!IsContentTypesSupported(photos))
             return BadRequest("Not supported ContentType");

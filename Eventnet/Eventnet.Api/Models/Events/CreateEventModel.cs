@@ -1,3 +1,5 @@
-﻿namespace Eventnet.Api.Models.Events;
+﻿using System.ComponentModel.DataAnnotations;
 
-public record CreateEventModel(EventInfoModel Info, IFormFile[]? Photos);
+namespace Eventnet.Api.Models.Events;
+
+public record CreateEventModel([Required] EventInfoModel Info, IFormFile[]? Photos);
