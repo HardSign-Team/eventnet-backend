@@ -10,6 +10,7 @@ using Eventnet.Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Eventnet.Api.Controllers;
@@ -268,11 +269,14 @@ public class UserAccountController : Controller
     private async Task SendEmailConfirmationMessageAsync(UserEntity user)
     {
         var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
-        var clientAddress = GetClientAddress() + $"completed-register/{user.Id}/{code}";
+        var clientAddress = GetClientAddress() + $"completed-register";
+        
+        var query = new Dictionary<string, string> { { "userId", user.Id.ToString() }, { "code", code } };
+        var uri = new Uri(QueryHelpers.AddQueryString(clientAddress, query!));
 
         await emailService.SendEmailAsync(user.Email,
             "Подтверждение регистрации",
-            $"Подтвердите регистрацию, перейдя по ссылке: <a href='{clientAddress}'>{clientAddress}</a>");
+            $"Подтвердите регистрацию, перейдя по ссылке: <a href='{uri}'>{uri}</a>");
     }
 
     private string GetClientAddress() => Request.Headers["Referer"].ToString();
