@@ -6,12 +6,10 @@ using Eventnet.Api.Models.Authentication;
 using Eventnet.Api.Models.Authentication.Tokens;
 using Eventnet.Api.Services;
 using Eventnet.DataAccess.Entities;
-using Eventnet.DataAccess.Models;
 using Eventnet.Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Eventnet.Api.Controllers;
@@ -270,24 +268,12 @@ public class UserAccountController : Controller
     private async Task SendEmailConfirmationMessageAsync(UserEntity user)
     {
         var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
-        var clientAddress = GetClientAddress();
-
-        if (clientAddress is null)
-            throw new BadHttpRequestException("Origin header in request is required");
-
-        var query = new Dictionary<string, string> { { "userId", user.Id.ToString() }, { "code", code } };
-        var uri = new Uri(QueryHelpers.AddQueryString(clientAddress + "/confirm", query!));
+        var clientAddress = GetClientAddress() + $"completed-register/{user.Id}/{code}";
 
         await emailService.SendEmailAsync(user.Email,
             "Подтверждение регистрации",
-            $"Подтвердите регистрацию, перейдя по ссылке: <a href='{uri}'>{uri}</a>");
+            $"Подтвердите регистрацию, перейдя по ссылке: <a href='{clientAddress}'>{clientAddress}</a>");
     }
 
-    private string? GetClientAddress()
-    {
-        var origin = HttpContext.Request.Headers.Origin;
-        var referer = HttpContext.Request.Headers.Referer;
-
-        return origin.FirstOrDefault() ?? referer.FirstOrDefault();
-    }
+    private string GetClientAddress() => Request.Headers["Referer"].ToString();
 }
