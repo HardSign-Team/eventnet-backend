@@ -135,6 +135,9 @@ public class EventController : Controller
     [HttpPost]
     public async Task<IActionResult> CreateEvent([FromForm] CreateEventModel createModel)
     {
+        if (createModel is null)
+            return UnprocessableEntity();
+
         var (eventInfoModel, photos) = createModel;
         photos ??= Array.Empty<IFormFile>();
                 
