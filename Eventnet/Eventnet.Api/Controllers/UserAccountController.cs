@@ -6,7 +6,6 @@ using Eventnet.Api.Models.Authentication;
 using Eventnet.Api.Models.Authentication.Tokens;
 using Eventnet.Api.Services;
 using Eventnet.DataAccess.Entities;
-using Eventnet.DataAccess.Models;
 using Eventnet.Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -118,8 +117,6 @@ public class UserAccountController : Controller
 
         var result = await userManager.CreateAsync(user, registerModel.Password);
 
-        await userManager.AddToRoleAsync(user, UserRoles.User);
-
         if (!result.Succeeded)
             return BadRequest("User creation failed");
 
@@ -206,9 +203,12 @@ public class UserAccountController : Controller
     {
         var user = await userManager.FindByEmailAsync(model.Email);
 
+        if (user is null)
+            return NotFound();
+
         var emailConfirmed = await userManager.IsEmailConfirmedAsync(user);
-        if (user is null || !emailConfirmed)
-            return NotFound(); // return NotFound to don't discover is email exists or not
+        if (!emailConfirmed)
+            return NotFound();
 
         await forgotPasswordService.SendCodeAsync(user.Email);
 
@@ -272,24 +272,15 @@ public class UserAccountController : Controller
     private async Task SendEmailConfirmationMessageAsync(UserEntity user)
     {
         var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
-        var clientAddress = GetClientAddress();
-
-        if (clientAddress is null)
-            throw new BadHttpRequestException("Origin header in request is required");
-
+        var clientAddress = GetClientAddress() + "completed-register";
+        
         var query = new Dictionary<string, string> { { "userId", user.Id.ToString() }, { "code", code } };
-        var uri = new Uri(QueryHelpers.AddQueryString(clientAddress + "/confirm", query!));
+        var uri = new Uri(QueryHelpers.AddQueryString(clientAddress, query!));
 
         await emailService.SendEmailAsync(user.Email,
             "Подтверждение регистрации",
             $"Подтвердите регистрацию, перейдя по ссылке: <a href='{uri}'>{uri}</a>");
     }
 
-    private string? GetClientAddress()
-    {
-        var origin = HttpContext.Request.Headers.Origin;
-        var referer = HttpContext.Request.Headers.Referer;
-
-        return origin.FirstOrDefault() ?? referer.FirstOrDefault();
-    }
+    private string GetClientAddress() => Request.Headers["Referer"].ToString();
 }
