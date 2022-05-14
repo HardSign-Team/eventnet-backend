@@ -203,9 +203,12 @@ public class UserAccountController : Controller
     {
         var user = await userManager.FindByEmailAsync(model.Email);
 
+        if (user is null)
+            return NotFound();
+
         var emailConfirmed = await userManager.IsEmailConfirmedAsync(user);
-        if (user is null || !emailConfirmed)
-            return NotFound(); // return NotFound to don't discover is email exists or not
+        if (!emailConfirmed)
+            return NotFound();
 
         await forgotPasswordService.SendCodeAsync(user.Email);
 
@@ -269,7 +272,7 @@ public class UserAccountController : Controller
     private async Task SendEmailConfirmationMessageAsync(UserEntity user)
     {
         var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
-        var clientAddress = GetClientAddress() + $"completed-register";
+        var clientAddress = GetClientAddress() + "completed-register";
         
         var query = new Dictionary<string, string> { { "userId", user.Id.ToString() }, { "code", code } };
         var uri = new Uri(QueryHelpers.AddQueryString(clientAddress, query!));
