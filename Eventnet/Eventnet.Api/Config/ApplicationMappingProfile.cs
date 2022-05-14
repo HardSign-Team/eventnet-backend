@@ -40,9 +40,15 @@ public class ApplicationMappingProfile : Profile
         CreateMap<Event, EventLocationViewModel>();
         CreateMap<Event, EventEntity>();
         CreateMap<EventName, EventNameViewModel>();
-        CreateMap<EventInfoModel, EventInfo>()
+        CreateMap<CreateEventModel, EventInfo>()
+            .ForMember(x => x.Tags, opt => opt.MapFrom(
+                src => src.Tags ?? Array.Empty<string>()))
+            .ForMember(x => x.Location,
+                opt => opt.MapFrom(
+                    src => new Location(src.Latitude, src.Longitude)))
             .ForMember(x => x.OwnerId,
-                opt => opt.MapFrom(x => Guid.Empty));
+                opt => opt.MapFrom(
+                    x => Guid.Empty));
     }
 
     private void CreateTagsMap()

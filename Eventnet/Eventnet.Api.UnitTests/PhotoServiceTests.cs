@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Eventnet.Api.Services.Photo;
 using Eventnet.Api.UnitTests.Helpers;
-using Eventnet.DataAccess;
 using Eventnet.DataAccess.Entities;
 using Eventnet.Infrastructure.PhotoServices;
 using FluentAssertions;
