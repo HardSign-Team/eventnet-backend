@@ -7,7 +7,6 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Eventnet.Api.IntegrationTests.Helpers;
 using Eventnet.Api.Models.Events;
-using Eventnet.Domain.Events;
 using Microsoft.AspNetCore.Http.Extensions;
 
 namespace Eventnet.Api.IntegrationTests.EventControllerTests.CreateEventTests;
@@ -51,51 +50,43 @@ public class CreateEventTestsBase : TestWithRabbitMqBase
 
     protected static MultipartFormDataContent GetEventCreationRequestMessage(CreateEventModel model)
     {
-        var (eventInfo, formFiles) = model;
         var multiContent = new MultipartFormDataContent();
 
-        foreach (var (content, name) in GetInfoContent(eventInfo))
+        foreach (var (content, name) in GetInfoContent(model))
         {
-            multiContent.Add(content, $"{nameof(CreateEventModel.Info)}.{name}");
+            multiContent.Add(content, $"{name}");
         }
 
+        var formFiles = model.Photos;
         if (formFiles is not null)
         {
             foreach (var photo in formFiles)
             {
                 var fs = photo.OpenReadStream();
                 var fileStreamContent = GetFileStreamContent(fs, photo.Headers.ContentType[0] ?? throw new Exception());
-                multiContent.Add(fileStreamContent, "Photos", photo.FileName);
+                multiContent.Add(fileStreamContent, nameof(CreateEventModel.Photos), photo.FileName);
             }
         }
 
         return multiContent;
     }
 
-    private static IEnumerable<(HttpContent, string)> GetInfoContent(EventInfoModel eventInfo)
+    private static IEnumerable<(HttpContent, string)> GetInfoContent(CreateEventModel eventInfo)
     {
-        yield return (new StringContent(eventInfo.EventId.ToString()), nameof(EventInfoModel.EventId));
-
+        yield return (new StringContent(eventInfo.EventId.ToString()), nameof(CreateEventModel.EventId));
         yield return (new StringContent(eventInfo.StartDate.ToString(CultureInfo.CurrentCulture)),
-            nameof(EventInfoModel.StartDate));
-
+            nameof(CreateEventModel.StartDate));
         if (eventInfo.EndDate is { } endDate)
             yield return (new StringContent(endDate.ToString(CultureInfo.CurrentCulture)),
-                nameof(EventInfoModel.EndDate));
-
-        yield return (new StringContent(eventInfo.Name), nameof(EventInfoModel.Name));
-
-        if (eventInfo.Description is { } description)
-            yield return (new StringContent(description), nameof(EventInfoModel.Description));
-
-        foreach (var tag in eventInfo.Tags)
-            yield return (new StringContent(tag), nameof(EventInfoModel.Tags));
-
-        const string locationName = nameof(EventInfoModel.Location);
-        yield return (new StringContent(eventInfo.Location.Latitude.ToString(CultureInfo.InvariantCulture)),
-            $"{locationName}.{nameof(Location.Latitude)}");
-        yield return (new StringContent(eventInfo.Location.Longitude.ToString(CultureInfo.InvariantCulture)),
-            $"{locationName}.{nameof(Location.Longitude)}");
+                nameof(CreateEventModel.EndDate));
+        yield return (new StringContent(eventInfo.Name), nameof(CreateEventModel.Name));
+        yield return (new StringContent(eventInfo.Description), nameof(CreateEventModel.Description));
+        foreach (var tag in eventInfo.Tags ?? Array.Empty<string>()) 
+            yield return (new StringContent(tag), nameof(CreateEventModel.Tags));
+        yield return (new StringContent(eventInfo.Latitude.ToString(CultureInfo.InvariantCulture)),
+            nameof(CreateEventModel.Latitude));
+        yield return (new StringContent(eventInfo.Longitude.ToString(CultureInfo.InvariantCulture)),
+            nameof(CreateEventModel.Longitude));
     }
 
     private static StreamContent GetFileStreamContent(Stream fileStream, string mediaType)

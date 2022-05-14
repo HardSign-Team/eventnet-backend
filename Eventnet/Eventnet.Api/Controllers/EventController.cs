@@ -15,7 +15,6 @@ using Eventnet.Domain.Selectors;
 using Eventnet.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 
 namespace Eventnet.Api.Controllers;
@@ -132,22 +131,25 @@ public class EventController : Controller
     }
 
     [Authorize]
+    [HttpGet("request-event-creation")]
+    [Produces(typeof(Guid))]
+    public IActionResult RequestEventCreation() => Ok(Guid.NewGuid());
+    
+    [Authorize]
     [HttpPost]
-    public async Task<IActionResult> CreateEvent([FromForm] CreateEventModel createModel)
+    public async Task<IActionResult> CreateEvent([FromForm] CreateEventModel? createModel)
     {
         if (createModel is null)
             return UnprocessableEntity();
 
-        var (eventInfoModel, photos) = createModel;
-        photos ??= Array.Empty<IFormFile>();
-                
+        if (!ModelState.IsValid)
+            return UnprocessableEntity(ModelState);
+        
         var user = await currentUserService.GetCurrentUserAsync();
         if (user is null)
             return Unauthorized();
         
-        if (!ModelState.IsValid)
-            return UnprocessableEntity(ModelState);
-
+        var photos = createModel.Photos ?? Array.Empty<IFormFile>();
         if (!IsContentTypesSupported(photos))
             return BadRequest("Not supported ContentType");
 
@@ -155,12 +157,12 @@ public class EventController : Controller
             return BadRequest(
                 $"Too large images. Recommended size of all images is {rabbitMqConfig.RecommendedMessageSizeInMb()}Mb.");
 
-        var eventId = eventInfoModel.EventId;
+        var eventId = createModel.EventId;
         var isSaved = await dbContext.Events.AnyAsync(x => x.Id == eventId);
         if (eventSaveService.IsHandling(eventId) || isSaved)
             return BadRequest("One event id provided two times");
 
-        var eventInfo = mapper.Map<EventInfo>(eventInfoModel) with { OwnerId = user.Id };
+        var eventInfo = mapper.Map<EventInfo>(createModel) with { OwnerId = user.Id };
         await eventSaveService.RequestSave(eventInfo, photos);
 
         return Accepted();
@@ -201,10 +203,6 @@ public class EventController : Controller
         return Ok(eventId);
     }
 
-    [Authorize]
-    [HttpGet("request-event-creation")]
-    [Produces(typeof(Guid))]
-    public IActionResult RequestEventCreation() => Ok(Guid.NewGuid());
 
     private static bool IsContentTypesSupported(IFormFile[] files)
     {

@@ -9,7 +9,6 @@ using Eventnet.Api.IntegrationTests.Helpers;
 using Eventnet.Api.Models.Events;
 using Eventnet.DataAccess.Entities;
 using Eventnet.DataAccess.Extensions;
-using Eventnet.Domain.Events;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -94,8 +93,7 @@ public class CreateEventShould : CreateEventTestsBase
 
         var eventId = await GetEventGuid(client);
 
-        var info = CreateDefaultEventInfo() with { EventId = eventId };
-        var model = new CreateEventModel(info, formFiles);
+        var model = CreateDefaultEventInfo(formFiles) with { EventId = eventId };
         await PostAsync(client, model);
         await Task.Delay(1000);
 
@@ -167,8 +165,7 @@ public class CreateEventShould : CreateEventTestsBase
         FileStream fileStream,
         string mediaType)
     {
-        var info = CreateDefaultEventInfo() with { EventId = eventId };
-        var model = new CreateEventModel(info, new[] { CreateFormFile(fileStream, mediaType) });
+        var model = CreateDefaultEventInfo(new[] { CreateFormFile(fileStream, mediaType) }) with { EventId = eventId };
         return await PostAsync(client, model);
     }
 
@@ -186,15 +183,17 @@ public class CreateEventShould : CreateEventTestsBase
         return formFile;
     }
 
-    private static EventInfoModel CreateDefaultEventInfo()
+    private static CreateEventModel CreateDefaultEventInfo(IFormFile[] formFiles)
     {
-        return new EventInfoModel(Guid.NewGuid(),
+        return new CreateEventModel(Guid.NewGuid(),
             DateTime.Now,
             DateTime.Now.AddDays(3),
             "Test",
             "Description",
-            new Location(0, 0),
-            new[] { "Tag1", "Tag2", "Tag3" });
+            0, 
+            0,
+            new[] { "Tag1", "Tag2", "Tag3" },
+            formFiles);
     }
 
     private static async Task<HttpResponseMessage> PostAsync(HttpClient client, CreateEventModel model)
@@ -206,19 +205,20 @@ public class CreateEventShould : CreateEventTestsBase
 
     private static void AssertSave(EventEntity eventEntity, UserEntity owner, CreateEventModel model)
     {
-        eventEntity.Should().BeEquivalentTo(model.Info,
-            opt => opt
-                .Excluding(x => x.EventId)
-                .Excluding(x => x.Tags)
-                .Excluding(x => x.StartDate)
-                .Excluding(x => x.EndDate));
-        eventEntity.Id.Should().Be(model.Info.EventId);
-        eventEntity.StartDate.Should().BeCloseTo(model.Info.StartDate, TimeSpan.FromSeconds(30));
-        if (model.Info.EndDate is { } endDate)
+        eventEntity.Id.Should().Be(model.EventId);
+        eventEntity.Name.Should().Be(model.Name);
+        eventEntity.Description.Should().Be(model.Description);
+        eventEntity.Location.Latitude.Should().Be(model.Latitude);
+        eventEntity.Location.Longitude.Should().Be(model.Longitude);
+        eventEntity.OwnerId.Should().Be(owner.Id);
+        eventEntity.StartDate.Should().BeCloseTo(model.StartDate, TimeSpan.FromSeconds(30));
+        if (model.EndDate is { } endDate)
             eventEntity.EndDate.Should().BeCloseTo(endDate, TimeSpan.FromSeconds(30));
         else
             eventEntity.EndDate.Should().BeNull();
-        eventEntity.OwnerId.Should().Be(owner.Id);
-        eventEntity.Tags.Select(x => x.Name).OrderBy(x => x).Should().Equal(model.Info.Tags.OrderBy(x => x));
+        if (model.Tags is {} tags)
+            eventEntity.Tags.Select(x => x.Name).OrderBy(x => x).Should().Equal(tags.OrderBy(x => x));
+        else
+            eventEntity.Tags.Should().BeEmpty();
     }
 }
