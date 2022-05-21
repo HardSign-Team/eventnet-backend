@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using System.Drawing.Imaging;
+﻿using SixLabors.ImageSharp;
 
 namespace Eventnet.Domain;
 
@@ -8,29 +7,28 @@ namespace Eventnet.Domain;
 public class Photo
 {
     private readonly byte[] rawData;
-    private readonly ImageFormat imageFormat;
     private readonly string extension;
 
     public Photo(byte[] rawData, string contentType)
     {
         this.rawData = rawData;
-        (imageFormat, extension) = GetFormatAndExtensionFromContentType(contentType);
+        extension = GetFormatAndExtensionFromContentType(contentType);
     }
 
     public void Save(string path)
     {
         using var ms = new MemoryStream(rawData);
-        var photo = Image.FromStream(ms);
-        photo.Save(path + extension, imageFormat);
+        var photo = Image.Load(ms);
+        photo.Save(path + extension);
     }
 
-    private static (ImageFormat, string) GetFormatAndExtensionFromContentType(string contentType)
+    private static  string GetFormatAndExtensionFromContentType(string contentType)
     {
         return contentType switch
         {
-            "image/jpeg" => (ImageFormat.Jpeg, ".jpeg"),
-            "image/png"  => (ImageFormat.Png, ".png"),
-            "image/bmp"  => (ImageFormat.Bmp, ".bmp"),
+            "image/jpeg" =>  ".jpeg",
+            "image/png"  => ".png",
+            "image/bmp"  => ".bmp",
             _            => throw new ArgumentOutOfRangeException($"Unknown content type {contentType}")
         };
     }
