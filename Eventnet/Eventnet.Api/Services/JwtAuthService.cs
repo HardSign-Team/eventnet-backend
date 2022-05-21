@@ -8,8 +8,6 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Eventnet.Api.Services;
 
-public record RefreshToken(string UserName, string TokenString, DateTime ExpireAt);
-
 public class JwtAuthService : IJwtAuthService
 {
     private readonly ConcurrentDictionary<string, RefreshToken> usersRefreshTokens = new();
@@ -62,11 +60,11 @@ public class JwtAuthService : IJwtAuthService
         if (jwtToken == null || !jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256Signature))
             throw new SecurityTokenException("Invalid token");
 
-        var userName = principal.Claims
-            .FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
-
         if (!usersRefreshTokens.TryGetValue(refreshToken, out var existingRefreshToken))
             throw new SecurityTokenException("Invalid token");
+        
+        var userName = principal.Claims
+            .FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
 
         if (existingRefreshToken.UserName != userName || existingRefreshToken.ExpireAt < now)
             throw new SecurityTokenException("Invalid token");

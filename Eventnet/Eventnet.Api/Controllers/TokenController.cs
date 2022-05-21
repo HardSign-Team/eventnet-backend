@@ -3,7 +3,6 @@ using AutoMapper;
 using Eventnet.Api.Models;
 using Eventnet.Api.Models.Authentication.Tokens;
 using Eventnet.Api.Services;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -40,27 +39,16 @@ public class TokenController : Controller
         return Ok(mapper.Map<UserViewModel>(user));
     }
 
-    [Authorize]
     [HttpPost("refresh-token")]
     [Produces(typeof(TokensViewModel))]
-    public async Task<ActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
+    public IActionResult RefreshToken([FromBody] RefreshTokenRequest request)
     {
-        var user = await currentUserService.GetCurrentUserAsync();
-
-        if (user == null)
-            return NotFound();
-
-        if (string.IsNullOrWhiteSpace(request.RefreshToken))
-            return Unauthorized();
-
-        var accessToken = await HttpContext.GetTokenAsync("Bearer", "access_token");
-
-        if (string.IsNullOrEmpty(accessToken))
+        if (string.IsNullOrWhiteSpace(request.AccessToken) || string.IsNullOrWhiteSpace(request.RefreshToken))
             return Unauthorized();
         try
         {
             var (jwtSecurityToken, (_, tokenString, _)) =
-                jwtAuthService.Refresh(request.RefreshToken, accessToken, DateTime.Now);
+                jwtAuthService.Refresh(request.RefreshToken, request.AccessToken, DateTime.Now);
 
             return Ok(new TokensViewModel(new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
                 jwtSecurityToken.ValidTo,
