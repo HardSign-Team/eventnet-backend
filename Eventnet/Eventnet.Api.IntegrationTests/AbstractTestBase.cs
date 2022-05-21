@@ -50,7 +50,9 @@ public abstract class AbstractTestBase
         return await action(context!);
     }
 
-    protected async Task<(UserEntity, HttpClient)> CreateAuthorizedClient(string username, string password)
+    protected async Task<(UserEntity, HttpClient)> CreateAuthorizedClient(
+        string username = "TestUser",
+        string password = "TestPassword")
     {
         var factory = GetScopeFactory();
         using var scope = factory.CreateScope();

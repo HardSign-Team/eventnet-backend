@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Eventnet.Api.IntegrationTests.Helpers;
 using Eventnet.Api.Models.Marks;
+using Eventnet.Api.UnitTests.Helpers;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
@@ -42,7 +43,7 @@ public class AddDislikeShould : MarksApiTestBase
     [Test]
     public async Task Response404_WhenEventNotFound()
     {
-        var (_, client) = await CreateAuthorizedClient("TestUser", "TestPassword");
+        var (_, client) = await CreateAuthorizedClient();
         var request = BuildAddDislikeRequest(Guid.Empty);
 
         var response = await client.SendAsync(request);
@@ -53,7 +54,7 @@ public class AddDislikeShould : MarksApiTestBase
     [Test]
     public async Task Response200_WhenAddSingleTime()
     {
-        var (_, client) = await CreateAuthorizedClient("TestUser", "TestPassword");
+        var (_, client) = await CreateAuthorizedClient();
         var entity = ApplyToDb(context =>
         {
             context.AddUsers();
@@ -74,7 +75,7 @@ public class AddDislikeShould : MarksApiTestBase
     [TestCase(10)]
     public async Task Response200_WhenAddSeveralTimes(int n)
     {
-        var (_, client) = await CreateAuthorizedClient("TestUser", "TestPassword");
+        var (_, client) = await CreateAuthorizedClient();
         var entity = ApplyToDb(context =>
         {
             context.AddUsers();
@@ -98,7 +99,7 @@ public class AddDislikeShould : MarksApiTestBase
     [Test]
     public async Task Response200_WhenLikeBefore()
     {
-        var (user, client) = await CreateAuthorizedClient("TestUser", "TestPassword");
+        var (user, client) = await CreateAuthorizedClient();
         var entity = await ApplyToDbAsync(async context =>
         {
             context.AddUsers();

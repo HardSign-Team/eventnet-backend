@@ -24,6 +24,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Eventnet.Api.UnitTests\Eventnet.Api.UnitTests.csproj"/>
         <ProjectReference Include="..\Eventnet.TestsUtils\Eventnet.TestsUtils.csproj"/>
         <ProjectReference Include="..\Eventnet.Api\Eventnet.Api.csproj"/>
         <ProjectReference Include="..\Eventnet.DataAccess\Eventnet.DataAccess.csproj"/>

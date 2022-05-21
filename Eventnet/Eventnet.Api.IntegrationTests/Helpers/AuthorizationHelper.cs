@@ -18,7 +18,7 @@ public class AuthorizationHelper
     {
         var user = new UserEntity
         {
-            Id = Guid.NewGuid().ToString(),
+            Id = Guid.NewGuid(),
             UserName = registerModel.UserName,
             NormalizedUserName = registerModel.UserName,
             Email = registerModel.Email,
@@ -34,8 +34,7 @@ public class AuthorizationHelper
     {
         var request = BuildRequestLogin(username, password);
         var response = await httpClient.SendAsync(request);
-        var result = await response.Content.ReadAsStringAsync();
-        var loginResult = JsonConvert.DeserializeObject<LoginResult>(result);
+        var loginResult = response.ReadContentAs<LoginResult>();
         var token = loginResult.Tokens.AccessToken;
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         return httpClient;

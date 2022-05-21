@@ -5,6 +5,10 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Eventnet.Api.IntegrationTests.Helpers;
+using Eventnet.Api.Models.Events;
+using Eventnet.Api.Models.Marks;
+using Eventnet.Api.Models.Tags;
+using Eventnet.Api.UnitTests.Helpers;
 using Eventnet.DataAccess.Entities;
 using FluentAssertions;
 using NUnit.Framework;
@@ -18,7 +22,7 @@ public class GetEventByIdShould : EventApiTestsBase
     {
         var request = new HttpRequestMessage();
         request.Method = HttpMethod.Get;
-        request.RequestUri = BuildEventsByIdUri("trash");
+        request.RequestUri = BuildEventByIdUri("trash");
         request.Headers.Add("Accept", "application/json");
 
         var response = await HttpClient.SendAsync(request);
@@ -32,7 +36,7 @@ public class GetEventByIdShould : EventApiTestsBase
     {
         var request = new HttpRequestMessage();
         request.Method = HttpMethod.Get;
-        request.RequestUri = BuildEventsByIdUri(Guid.NewGuid());
+        request.RequestUri = BuildEventByIdUri(Guid.NewGuid());
         request.Headers.Add("Accept", "application/json");
 
         var response = await HttpClient.SendAsync(request);
@@ -46,7 +50,7 @@ public class GetEventByIdShould : EventApiTestsBase
     {
         var request = new HttpRequestMessage();
         request.Method = HttpMethod.Get;
-        request.RequestUri = BuildEventsByIdUri(Guid.Empty);
+        request.RequestUri = BuildEventByIdUri(Guid.Empty);
         request.Headers.Add("Accept", "application/json");
 
         var response = await HttpClient.SendAsync(request);
@@ -60,30 +64,24 @@ public class GetEventByIdShould : EventApiTestsBase
         var eventEntity = GetTestEvent();
         var request = new HttpRequestMessage();
         request.Method = HttpMethod.Get;
-        request.RequestUri = BuildEventsByIdUri(eventEntity.Id);
+        request.RequestUri = BuildEventByIdUri(eventEntity.Id);
         request.Headers.Add("Accept", "application/json");
 
         var response = await HttpClient.SendAsync(request);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         response.ShouldHaveHeader("Content-Type", "application/json; charset=utf-8");
-        response.ShouldHaveJsonContentEquivalentTo(new
-        {
-            id = eventEntity.Id,
-            ownerId = eventEntity.OwnerId,
-            name = eventEntity.Name,
-            description = eventEntity.Description,
-            startDate = eventEntity.StartDate,
-            endDate = eventEntity.EndDate,
-            location = eventEntity.Location,
-            tags = eventEntity.Tags,
-            totalSubscriptions = eventEntity.Subscriptions.Count,
-            marks = new
-            {
-                likes = 2,
-                dislikes = 1
-            }
-        });
+        var model = response.ReadContentAs<EventViewModel>();
+        model.Should().BeEquivalentTo(new EventViewModel(eventEntity.Id,
+            eventEntity.OwnerId,
+            eventEntity.Name,
+            eventEntity.Description,
+            new LocationViewModel(eventEntity.Location.Latitude, eventEntity.Location.Longitude),
+            eventEntity.StartDate,
+            eventEntity.EndDate,
+            eventEntity.Tags.Select(x => new TagNameViewModel(x.Id, x.Name)).ToList(),
+            eventEntity.Subscriptions.Count,
+            new MarksCountViewModel(2, 1)));
     }
 
     private EventEntity GetTestEvent()
@@ -116,16 +114,12 @@ public class GetEventByIdShould : EventApiTestsBase
     private static void AddSubscribers(EventEntity eventEntity, IEnumerable<UserEntity> users)
     {
         foreach (var user in users)
-        {
             eventEntity.Subscribe(user);
-        }
     }
 
     private static void AddTags(EventEntity eventEntity, IEnumerable<TagEntity> tags)
     {
         foreach (var tag in tags)
-        {
             eventEntity.AddTag(tag);
-        }
     }
 }

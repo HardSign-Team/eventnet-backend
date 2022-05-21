@@ -6,12 +6,12 @@ using Eventnet.Api.Models.Authentication;
 using Eventnet.Api.Models.Authentication.Tokens;
 using Eventnet.Api.Services;
 using Eventnet.DataAccess.Entities;
-using Eventnet.DataAccess.Models;
 using Eventnet.Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Eventnet.Api.Controllers;
 
@@ -117,8 +117,6 @@ public class UserAccountController : Controller
 
         var result = await userManager.CreateAsync(user, registerModel.Password);
 
-        await userManager.AddToRoleAsync(user, UserRoles.User);
-
         if (!result.Succeeded)
             return BadRequest("User creation failed");
 
@@ -140,7 +138,7 @@ public class UserAccountController : Controller
         if (changePasswordModel.OldPassword == changePasswordModel.NewPassword)
             return UnprocessableEntity("Passwords should be different");
 
-        var user = await currentUserService.GetCurrentUser();
+        var user = await currentUserService.GetCurrentUserAsync();
 
         if (user is null)
             return NotFound();
@@ -181,9 +179,9 @@ public class UserAccountController : Controller
     /// <param name="code">Code from email redirect link</param>
     /// <returns></returns>
     [HttpPost("confirm-email", Name = nameof(ConfirmEmail))]
-    public async Task<IActionResult> ConfirmEmail(string userId, string code)
+    public async Task<IActionResult> ConfirmEmail(Guid userId, string code)
     {
-        var user = await userManager.FindByIdAsync(userId);
+        var user = await userManager.Users.FirstOrDefaultAsync(x => x.Id == userId);
         if (user is null)
             return NotFound();
 
@@ -205,9 +203,12 @@ public class UserAccountController : Controller
     {
         var user = await userManager.FindByEmailAsync(model.Email);
 
+        if (user is null)
+            return NotFound();
+
         var emailConfirmed = await userManager.IsEmailConfirmedAsync(user);
-        if (user is null || !emailConfirmed)
-            return NotFound(); // return NotFound to don't discover is email exists or not
+        if (!emailConfirmed)
+            return NotFound();
 
         await forgotPasswordService.SendCodeAsync(user.Email);
 
@@ -221,10 +222,10 @@ public class UserAccountController : Controller
     /// <param name="code"></param>
     /// <returns></returns>
     [HttpGet("password/forgot/code")]
-    [Produces(typeof(bool))]
+    [Produces(typeof(VerifyPasswordCodeResultModel))]
     public IActionResult VerifyUserCode(string email, string code)
     {
-        return Ok(new { Status = forgotPasswordService.VerifyCode(email, code) });
+        return Ok(new VerifyPasswordCodeResultModel(forgotPasswordService.VerifyCode(email, code)));
     }
 
     /// <summary>
@@ -271,24 +272,15 @@ public class UserAccountController : Controller
     private async Task SendEmailConfirmationMessageAsync(UserEntity user)
     {
         var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
-        var clientAddress = GetClientAddress();
-
-        if (clientAddress is null)
-            throw new BadHttpRequestException("Origin header in request is required");
-
-        var query = new Dictionary<string, string> { { "userId", user.Id }, { "code", code } };
-        var uri = new Uri(QueryHelpers.AddQueryString(clientAddress + "/confirm", query!));
+        var clientAddress = GetClientAddress() + "completed-register";
+        
+        var query = new Dictionary<string, string> { { "userId", user.Id.ToString() }, { "code", code } };
+        var uri = new Uri(QueryHelpers.AddQueryString(clientAddress, query!));
 
         await emailService.SendEmailAsync(user.Email,
             "Подтверждение регистрации",
             $"Подтвердите регистрацию, перейдя по ссылке: <a href='{uri}'>{uri}</a>");
     }
 
-    private string? GetClientAddress()
-    {
-        var origin = HttpContext.Request.Headers.Origin;
-        var referer = HttpContext.Request.Headers.Referer;
-
-        return origin.FirstOrDefault() ?? referer.FirstOrDefault();
-    }
+    private string GetClientAddress() => Request.Headers["Referer"].ToString();
 }

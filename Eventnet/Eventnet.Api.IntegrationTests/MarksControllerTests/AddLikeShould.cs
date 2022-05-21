@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Eventnet.Api.IntegrationTests.Helpers;
 using Eventnet.Api.Models.Marks;
+using Eventnet.Api.UnitTests.Helpers;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -13,7 +14,7 @@ namespace Eventnet.Api.IntegrationTests.MarksControllerTests;
 public class AddLikeShould : MarksApiTestBase
 {
     [Test]
-    public async Task Response400_WhenNotAuthorized()
+    public async Task Response401_WhenNotAuthorized()
     {
         var entity = ApplyToDb(context =>
         {
@@ -31,7 +32,7 @@ public class AddLikeShould : MarksApiTestBase
     [Test]
     public async Task Response404_WhenEventNotFound()
     {
-        var (_, client) = await CreateAuthorizedClient("TestUser", "TestPassword");
+        var (_, client) = await CreateAuthorizedClient();
         var request = BuildAddLikeRequest(Guid.Empty);
 
         var response = await client.SendAsync(request);
@@ -42,7 +43,7 @@ public class AddLikeShould : MarksApiTestBase
     [Test]
     public async Task Response200_WhenAddSingleTime()
     {
-        var (_, client) = await CreateAuthorizedClient("TestUser", "TestPassword");
+        var (_, client) = await CreateAuthorizedClient();
         var entity = ApplyToDb(context =>
         {
             context.AddUsers();
@@ -63,7 +64,7 @@ public class AddLikeShould : MarksApiTestBase
     [TestCase(10)]
     public async Task Response200_WhenAddSeveralTimes(int n)
     {
-        var (_, client) = await CreateAuthorizedClient("TestUser", "TestPassword");
+        var (_, client) = await CreateAuthorizedClient();
         var entity = ApplyToDb(context =>
         {
             context.AddUsers();
@@ -87,7 +88,7 @@ public class AddLikeShould : MarksApiTestBase
     [Test]
     public async Task Response200_WhenDislikeBefore()
     {
-        var (user, client) = await CreateAuthorizedClient("TestUser", "TestPassword");
+        var (user, client) = await CreateAuthorizedClient();
         var entity = ApplyToDb(context =>
         {
             context.AddUsers();

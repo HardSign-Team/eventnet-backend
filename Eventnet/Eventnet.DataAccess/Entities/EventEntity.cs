@@ -4,14 +4,12 @@ namespace Eventnet.DataAccess.Entities;
 
 public class EventEntity
 {
+    public Guid Id { get; private set; }
     public string Description { get; set; }
     public DateTime? EndDate { get; set; }
-
-    public Guid Id { get; private set; }
-
     public LocationEntity Location { get; set; } = new();
     public string Name { get; set; }
-    public string OwnerId { get; }
+    public Guid OwnerId { get; }
     public DateTime StartDate { get; set; }
     public List<TagEntity> Tags { get; set; } = new();
     public IReadOnlyCollection<SubscriptionEntity> Subscriptions { get; private set; } = new List<SubscriptionEntity>();
@@ -19,7 +17,7 @@ public class EventEntity
 
     private EventEntity(
         Guid id,
-        string ownerId,
+        Guid ownerId,
         DateTime startDate,
         DateTime? endDate,
         string name,
@@ -35,7 +33,7 @@ public class EventEntity
 
     public EventEntity(
         Guid id,
-        string ownerId,
+        Guid ownerId,
         DateTime startDate,
         DateTime? endDate,
         string name,
@@ -50,6 +48,11 @@ public class EventEntity
     public void AddTag(TagEntity tagEntity)
     {
         Tags.Add(tagEntity);
+    }
+
+    public void AddTags(IEnumerable<TagEntity> tags)
+    {
+        Tags.AddRange(tags);
     }
 
     public MarkEntity Like(UserEntity user) => new(user.Id, Id, true, DateTime.Now);

@@ -4,5 +4,5 @@ namespace Eventnet.Api.Services.SaveServices;
 
 public interface IConsumeEventService : IDisposable
 {
-    void ConsumeAndHandle(Action<RabbitMqMessage> handle);
+    void ConsumeAndHandle(Func<RabbitMqMessage, Task> handle);
 }

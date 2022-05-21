@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Eventnet.Api.IntegrationTests.Helpers;
 using Eventnet.Api.Models.Subscriptions;
+using Eventnet.Api.UnitTests.Helpers;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -33,9 +34,7 @@ public class GetSubscriptionsCountShould : SubscriptionsApiTestsBase
 
             var entity = context.Events.First();
             foreach (var user in context.Users)
-            {
                 entity.Subscribe(user);
-            }
 
             var subscriptionEntities = context.Users.Select(user => entity.Subscribe(user)).ToArray();
             context.Subscriptions.AddRange(subscriptionEntities);

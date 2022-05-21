@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Eventnet.Api.Config;
 using RabbitMQ.Client;
 
 namespace Eventnet.Api.Services.SaveServices;

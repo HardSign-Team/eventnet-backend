@@ -1,13 +1,14 @@
-﻿using Eventnet.Domain.Events;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Eventnet.Api.Models.Events;
 
 public record CreateEventModel(
-    Guid Id,
-    string OwnerId,
-    DateTime StartDate,
+    [Required] Guid EventId,
+    [Required] DateTime StartDate,
     DateTime? EndDate,
-    string Name,
-    string? Description,
-    Location Location,
-    IFormFile[] Photos);
+    [Required] string Name,
+    [Required] string Description,
+    [Required] [Range(-90, 90)] double Longitude,
+    [Required] [Range(-90, 90)] double Latitude,
+    string[]? Tags,
+    IFormFile[]? Photos);

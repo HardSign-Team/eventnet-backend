@@ -6,6 +6,7 @@ using Eventnet.Api.Helpers.EventFilterFactories;
 using Eventnet.Api.Models.Authentication.Tokens;
 using Eventnet.Api.Services;
 using Eventnet.Api.Services.Filters;
+using Eventnet.Api.Services.Photo;
 using Eventnet.Api.Services.SaveServices;
 using Eventnet.DataAccess;
 using Eventnet.DataAccess.Entities;
@@ -16,6 +17,7 @@ using Eventnet.Infrastructure.Validators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -34,6 +36,7 @@ services.AddSingleton(rabbitMqConfig);
 services.AddSingleton(photoStorageConfig);
 services.AddSingleton<IJwtAuthService, JwtAuthService>();
 services.AddScoped<CurrentUserService>();
+services.AddScoped<IPhotoService, PhotoService>();
 
 services.AddSingleton<IEventFilterFactory, LocationFilterFactory>();
 services.AddSingleton<IEventFilterFactory, StartDateFilterFactory>();
@@ -43,14 +46,14 @@ services.AddSingleton<IEventFilterFactory, TagsFilterFactory>();
 services.AddSingleton<IEventFilterMapper, EventFilterMapper>();
 services.AddSingleton<IPublishEventService, PublishEventService>();
 services.AddSingleton<EventSaveHandler>();
+services.AddSingleton<EventsFilterService>();
 services.AddMemoryCache();
 services.AddSingleton<IConsumeEventService, RabbitMqConsumeEventService>();
 services.AddSingleton<IEventSaveService, EventSaveService>();
 services.AddSingleton<IPhotoValidator, PhotoValidator>();
-services.AddSingleton<IPhotoToStorageSaveService, PhotoToStorageSaveService>();
-services.AddSingleton<ISaveToDbService, SaveToDbService>();
+services.AddScoped<IPhotoStorageService, PhotoStorageService>();
+services.AddScoped<ISaveToDbService, SaveToDbService>();
 services.AddSingleton<IEventValidator, EventValidator>();
-services.AddSingleton<IPhotoValidator, PhotoValidator>();
 services.AddSingleton<IEventCreationValidator, EventCreationValidator>();
 services.AddSingleton<IRabbitMqMessageHandler, RabbitMqMessageHandler>();
 
@@ -82,12 +85,13 @@ services.AddCors(options =>
         });
 });
 
-services.AddIdentity<UserEntity, IdentityRole>(options =>
+services.AddIdentity<UserEntity, UserRole>(options =>
     {
         options.Password.RequireDigit = false;
         options.Password.RequireNonAlphanumeric = false;
         options.Password.RequireUppercase = false;
         options.Password.RequireLowercase = false;
+        options.Password.RequiredLength = 0;
     })
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
@@ -163,11 +167,16 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath, "static")),
+    RequestPath = "/static"
+});
+
 if (app.Environment.IsProduction())
 {
     using var scope = app.Services.CreateScope();
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-
     if (context.Database.GetPendingMigrations().Any())
         context.Database.Migrate();
 }

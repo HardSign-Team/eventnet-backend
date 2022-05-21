@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Eventnet.Api.IntegrationTests.Helpers;
+using Eventnet.Api.UnitTests.Helpers;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -15,9 +16,10 @@ public class DeleteEventShould : EventApiTestsBase
     [TestCaseSource(nameof(GetInvalidGuids))]
     public async Task ResponseCode405_WhenEventInvalidGuid(string? guid)
     {
+        var (_, client) = await CreateAuthorizedClient();
         var request = CreateDefaultRequest(guid);
 
-        var response = await HttpClient.SendAsync(request);
+        var response = await client.SendAsync(request);
 
         response.StatusCode.Should().Be(HttpStatusCode.MethodNotAllowed);
         response.ShouldNotHaveHeader("Content-Type");
@@ -26,9 +28,10 @@ public class DeleteEventShould : EventApiTestsBase
     [Test]
     public async Task ResponseCode404_WhenEventNotFound()
     {
+        var (_, client) = await CreateAuthorizedClient();
         var request = CreateDefaultRequest(Guid.NewGuid());
 
-        var response = await HttpClient.SendAsync(request);
+        var response = await client.SendAsync(request);
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         response.ShouldNotHaveHeader("Content-Type");
@@ -37,9 +40,10 @@ public class DeleteEventShould : EventApiTestsBase
     [Test]
     public async Task ResponseCode400_WhenEmptyGuid()
     {
+        var (_, client) = await CreateAuthorizedClient();
         var request = CreateDefaultRequest(Guid.Empty);
 
-        var response = await HttpClient.SendAsync(request);
+        var response = await client.SendAsync(request);
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         response.ShouldNotHaveHeader("Content-Type");
@@ -48,6 +52,7 @@ public class DeleteEventShould : EventApiTestsBase
     [Test]
     public async Task ResponseCode200_WhenDeleteGuid()
     {
+        var (_, client) = await CreateAuthorizedClient();
         var eventEntity = EventEntityMother.CreateEventEntity();
         ApplyToDb(context =>
         {
@@ -56,13 +61,10 @@ public class DeleteEventShould : EventApiTestsBase
         });
         var request = CreateDefaultRequest(eventEntity.Id);
 
-        var response = await HttpClient.SendAsync(request);
+        var response = await client.SendAsync(request);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        response.ShouldHaveJsonContentEquivalentTo(new
-        {
-            eventId = eventEntity.Id
-        });
+        response.ReadContentAs<Guid>().Should().Be(eventEntity.Id);
         ApplyToDb(context => context.Events.ToArray()).Should().BeEmpty();
     }
 

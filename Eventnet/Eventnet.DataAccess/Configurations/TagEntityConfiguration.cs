@@ -10,5 +10,6 @@ public class TagEntityConfiguration : IEntityTypeConfiguration<TagEntity>
     {
         builder.Property(x => x.Id);
         builder.Property(x => x.Name);
+        builder.HasIndex(x => x.Name).IsUnique();
     }
 }

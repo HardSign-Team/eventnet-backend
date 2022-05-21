@@ -8,4 +8,5 @@ public record EmailConfiguration
     public string Login { get; init; }
     public string Password { get; init; }
     public int Port { get; init; }
+    public string CompanyAddress { get; init; }
 }

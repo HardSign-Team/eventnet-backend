@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Eventnet.Api.Services.SaveServices;
 using Eventnet.Infrastructure;
 
@@ -10,7 +11,7 @@ public class ConsumeEventMock : IConsumeEventService
     {
     }
 
-    public void ConsumeAndHandle(Action<RabbitMqMessage> handle)
+    public void ConsumeAndHandle(Func<RabbitMqMessage, Task> handle)
     {
     }
 }
