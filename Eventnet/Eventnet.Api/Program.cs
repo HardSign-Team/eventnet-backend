@@ -8,6 +8,7 @@ using Eventnet.Api.Services;
 using Eventnet.Api.Services.Filters;
 using Eventnet.Api.Services.Photo;
 using Eventnet.Api.Services.SaveServices;
+using Eventnet.Api.Services.UserAvatars;
 using Eventnet.DataAccess;
 using Eventnet.DataAccess.Entities;
 using Eventnet.Domain;
@@ -69,6 +70,7 @@ services.AddSingleton<IRabbitMqMessageHandler, RabbitMqMessageHandler>();
 
 services.AddScoped<IEmailService, EmailService>();
 services.AddScoped<IForgotPasswordService, ForgotPasswordService>();
+services.AddScoped<IUserAvatarsService, UserAvatarsService>();
 
 services.AddMemoryCache();
 services.AddImageSharp()

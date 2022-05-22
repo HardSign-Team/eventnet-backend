@@ -1,7 +1,9 @@
-﻿using AutoMapper;
+﻿using System.Text;
+using AutoMapper;
 using Eventnet.Api.Helpers;
 using Eventnet.Api.Models;
 using Eventnet.Api.Services;
+using Eventnet.Api.Services.UserAvatars;
 using Eventnet.DataAccess;
 using Eventnet.DataAccess.Entities;
 using Eventnet.Domain;
@@ -20,19 +22,19 @@ public class UserController : Controller
     private readonly IMapper mapper;
     private readonly UserManager<UserEntity> userManager;
     private readonly CurrentUserService currentUserService;
-    private readonly IPhotoStorageService photoStorageService;
+    private readonly IUserAvatarsService userAvatarsService;
     private static readonly string[] SupportedContentTypes = { "image/bmp", "image/png", "image/jpeg" };
 
     public UserController(ApplicationDbContext dbContext, 
         IMapper mapper, UserManager<UserEntity> userManager, 
         CurrentUserService currentUserService,
-        IPhotoStorageService photoStorageService)
+        IUserAvatarsService userAvatarsService)
     {
         this.dbContext = dbContext;
         this.mapper = mapper;
         this.userManager = userManager;
         this.currentUserService = currentUserService;
-        this.photoStorageService = photoStorageService;
+        this.userAvatarsService = userAvatarsService;
     }
 
     [Authorize]
@@ -66,13 +68,9 @@ public class UserController : Controller
         if(SupportedContentTypes.All(x => x != form.Avatar.ContentType))
             return BadRequest("Not supported ContentType");
 
-        var photoId = Guid.NewGuid();
-        await using var memoryStream = new MemoryStream();
-        await form.Avatar.CopyToAsync(memoryStream);
-        var photo = new Photo(memoryStream.ToArray(), form.Avatar.ContentType);
-        photoStorageService.Save(photo, photoId);
+        var avatarName = await userAvatarsService.UploadAvatarAsync(user, form.Avatar);
         
-        return Ok(photoId);
+        return Ok($"{GetBaseUrl()}{avatarName}");
     }
 
     [HttpGet("search/prefix/{prefix:alpha:required}")]
@@ -88,6 +86,16 @@ public class UserController : Controller
         var result = await mapper.ProjectTo<UserNameModel>(query).ToArrayAsync();
 
         return Ok(new UserNameListViewModel(result.Length, result));
+    }
+    
+    private string GetBaseUrl()
+    {
+        var sb = new StringBuilder();
+        sb.Append($"{Request.Scheme}://{Request.Host.Host}");
+        if (Request.Host.Port is { } port)
+            sb.Append($":{port}");
+        sb.Append('/');
+        return sb.ToString();
     }
 }
 
