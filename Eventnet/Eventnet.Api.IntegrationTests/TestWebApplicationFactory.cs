@@ -32,9 +32,9 @@ public class TestWebApplicationFactory<TStartup> : WebApplicationFactory<TStartu
             services.Remove(consumer!);
             services.AddSingleton<IConsumeEventService, ConsumeEventMock>();
 
-            var publisher = services.SingleOrDefault(d => d.ServiceType == typeof(IPublishEventService));
+            var publisher = services.SingleOrDefault(d => d.ServiceType == typeof(IPublishEventSaveService));
             services.Remove(publisher!);
-            services.AddSingleton<IPublishEventService, PublishEventMock>();
+            services.AddSingleton<IPublishEventSaveService, PublishEventSaveMock>();
 
             var sp = services.BuildServiceProvider();
 
