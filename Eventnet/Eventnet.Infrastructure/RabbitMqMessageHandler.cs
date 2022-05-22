@@ -10,12 +10,14 @@ public class RabbitMqMessageHandler : IRabbitMqMessageHandler
     private readonly EventSaveHandler eventSaveHandler;
     private readonly IEventCreationValidator validator;
     private readonly IServiceScopeFactory serviceScopeFactory;
+    private readonly RabbitMqMessageHandlerHelper rabbitMqMessageHandlerHelper;
 
     public RabbitMqMessageHandler(
         EventSaveHandler eventSaveHandler,
         IEventCreationValidator validator,
         IServiceScopeFactory serviceScopeFactory)
     {
+        rabbitMqMessageHandlerHelper = new RabbitMqMessageHandlerHelper();
         this.eventSaveHandler = eventSaveHandler;
         this.validator = validator;
         this.serviceScopeFactory = serviceScopeFactory;
@@ -28,7 +30,7 @@ public class RabbitMqMessageHandler : IRabbitMqMessageHandler
         EventSaveStatus status;
         try
         {
-            var photos = GetPhotos(binaryPhotos);
+            var photos = rabbitMqMessageHandlerHelper.GetPhotos(binaryPhotos);
             (var isOk, errorMessage) = validator.Validate(photos, eventForSave);
             if (isOk)
             {
@@ -54,9 +56,4 @@ public class RabbitMqMessageHandler : IRabbitMqMessageHandler
         await service.SaveEventAsync(info);
         await service.SavePhotosAsync(photos, info.EventId);
     }
-
-    private static List<Photo> GetPhotos(IEnumerable<RabbitMqPhoto> rabbitMqPhotos) =>
-        rabbitMqPhotos
-            .Select(rabbitMqPhoto => new Photo(rabbitMqPhoto.PhotoInBytes, rabbitMqPhoto.ContentType))
-            .ToList();
 }
