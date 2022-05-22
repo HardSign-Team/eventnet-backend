@@ -20,6 +20,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using SixLabors.ImageSharp.Web.Caching;
+using SixLabors.ImageSharp.Web.Commands;
+using SixLabors.ImageSharp.Web.DependencyInjection;
+using SixLabors.ImageSharp.Web.Processors;
+using SixLabors.ImageSharp.Web.Providers;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
@@ -61,6 +66,26 @@ services.AddScoped<IEmailService, EmailService>();
 services.AddScoped<IForgotPasswordService, ForgotPasswordService>();
 
 services.AddMemoryCache();
+services.AddImageSharp()
+    .SetRequestParser<QueryCollectionRequestParser>()
+    .Configure<PhysicalFileSystemCacheOptions>(options =>
+    {
+        options.CacheRootPath = null;
+        options.CacheFolder = "is-cache";
+        options.CacheFolderDepth = 8;
+    })
+    .SetCache<PhysicalFileSystemCache>()
+    .SetCacheKey<UriRelativeLowerInvariantCacheKey>()
+    .SetCacheHash<SHA256CacheHash>()
+    .Configure<PhysicalFileSystemProviderOptions>(options =>
+    {
+        options.ProviderRootPath = "static";
+    })
+    .AddProvider<PhysicalFileSystemProvider>()
+    .AddProcessor<ResizeWebProcessor>()
+    .AddProcessor<FormatWebProcessor>()
+    .AddProcessor<BackgroundColorWebProcessor>()
+    .AddProcessor<QualityWebProcessor>();
 
 services.AddHttpContextAccessor();
 
@@ -166,7 +191,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
+app.UseImageSharp();
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath, "static")),
