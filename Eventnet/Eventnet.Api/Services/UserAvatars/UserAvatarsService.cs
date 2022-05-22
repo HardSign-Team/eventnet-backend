@@ -4,6 +4,17 @@ using Eventnet.Infrastructure.PhotoServices;
 
 namespace Eventnet.Api.Services.UserAvatars;
 
+public static class UserAvatarHelpers
+{
+    public static string GetUserAvatar(UserEntity user)
+    {
+        if (!user.AvatarId.HasValue)
+            return "default.jpeg";
+
+        return $"{user.AvatarId.Value}.jpeg";
+    }
+}
+
 public class UserAvatarsService : IUserAvatarsService
 {
     private readonly IPhotoStorageService photoStorageService;

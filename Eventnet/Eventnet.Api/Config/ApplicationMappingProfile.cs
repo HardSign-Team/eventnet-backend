@@ -4,6 +4,7 @@ using Eventnet.Api.Models.Authentication;
 using Eventnet.Api.Models.Events;
 using Eventnet.Api.Models.Marks;
 using Eventnet.Api.Models.Tags;
+using Eventnet.Api.Services.UserAvatars;
 using Eventnet.DataAccess.Entities;
 using Eventnet.Domain.Events;
 using Eventnet.Domain.Selectors;
@@ -19,7 +20,10 @@ public class ApplicationMappingProfile : Profile
         CreateTagsMap();
         CreateMap<CreateEventModel, Event>();
         CreateProjection<UserEntity, UserNameModel>();
-        CreateMap<UserEntity, UserViewModel>();
+        CreateMap<UserEntity, UserViewModel>()
+            .ForMember(x => x.AvatarUrl,
+                opt => 
+                    opt.MapFrom(x => UserAvatarHelpers.GetUserAvatar(x)));
         CreateMap<UpdateUserForm, UserEntity>();
         CreateMap<RegisterModel, UserEntity>()
             .ForSourceMember(x => x.Password,
