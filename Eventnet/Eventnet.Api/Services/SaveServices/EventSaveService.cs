@@ -7,11 +7,11 @@ namespace Eventnet.Api.Services.SaveServices;
 public class EventSaveService : IEventSaveService
 {
     private readonly EventSaveHandler eventSaveHandler;
-    private readonly IPublishEventService publishEventService;
+    private readonly IPublishEventSaveService publishEventSaveService;
 
-    public EventSaveService(IPublishEventService publishEventService, EventSaveHandler eventSaveHandler)
+    public EventSaveService(IPublishEventSaveService publishEventSaveService, EventSaveHandler eventSaveHandler)
     {
-        this.publishEventService = publishEventService;
+        this.publishEventSaveService = publishEventSaveService;
         this.eventSaveHandler = eventSaveHandler;
     }
 
@@ -23,7 +23,7 @@ public class EventSaveService : IEventSaveService
         {
             var rabbitMqPhotos = await GetRabbitMqPhotosAsync(photos);
             var message = JsonSerializer.Serialize(new RabbitMqMessage(eventForSave, rabbitMqPhotos));
-            await publishEventService.PublishAsync(message);
+            await publishEventSaveService.PublishAsync(message);
         }
         catch (Exception e)
         {

@@ -17,7 +17,7 @@ public class RabbitMqConsumeEventService : IConsumeEventService
     public RabbitMqConsumeEventService(RabbitMqConfig config, IRabbitMqMessageHandler rabbitMqMessageHandler)
     {
         this.rabbitMqMessageHandler = rabbitMqMessageHandler;
-        queue = config.Queue;
+        queue = config.QueueEventSave;
         var connectionFactory = new ConnectionFactory { HostName = config.HostName, Port = config.Port };
         connection = connectionFactory.CreateConnection();
         channel = connection.CreateModel();
