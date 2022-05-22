@@ -26,7 +26,12 @@ using SixLabors.ImageSharp.Web.DependencyInjection;
 using SixLabors.ImageSharp.Web.Processors;
 using SixLabors.ImageSharp.Web.Providers;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+{
+    ApplicationName = typeof(Program).Assembly.FullName,
+    ContentRootPath = Directory.GetCurrentDirectory(),
+    WebRootPath = "static"
+});
 var services = builder.Services;
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var jwtTokenConfig = builder.Configuration.GetSection("JWT").Get<JwtTokenConfig>();
@@ -67,20 +72,20 @@ services.AddScoped<IForgotPasswordService, ForgotPasswordService>();
 
 services.AddMemoryCache();
 services.AddImageSharp()
+    .Configure<PhysicalFileSystemProviderOptions>(options =>
+    {
+        options.ProviderRootPath = "static";
+    })
     .SetRequestParser<QueryCollectionRequestParser>()
     .Configure<PhysicalFileSystemCacheOptions>(options =>
     {
-        options.CacheRootPath = null;
+        options.CacheRootPath = "static";
         options.CacheFolder = "is-cache";
         options.CacheFolderDepth = 8;
     })
     .SetCache<PhysicalFileSystemCache>()
     .SetCacheKey<UriRelativeLowerInvariantCacheKey>()
     .SetCacheHash<SHA256CacheHash>()
-    .Configure<PhysicalFileSystemProviderOptions>(options =>
-    {
-        options.ProviderRootPath = "static";
-    })
     .AddProvider<PhysicalFileSystemProvider>()
     .AddProcessor<ResizeWebProcessor>()
     .AddProcessor<FormatWebProcessor>()

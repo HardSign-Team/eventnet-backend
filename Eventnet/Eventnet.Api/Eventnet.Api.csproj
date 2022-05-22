@@ -33,11 +33,20 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="storage" />
+        <None Remove="storage\eafbe94f-8437-4bd5-8fca-0adf18dbf16e.jpeg" />
+        <None Remove="storage\**" />
     </ItemGroup>
 
     <ItemGroup>
-        <None Remove="storage\eafbe94f-8437-4bd5-8fca-0adf18dbf16e.jpeg" />
+      <Compile Remove="storage\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="storage\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Remove="storage\**" />
     </ItemGroup>
 
     <PropertyGroup>
