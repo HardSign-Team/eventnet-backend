@@ -1,6 +1,6 @@
 ﻿namespace Eventnet.Api.Services.SaveServices;
 
-public interface IPublishEventService : IDisposable
+public interface IPublishEventSaveService
 {
     Task PublishAsync(string message);
 }
