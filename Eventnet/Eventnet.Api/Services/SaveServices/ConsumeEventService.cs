@@ -9,12 +9,14 @@ namespace Eventnet.Api.Services.SaveServices;
 
 public class RabbitMqConsumeEventService : IConsumeEventService
 {
+    private readonly IRabbitMqMessageHandler rabbitMqMessageHandler;
     private readonly IModel channel;
     private readonly IConnection connection;
     private readonly string queue;
 
-    public RabbitMqConsumeEventService(RabbitMqConfig config)
+    public RabbitMqConsumeEventService(RabbitMqConfig config, IRabbitMqMessageHandler rabbitMqMessageHandler)
     {
+        this.rabbitMqMessageHandler = rabbitMqMessageHandler;
         queue = config.Queue;
         var connectionFactory = new ConnectionFactory { HostName = config.HostName, Port = config.Port };
         connection = connectionFactory.CreateConnection();
@@ -22,14 +24,14 @@ public class RabbitMqConsumeEventService : IConsumeEventService
         channel.QueueDeclare(queue, true, false, false);
     }
 
-    public void ConsumeAndHandle(Func<RabbitMqMessage, Task> handle)
+    public void ConsumeAndHandle()
     {
         var consumer = new EventingBasicConsumer(channel);
         consumer.Received += async (_, ea) =>
         {
             var content = Encoding.UTF8.GetString(ea.Body.ToArray());
             var message = JsonSerializer.Deserialize<RabbitMqMessage>(content);
-            await handle(message!);
+            await rabbitMqMessageHandler.HandleAsync(message!);
             channel.BasicAck(ea.DeliveryTag, false);
         };
 

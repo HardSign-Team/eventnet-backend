@@ -11,7 +11,7 @@ public class ConsumeEventMock : IConsumeEventService
     {
     }
 
-    public void ConsumeAndHandle(Func<RabbitMqMessage, Task> handle)
+    public void ConsumeAndHandle()
     {
     }
 }
