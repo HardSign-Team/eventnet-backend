@@ -2,5 +2,5 @@
 
 
 public record PhotosUpdateModel(
-    IFormFile[] NewPhotos,
-    Guid[] PhotosIdToDelete);
+    IFormFile[]? NewPhotos,
+    Guid[]? PhotosIdToDelete);
