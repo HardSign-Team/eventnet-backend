@@ -4,17 +4,6 @@ using Eventnet.Infrastructure.PhotoServices;
 
 namespace Eventnet.Api.Services.UserAvatars;
 
-public static class UserAvatarHelpers
-{
-    public static string GetUserAvatar(UserEntity user)
-    {
-        if (!user.AvatarId.HasValue)
-            return "default.jpeg";
-
-        return $"{user.AvatarId.Value}.jpeg";
-    }
-}
-
 public class UserAvatarsService : IUserAvatarsService
 {
     private readonly IPhotoStorageService photoStorageService;
@@ -28,30 +17,28 @@ public class UserAvatarsService : IUserAvatarsService
         this.dbContext = dbContext;
     }
     
-    public async Task<string> UploadAvatarAsync(UserEntity user, IFormFile avatar)
+    public async Task<Guid> UploadAvatarAsync(UserEntity user, IFormFile avatar)
     {
         if(user.AvatarId.HasValue)
             await DeleteUserAvatarAsync(user.AvatarId.Value);
         
         var avatarId = Guid.NewGuid();
 
-        var photo = await SaveAvatarAsync(avatar, avatarId);
+        await SaveAvatarAsync(avatar, avatarId);
 
         dbContext.Attach(user);
         user.AvatarId = avatarId;
         await dbContext.SaveChangesAsync();
-                    
-        return $"{avatarId.ToString()}{photo.Extension}";
+
+        return avatarId;
     }
 
-    private async Task<Domain.Photo> SaveAvatarAsync(IFormFile avatar, Guid avatarId)
+    private async Task SaveAvatarAsync(IFormFile avatar, Guid avatarId)
     {
         await using var memoryStream = new MemoryStream();
         await avatar.CopyToAsync(memoryStream);
         var photo = new Domain.Photo(memoryStream.ToArray(), avatar.ContentType);
         photoStorageService.Save(photo, avatarId);
-
-        return photo;
     }
 
     private Task DeleteUserAvatarAsync(Guid avatarId)

@@ -4,5 +4,5 @@ namespace Eventnet.Api.Services.UserAvatars;
 
 public interface IUserAvatarsService
 {
-    Task<string> UploadAvatarAsync(UserEntity user, IFormFile avatar);
+    Task<Guid> UploadAvatarAsync(UserEntity user, IFormFile avatar);
 }

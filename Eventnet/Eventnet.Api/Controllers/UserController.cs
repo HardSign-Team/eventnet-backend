@@ -1,13 +1,11 @@
-﻿using System.Text;
-using AutoMapper;
+﻿using AutoMapper;
 using Eventnet.Api.Helpers;
 using Eventnet.Api.Models;
+using Eventnet.Api.Models.Photos;
 using Eventnet.Api.Services;
 using Eventnet.Api.Services.UserAvatars;
 using Eventnet.DataAccess;
 using Eventnet.DataAccess.Entities;
-using Eventnet.Domain;
-using Eventnet.Infrastructure.PhotoServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -58,6 +56,7 @@ public class UserController : Controller
 
     [Authorize]
     [HttpPost("avatar")]
+    [Produces(typeof(string))]
     public async Task<IActionResult> UploadAvatar([FromForm] FileForm form)
     {
         var user = await currentUserService.GetCurrentUserAsync();
@@ -68,9 +67,9 @@ public class UserController : Controller
         if(SupportedContentTypes.All(x => x != form.Avatar.ContentType))
             return BadRequest("Not supported ContentType");
 
-        var avatarName = await userAvatarsService.UploadAvatarAsync(user, form.Avatar);
+        await userAvatarsService.UploadAvatarAsync(user, form.Avatar);
         
-        return Ok($"{GetBaseUrl()}{avatarName}");
+        return Ok(UserAvatarHelpers.GetUserAvatar(user));
     }
 
     [HttpGet("search/prefix/{prefix:alpha:required}")]
@@ -87,16 +86,4 @@ public class UserController : Controller
 
         return Ok(new UserNameListViewModel(result.Length, result));
     }
-    
-    private string GetBaseUrl()
-    {
-        var sb = new StringBuilder();
-        sb.Append($"{Request.Scheme}://{Request.Host.Host}");
-        if (Request.Host.Port is { } port)
-            sb.Append($":{port}");
-        sb.Append('/');
-        return sb.ToString();
-    }
 }
-
-public record FileForm(IFormFile Avatar);
