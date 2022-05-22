@@ -9,4 +9,6 @@ public class UserEntity : IdentityUser<Guid>
     public Gender Gender { get; set; }
 
     public DateTime BirthDate { get; set; }
+    
+    public Guid? AvatarId { get; set; }
 }

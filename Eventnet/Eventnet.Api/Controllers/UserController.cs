@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
 using Eventnet.Api.Helpers;
 using Eventnet.Api.Models;
+using Eventnet.Api.Models.Photos;
+using Eventnet.Api.Services;
+using Eventnet.Api.Services.UserAvatars;
 using Eventnet.DataAccess;
 using Eventnet.DataAccess.Entities;
 using Microsoft.AspNetCore.Authorization;
@@ -16,13 +19,20 @@ public class UserController : Controller
     private readonly ApplicationDbContext dbContext;
     private readonly IMapper mapper;
     private readonly UserManager<UserEntity> userManager;
+    private readonly CurrentUserService currentUserService;
+    private readonly IUserAvatarsService userAvatarsService;
+    private static readonly string[] SupportedContentTypes = { "image/bmp", "image/png", "image/jpeg" };
 
     public UserController(ApplicationDbContext dbContext, 
-        IMapper mapper, UserManager<UserEntity> userManager)
+        IMapper mapper, UserManager<UserEntity> userManager, 
+        CurrentUserService currentUserService,
+        IUserAvatarsService userAvatarsService)
     {
         this.dbContext = dbContext;
         this.mapper = mapper;
         this.userManager = userManager;
+        this.currentUserService = currentUserService;
+        this.userAvatarsService = userAvatarsService;
     }
 
     [Authorize]
@@ -42,6 +52,24 @@ public class UserController : Controller
         await dbContext.SaveChangesAsync();
 
         return Ok(mapper.Map<UserViewModel>(user));
+    }
+
+    [Authorize]
+    [HttpPost("avatar")]
+    [Produces(typeof(string))]
+    public async Task<IActionResult> UploadAvatar([FromForm] FileForm form)
+    {
+        var user = await currentUserService.GetCurrentUserAsync();
+        
+        if (user is null)
+            return NotFound();
+        
+        if(SupportedContentTypes.All(x => x != form.Avatar.ContentType))
+            return BadRequest("Not supported ContentType");
+
+        await userAvatarsService.UploadAvatarAsync(user, form.Avatar);
+        
+        return Ok(UserAvatarHelpers.GetUserAvatar(user));
     }
 
     [HttpGet("search/prefix/{prefix:alpha:required}")]

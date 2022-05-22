@@ -8,6 +8,7 @@ using Eventnet.Api.Services;
 using Eventnet.Api.Services.Filters;
 using Eventnet.Api.Services.Photo;
 using Eventnet.Api.Services.SaveServices;
+using Eventnet.Api.Services.UserAvatars;
 using Eventnet.DataAccess;
 using Eventnet.DataAccess.Entities;
 using Eventnet.Domain;
@@ -20,8 +21,18 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using SixLabors.ImageSharp.Web.Caching;
+using SixLabors.ImageSharp.Web.Commands;
+using SixLabors.ImageSharp.Web.DependencyInjection;
+using SixLabors.ImageSharp.Web.Processors;
+using SixLabors.ImageSharp.Web.Providers;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+{
+    ApplicationName = typeof(Program).Assembly.FullName,
+    ContentRootPath = Directory.GetCurrentDirectory(),
+    WebRootPath = "static"
+});
 var services = builder.Services;
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var jwtTokenConfig = builder.Configuration.GetSection("JWT").Get<JwtTokenConfig>();
@@ -59,8 +70,29 @@ services.AddSingleton<IRabbitMqMessageHandler, RabbitMqMessageHandler>();
 
 services.AddScoped<IEmailService, EmailService>();
 services.AddScoped<IForgotPasswordService, ForgotPasswordService>();
+services.AddScoped<IUserAvatarsService, UserAvatarsService>();
 
 services.AddMemoryCache();
+services.AddImageSharp()
+    .Configure<PhysicalFileSystemProviderOptions>(options =>
+    {
+        options.ProviderRootPath = "static";
+    })
+    .SetRequestParser<QueryCollectionRequestParser>()
+    .Configure<PhysicalFileSystemCacheOptions>(options =>
+    {
+        options.CacheRootPath = "static";
+        options.CacheFolder = "is-cache";
+        options.CacheFolderDepth = 8;
+    })
+    .SetCache<PhysicalFileSystemCache>()
+    .SetCacheKey<UriRelativeLowerInvariantCacheKey>()
+    .SetCacheHash<SHA256CacheHash>()
+    .AddProvider<PhysicalFileSystemProvider>()
+    .AddProcessor<ResizeWebProcessor>()
+    .AddProcessor<FormatWebProcessor>()
+    .AddProcessor<BackgroundColorWebProcessor>()
+    .AddProcessor<QualityWebProcessor>();
 
 services.AddHttpContextAccessor();
 
@@ -166,7 +198,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
+app.UseImageSharp();
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath, "static")),

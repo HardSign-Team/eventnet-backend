@@ -7,19 +7,19 @@ namespace Eventnet.Domain;
 public class Photo
 {
     private readonly byte[] rawData;
-    private readonly string extension;
+    public readonly string Extension;
 
     public Photo(byte[] rawData, string contentType)
     {
         this.rawData = rawData;
-        extension = GetFormatAndExtensionFromContentType(contentType);
+        Extension = GetFormatAndExtensionFromContentType(contentType);
     }
 
     public void Save(string path)
     {
         using var ms = new MemoryStream(rawData);
         var photo = Image.Load(ms);
-        photo.Save(path + extension);
+        photo.Save(path + Extension);
     }
 
     private static  string GetFormatAndExtensionFromContentType(string contentType)
