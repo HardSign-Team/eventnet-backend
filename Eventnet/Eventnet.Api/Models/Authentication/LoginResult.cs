@@ -2,4 +2,4 @@
 
 namespace Eventnet.Api.Models.Authentication;
 
-public record LoginResult(TokensViewModel Tokens, UserViewModel User, IList<string> UserRoles);
+public record LoginResult(JwtAuthResult Tokens, UserViewModel User, IList<string> UserRoles);
