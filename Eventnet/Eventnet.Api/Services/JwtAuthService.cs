@@ -28,7 +28,7 @@ public class JwtAuthService : IJwtAuthService
             IssuerSigningKey = new SymmetricSecurityKey(secret),
             ValidAudience = jwtTokenConfig.Audience,
             ValidateAudience = true,
-            ValidateLifetime = true,
+            ValidateLifetime = false,
             ClockSkew = TimeSpan.FromMinutes(1)
         };
     }
