@@ -38,7 +38,7 @@ public class UserController : Controller
     [Authorize]
     [HttpPut("{userId:guid}")]
     [Produces(typeof(UserViewModel))]
-    public async Task<IActionResult> UpdateUser([FromRoute] Guid userId, [FromBody] UpdateUserForm updateUserForm)
+    public async Task<IActionResult> UpdateUser(Guid userId, [FromBody] UpdateUserForm updateUserForm)
     {
         var user = await userManager.Users.FirstOrDefaultAsync(x => x.Id == userId);
         
@@ -47,8 +47,10 @@ public class UserController : Controller
 
         dbContext.Attach(user);
 
-        mapper.Map(updateUserForm, user);
-        
+        user.Gender = updateUserForm.Gender;
+        user.BirthDate = updateUserForm.BirthDate;
+        user.UserName = updateUserForm.UserName;
+
         await dbContext.SaveChangesAsync();
 
         return Ok(mapper.Map<UserViewModel>(user));
