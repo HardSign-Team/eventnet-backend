@@ -1,5 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using AutoMapper;
+﻿using AutoMapper;
 using Eventnet.Api.Models;
 using Eventnet.Api.Models.Authentication.Tokens;
 using Eventnet.Api.Services;
@@ -40,19 +39,17 @@ public class TokenController : Controller
     }
 
     [HttpPost("refresh-token")]
-    [Produces(typeof(TokensViewModel))]
+    [Produces(typeof(JwtAuthResult))]
     public IActionResult RefreshToken([FromBody] RefreshTokenRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request.AccessToken) || string.IsNullOrWhiteSpace(request.RefreshToken))
+        if (string.IsNullOrWhiteSpace(request.RefreshToken))
             return Unauthorized();
         try
         {
-            var (jwtSecurityToken, (_, tokenString, _)) =
-                jwtAuthService.Refresh(request.RefreshToken, request.AccessToken, DateTime.Now);
+            var tokens =
+                jwtAuthService.Refresh(request.RefreshToken, DateTime.Now);
 
-            return Ok(new TokensViewModel(new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
-                jwtSecurityToken.ValidTo,
-                tokenString));
+            return Ok(tokens);
         }
         catch (SecurityTokenException e)
         {

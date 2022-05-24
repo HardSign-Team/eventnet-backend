@@ -1,9 +1,6 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using AutoMapper;
+﻿using AutoMapper;
 using Eventnet.Api.Models;
 using Eventnet.Api.Models.Authentication;
-using Eventnet.Api.Models.Authentication.Tokens;
 using Eventnet.Api.Services;
 using Eventnet.DataAccess.Entities;
 using Eventnet.Domain;
@@ -64,14 +61,10 @@ public class UserAccountController : Controller
             return Unauthorized(new { Messge = "Email not confirmed" });
 
         var roles = await userManager.GetRolesAsync(user);
-        var claims = CreateClaims(user.UserName, roles);
 
-        var (jwtSecurityToken, refreshToken) = jwtAuthService.GenerateTokens(user.UserName, claims, DateTime.Now);
+        var tokens = jwtAuthService.GenerateTokens(user.UserName, DateTime.Now);
 
         var userView = mapper.Map<UserViewModel>(user);
-        var tokens = new TokensViewModel(new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
-            jwtSecurityToken.ValidTo,
-            refreshToken.TokenString);
 
         return Ok(new LoginResult(tokens,
             userView,
@@ -80,14 +73,14 @@ public class UserAccountController : Controller
 
     [Authorize]
     [HttpPost("logout")]
-    public ActionResult Logout()
+    public ActionResult Logout([FromBody] string refreshToken)
     {
         var userName = currentUserService.GetCurrentUserName();
 
         if (userName is null)
             return Unauthorized();
 
-        jwtAuthService.RemoveRefreshTokenByUserName(userName);
+        jwtAuthService.RemoveRefreshToken(refreshToken);
         return Ok();
     }
 
@@ -253,20 +246,6 @@ public class UserAccountController : Controller
             return BadRequest(result.ToString());
 
         return Ok();
-    }
-
-    private static IEnumerable<Claim> CreateClaims(string userName, IEnumerable<string> roles)
-    {
-        var authClaims = new List<Claim>
-        {
-            new(ClaimTypes.Name, userName),
-            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
-
-        authClaims.AddRange(roles
-            .Select(userRole => new Claim(ClaimTypes.Role, userRole)));
-
-        return authClaims;
     }
 
     private async Task SendEmailConfirmationMessageAsync(UserEntity user)

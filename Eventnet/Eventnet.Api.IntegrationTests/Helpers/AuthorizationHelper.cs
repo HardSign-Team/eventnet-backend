@@ -35,7 +35,7 @@ public class AuthorizationHelper
         var request = BuildRequestLogin(username, password);
         var response = await httpClient.SendAsync(request);
         var loginResult = response.ReadContentAs<LoginResult>();
-        var token = loginResult.Tokens.AccessToken;
+        var token = loginResult.Tokens.AccessToken.TokenString;
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         return httpClient;
     }

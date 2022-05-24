@@ -1,16 +1,19 @@
-﻿using System.Collections.Concurrent;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
 using Eventnet.Api.Models.Authentication.Tokens;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Eventnet.Api.Services;
 
+public record RefreshTokenInfo(string Id, string UserName, DateTime ExpiresAt)
+{
+    public bool Revoked { get; set; }
+}
+
 public class JwtAuthService : IJwtAuthService
 {
-    private readonly ConcurrentDictionary<string, RefreshToken> usersRefreshTokens = new();
+    private readonly Dictionary<string, RefreshTokenInfo> usersRefreshTokens = new();
 
     private readonly JwtTokenConfig jwtTokenConfig;
     private readonly byte[] secret;
@@ -28,61 +31,104 @@ public class JwtAuthService : IJwtAuthService
             IssuerSigningKey = new SymmetricSecurityKey(secret),
             ValidAudience = jwtTokenConfig.Audience,
             ValidateAudience = true,
-            ValidateLifetime = false,
+            ValidateLifetime = true,
             ClockSkew = TimeSpan.FromMinutes(1)
         };
     }
 
-    public JwtAuthResult GenerateTokens(string userName, IEnumerable<Claim> claims, DateTime now)
+    public JwtAuthResult GenerateTokens(string userName, DateTime now)
     {
-        var jwtToken = new JwtSecurityToken(jwtTokenConfig.Issuer,
+        var valid = now.AddMinutes(jwtTokenConfig.AccessTokenExpiration);
+        var accessClaims = new List<Claim> { new(ClaimTypes.Name, userName) };
+        var accessToken = new JwtSecurityToken(jwtTokenConfig.Issuer,
             jwtTokenConfig.Audience,
-            claims,
-            expires: now.AddMinutes(jwtTokenConfig.AccessTokenExpiration),
+            accessClaims.ToList(),
+            expires: valid,
             signingCredentials: new SigningCredentials(new SymmetricSecurityKey(secret),
                 SecurityAlgorithms.HmacSha256Signature));
 
-        var refreshToken = new RefreshToken(userName,
-            GenerateRefreshTokenString(),
-            now.AddMinutes(jwtTokenConfig.RefreshTokenExpiration));
+        var validTo = now.AddMinutes(jwtTokenConfig.RefreshTokenExpiration);
+        var refreshToken = GenerateRefreshToken(Guid.NewGuid().ToString(), userName, validTo);
 
-        usersRefreshTokens.AddOrUpdate(refreshToken.TokenString,
-            refreshToken,
-            (_, _) => refreshToken);
-
-        return new JwtAuthResult(jwtToken, refreshToken);
+        return new JwtAuthResult(
+            new AccessToken(new JwtSecurityTokenHandler().WriteToken(accessToken), valid),
+            new RefreshToken(new JwtSecurityTokenHandler().WriteToken(refreshToken), validTo));
     }
 
-    public JwtAuthResult Refresh(string refreshToken, string accessToken, DateTime now)
+    public JwtAuthResult Refresh(string refreshToken, DateTime now)
     {
-        var (principal, jwtToken) = DecodeJwtToken(accessToken);
+        var jwtToken = DecodeJwtToken(refreshToken);
 
         if (jwtToken == null || !jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256Signature))
             throw new SecurityTokenException("Invalid token");
-
-        if (!usersRefreshTokens.TryGetValue(refreshToken, out var existingRefreshToken))
-            throw new SecurityTokenException("Invalid token");
         
-        var userName = principal.Claims
-            .FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
+        if(jwtToken.ValidTo < now.ToUniversalTime())
+            throw new SecurityTokenException("Token expired");
 
-        if (existingRefreshToken.UserName != userName || existingRefreshToken.ExpireAt < now)
-            throw new SecurityTokenException("Invalid token");
+        var id = jwtToken.Id;
+        var userName = usersRefreshTokens[id].UserName;
+        var revokedUserToken = usersRefreshTokens.Values
+            .FirstOrDefault(x => x.Id == id && x.Revoked);
+        if (revokedUserToken is not null)
+        {
+            RevokeAllUserTokens(userName);
+            throw new SecurityTokenException("Forgery");
+        }
 
-        return GenerateTokens(userName, principal.Claims.ToArray(), now);
+        var token = usersRefreshTokens.Values.FirstOrDefault(x => x.Id == id && !x.Revoked);
+        if(token is null)
+            throw new SecurityTokenException("Not logged in");
+
+        token.Revoked = true;
+        
+        return GenerateTokens(userName, now);
     }
 
-    public void RemoveRefreshTokenByUserName(string userName)
+    public void RemoveRefreshToken(string refreshToken)
     {
-        var refreshTokens = usersRefreshTokens
-            .Where(x => x.Value.UserName == userName)
-            .ToList();
-
-        foreach (var refreshToken in refreshTokens)
-            usersRefreshTokens.TryRemove(refreshToken.Key, out _);
+        var jwtToken = DecodeJwtToken(refreshToken);
+        if (usersRefreshTokens.ContainsKey(jwtToken.Id))
+            usersRefreshTokens[jwtToken.Id].Revoked = true;
     }
 
-    private (ClaimsPrincipal principal, JwtSecurityToken?) DecodeJwtToken(string token)
+    private void RevokeAllUserTokens(string userName)
+    {
+        var tokens = usersRefreshTokens
+            .Where(x => x.Value.UserName == userName && !x.Value.Revoked);
+
+        foreach (var token in tokens)
+        {
+            token.Value.Revoked = true;
+            usersRefreshTokens[token.Key] = token.Value;
+        }
+    }
+
+    private JwtSecurityToken GenerateRefreshToken(string id, string userName, DateTime expireAt)
+    {
+        var claims = new List<Claim> { new(JwtRegisteredClaimNames.Jti, id) };
+        
+        var token = new JwtSecurityToken(jwtTokenConfig.Issuer,
+            jwtTokenConfig.Audience,
+            claims,
+            expires: expireAt,
+            signingCredentials: new SigningCredentials(new SymmetricSecurityKey(secret),
+                SecurityAlgorithms.HmacSha256Signature));
+        
+        var existsToken = usersRefreshTokens.Values
+            .FirstOrDefault(x => x.UserName == userName && !x.Revoked);
+        if (existsToken is not null)
+            existsToken.Revoked = true;
+        
+        var newToken = new RefreshTokenInfo(id,
+            userName,
+            expireAt);
+
+        usersRefreshTokens.Add(id, newToken);
+
+        return token;
+    }
+
+    private JwtSecurityToken? DecodeJwtToken(string token)
     {
         if (string.IsNullOrWhiteSpace(token))
             throw new SecurityTokenException("Invalid token");
@@ -92,14 +138,6 @@ public class JwtAuthService : IJwtAuthService
                 tokenValidationParameters,
                 out var validatedToken);
 
-        return (principal, validatedToken as JwtSecurityToken);
-    }
-
-    private static string GenerateRefreshTokenString()
-    {
-        var randomNumber = new byte[32];
-        using var randomNumberGenerator = RandomNumberGenerator.Create();
-        randomNumberGenerator.GetBytes(randomNumber);
-        return Convert.ToBase64String(randomNumber);
+        return validatedToken as JwtSecurityToken;
     }
 }
