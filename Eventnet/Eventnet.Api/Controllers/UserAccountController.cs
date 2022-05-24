@@ -53,8 +53,8 @@ public class UserAccountController : Controller
         if (!ModelState.IsValid)
             return UnprocessableEntity(ModelState);
 
-        var user = await userManager.FindByNameAsync(loginModel.Login)
-            ?? await userManager.FindByEmailAsync(loginModel.Login);
+        var user = await userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginModel.Login); 
+        user ??= await userManager.FindByEmailAsync(loginModel.Login);
 
         var passwordCorrect = await userManager.CheckPasswordAsync(user, loginModel.Password);
         if (user is null || !passwordCorrect)

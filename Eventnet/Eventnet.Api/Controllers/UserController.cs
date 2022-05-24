@@ -45,6 +45,11 @@ public class UserController : Controller
         if (user is null)
             return NotFound();
 
+        var conflictUser = await userManager.Users
+            .FirstOrDefaultAsync(x => x.UserName == updateUserForm.UserName);
+        if (conflictUser is not null)
+            return Conflict();
+
         dbContext.Attach(user);
 
         user.Gender = updateUserForm.Gender;
