@@ -9,10 +9,10 @@ namespace Eventnet.Api.Services.SaveServices;
 
 public class RabbitMqConsumeSaveEventService : IConsumeSaveEventService
 {
-    private readonly IRabbitMqMessageHandler rabbitMqMessageHandler;
     private readonly IModel channel;
     private readonly IConnection connection;
     private readonly string queue;
+    private readonly IRabbitMqMessageHandler rabbitMqMessageHandler;
 
     public RabbitMqConsumeSaveEventService(RabbitMqConfig config, IRabbitMqMessageHandler rabbitMqMessageHandler)
     {

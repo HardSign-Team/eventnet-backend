@@ -6,6 +6,5 @@ public class PublishEventSaveService : EventPublisher, IPublishEventSaveService
 {
     public PublishEventSaveService(RabbitMqConfig config) : base(config.QueueEventSave, config.HostName, config.Port)
     {
-        
     }
 }

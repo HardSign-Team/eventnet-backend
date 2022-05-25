@@ -8,7 +8,7 @@ public class BackgroundConsumeUpdateEventService : BackgroundService
     {
         this.consumeUpdateEventService = consumeUpdateEventService;
     }
-    
+
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
         stoppingToken.ThrowIfCancellationRequested();

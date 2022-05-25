@@ -9,10 +9,10 @@ namespace Eventnet.Api.Services.UpdateServices;
 
 public class ConsumeUpdateEventService : IConsumeUpdateEventService
 {
-    private readonly IRabbitMqMessageUpdateHandler rabbitMqMessageUpdateHandler;
     private readonly IModel channel;
     private readonly IConnection connection;
     private readonly string queue;
+    private readonly IRabbitMqMessageUpdateHandler rabbitMqMessageUpdateHandler;
 
     public ConsumeUpdateEventService(RabbitMqConfig config, IRabbitMqMessageUpdateHandler rabbitMqMessageUpdateHandler)
     {
@@ -23,7 +23,7 @@ public class ConsumeUpdateEventService : IConsumeUpdateEventService
         channel = connection.CreateModel();
         channel.QueueDeclare(queue, true, false, false);
     }
-    
+
     public void ConsumeAndHandle()
     {
         var consumer = new EventingBasicConsumer(channel);
@@ -37,7 +37,7 @@ public class ConsumeUpdateEventService : IConsumeUpdateEventService
 
         channel.BasicConsume(queue, false, consumer);
     }
-    
+
     public void Dispose()
     {
         channel.Close();

@@ -6,9 +6,9 @@ namespace Eventnet.Api.Services.SaveServices;
 public abstract class EventPublisher : IDisposable
 {
     private readonly IModel channel;
-    private readonly string queue;
     private readonly IConnection connection;
-    
+    private readonly string queue;
+
     protected EventPublisher(string queueName, string hostName, int port)
     {
         queue = queueName;
@@ -17,7 +17,13 @@ public abstract class EventPublisher : IDisposable
         channel = connection.CreateModel();
         channel.QueueDeclare(queue, true, false, false);
     }
-    
+
+    public void Dispose()
+    {
+        channel.Dispose();
+        connection.Dispose();
+    }
+
     public async Task PublishAsync(string message)
     {
         await Task.Run(() =>
@@ -26,11 +32,5 @@ public abstract class EventPublisher : IDisposable
             properties.Persistent = false;
             channel.BasicPublish("", queue, null, Encoding.UTF8.GetBytes(message));
         });
-    }
-
-    public void Dispose()
-    {
-        channel.Dispose();
-        connection.Dispose();
     }
 }

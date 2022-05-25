@@ -8,6 +8,7 @@ public class PhotosDbService : IPhotosDbService
 {
     private readonly ApplicationDbContext dbContext;
     private readonly IPhotoStorageService storageService;
+
     public PhotosDbService(
         IPhotoStorageService storageService,
         ApplicationDbContext dbContext)
@@ -15,7 +16,7 @@ public class PhotosDbService : IPhotosDbService
         this.storageService = storageService;
         this.dbContext = dbContext;
     }
-    
+
     public async Task SavePhotosAsync(List<Photo> photos, Guid eventId)
     {
         foreach (var photo in photos)
@@ -35,9 +36,7 @@ public class PhotosDbService : IPhotosDbService
         dbContext.Photos.RemoveRange(photosToDelete);
         await dbContext.SaveChangesAsync();
         foreach (var guid in guidsToDelete)
-        {
             storageService.Delete(guid);
-        }
     }
 
     private async Task SavePhotoToDbAsync(PhotoEntity photoEntity)

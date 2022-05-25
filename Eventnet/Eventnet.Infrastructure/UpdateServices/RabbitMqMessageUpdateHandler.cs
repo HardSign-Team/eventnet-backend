@@ -7,13 +7,13 @@ namespace Eventnet.Infrastructure.UpdateServices;
 
 public class RabbitMqMessageUpdateHandler : IRabbitMqMessageUpdateHandler
 {
-    private readonly IPhotoValidator photoValidator;
     private readonly IEventValidator eventValidator;
-    private readonly IServiceScopeFactory serviceScopeFactory;
+    private readonly IPhotoValidator photoValidator;
     private readonly RabbitMqMessageHandlerHelper rabbitMqMessageHandlerHelper;
+    private readonly IServiceScopeFactory serviceScopeFactory;
 
     public RabbitMqMessageUpdateHandler(
-        IPhotoValidator photoValidator, 
+        IPhotoValidator photoValidator,
         IEventValidator eventValidator,
         IServiceScopeFactory serviceScopeFactory)
     {
@@ -22,24 +22,18 @@ public class RabbitMqMessageUpdateHandler : IRabbitMqMessageUpdateHandler
         this.eventValidator = eventValidator;
         this.serviceScopeFactory = serviceScopeFactory;
     }
-    
+
     public async Task UpdateAsync(RabbitMqUpdateMessage rabbitMqMessageSave)
     {
         var (eventId, info, binaryPhotos, guidsToDelete) = rabbitMqMessageSave;
         if (binaryPhotos.Count > 0)
-        {
             await AddPhotosHandle(binaryPhotos, eventId);
-        }
 
         if (info is not null)
-        {
             await UpdateEvent(info);
-        }
 
         if (guidsToDelete.Length > 0)
-        {
             await DeletePhotos(guidsToDelete);
-        }
     }
 
     private async Task AddPhotosHandle(List<RabbitMqPhoto> binaryPhotos, Guid eventId)

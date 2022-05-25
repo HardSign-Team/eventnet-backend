@@ -8,7 +8,7 @@ public class BackgroundConsumeSaveEventService : BackgroundService
     {
         this.consumeSaveEventService = consumeSaveEventService;
     }
-    
+
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
         stoppingToken.ThrowIfCancellationRequested();

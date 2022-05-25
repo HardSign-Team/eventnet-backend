@@ -13,7 +13,7 @@ public class UpdateEventService : IUpdateEventService
     {
         this.publishEventUpdateService = publishEventUpdateService;
     }
-    
+
     public async Task SendEventForUpdate(EventInfo eventForUpdate)
     {
         var photos = new List<RabbitMqPhoto>();
@@ -30,7 +30,7 @@ public class UpdateEventService : IUpdateEventService
         var message = JsonSerializer.Serialize(rabbitMqUpdateMessage);
         await publishEventUpdateService.PublishAsync(message);
     }
-    
+
     private static async Task<List<RabbitMqPhoto>> GetRabbitMqPhotosAsync(IFormFile[] photos)
     {
         var rabbitMqPhoto = new List<RabbitMqPhoto>();
