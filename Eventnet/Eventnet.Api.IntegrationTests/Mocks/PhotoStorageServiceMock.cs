@@ -13,4 +13,8 @@ public class PhotoStorageServiceMock : IPhotoStorageService
     }
 
     public string GetPhotoPath(Guid arg) => arg.ToString();
+    public void Delete(Guid photoId)
+    {
+        Thread.Sleep(100);
+    }
 }
