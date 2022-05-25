@@ -2,23 +2,23 @@
 
 public class BackgroundConsumeUpdateEventService : BackgroundService
 {
-    private readonly IConsumeEventUpdateService consumeEventUpdateService;
+    private readonly IConsumeUpdateEventService consumeUpdateEventService;
 
-    public BackgroundConsumeUpdateEventService(IConsumeEventUpdateService consumeEventUpdateService)
+    public BackgroundConsumeUpdateEventService(IConsumeUpdateEventService consumeUpdateEventService)
     {
-        this.consumeEventUpdateService = consumeEventUpdateService;
+        this.consumeUpdateEventService = consumeUpdateEventService;
     }
     
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
         stoppingToken.ThrowIfCancellationRequested();
-        consumeEventUpdateService.ConsumeAndHandle();
+        consumeUpdateEventService.ConsumeAndHandle();
         return Task.CompletedTask;
     }
 
     public override void Dispose()
     {
-        consumeEventUpdateService.Dispose();
+        consumeUpdateEventService.Dispose();
         base.Dispose();
     }
 }

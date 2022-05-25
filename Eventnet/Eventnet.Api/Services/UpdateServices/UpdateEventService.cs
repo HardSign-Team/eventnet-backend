@@ -5,11 +5,11 @@ using Eventnet.Infrastructure.UpdateServices;
 
 namespace Eventnet.Api.Services.UpdateServices;
 
-public class EventUpdateService : IEventUpdateService
+public class UpdateEventService : IUpdateEventService
 {
-    private readonly IPublishEventUpdateService publishEventUpdateService;
+    private readonly IPublishUpdateEventService publishEventUpdateService;
 
-    public EventUpdateService(IPublishEventUpdateService publishEventUpdateService)
+    public UpdateEventService(IPublishUpdateEventService publishEventUpdateService)
     {
         this.publishEventUpdateService = publishEventUpdateService;
     }

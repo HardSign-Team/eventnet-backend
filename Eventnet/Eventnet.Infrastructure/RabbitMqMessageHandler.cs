@@ -24,9 +24,9 @@ public class RabbitMqMessageHandler : IRabbitMqMessageHandler
         this.serviceScopeFactory = serviceScopeFactory;
     }
 
-    public async Task HandleAsync(RabbitMqMessage rabbitMqMessage)
+    public async Task HandleAsync(RabbitMqSaveMessage rabbitMqSaveMessage)
     {
-        var (eventForSave, binaryPhotos) = rabbitMqMessage;
+        var (eventForSave, binaryPhotos) = rabbitMqSaveMessage;
         var errorMessage = string.Empty;
         EventSaveStatus status;
         try

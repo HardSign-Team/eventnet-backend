@@ -2,7 +2,7 @@
 
 namespace Eventnet.Api.Services.UpdateServices;
 
-public interface IEventUpdateService
+public interface IUpdateEventService
 {
     Task SendEventForUpdate(EventInfo eventForUpdate);
     Task SendPhotosForUpdate(Guid eventId, IFormFile[] newPhotos, Guid[] idToDelete);

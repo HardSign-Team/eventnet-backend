@@ -1,6 +1,6 @@
 ﻿namespace Eventnet.Api.Services.UpdateServices;
 
-public interface IPublishEventUpdateService
+public interface IPublishUpdateEventService
 {
     Task PublishAsync(string message);
 }

@@ -7,14 +7,14 @@ using RabbitMQ.Client.Events;
 
 namespace Eventnet.Api.Services.SaveServices;
 
-public class RabbitMqConsumeEventService : IConsumeEventService
+public class RabbitMqConsumeSaveEventService : IConsumeSaveEventService
 {
     private readonly IRabbitMqMessageHandler rabbitMqMessageHandler;
     private readonly IModel channel;
     private readonly IConnection connection;
     private readonly string queue;
 
-    public RabbitMqConsumeEventService(RabbitMqConfig config, IRabbitMqMessageHandler rabbitMqMessageHandler)
+    public RabbitMqConsumeSaveEventService(RabbitMqConfig config, IRabbitMqMessageHandler rabbitMqMessageHandler)
     {
         this.rabbitMqMessageHandler = rabbitMqMessageHandler;
         queue = config.QueueEventSave;
@@ -30,7 +30,7 @@ public class RabbitMqConsumeEventService : IConsumeEventService
         consumer.Received += async (_, ea) =>
         {
             var content = Encoding.UTF8.GetString(ea.Body.ToArray());
-            var message = JsonSerializer.Deserialize<RabbitMqMessage>(content);
+            var message = JsonSerializer.Deserialize<RabbitMqSaveMessage>(content);
             await rabbitMqMessageHandler.HandleAsync(message!);
             channel.BasicAck(ea.DeliveryTag, false);
         };

@@ -31,7 +31,7 @@ public class EventController : Controller
     private readonly ApplicationDbContext dbContext;
     private readonly UserManager<UserEntity> userManager;
     private readonly IEventSaveService eventSaveService;
-    private readonly IEventUpdateService eventUpdateService;
+    private readonly IUpdateEventService updateEventService;
     private readonly CurrentUserService currentUserService;
     private readonly LinkGenerator linkGenerator;
     private readonly EventsFilterService eventsFilterService;
@@ -43,7 +43,7 @@ public class EventController : Controller
         UserManager<UserEntity> userManager,
         IMapper mapper,
         IEventSaveService eventSaveService,
-        IEventUpdateService eventUpdateService,
+        IUpdateEventService updateEventService,
         CurrentUserService currentUserService,
         LinkGenerator linkGenerator,
         EventsFilterService eventsFilterService,
@@ -53,7 +53,7 @@ public class EventController : Controller
         this.userManager = userManager;
         this.mapper = mapper;
         this.eventSaveService = eventSaveService;
-        this.eventUpdateService = eventUpdateService;
+        this.updateEventService = updateEventService;
         this.currentUserService = currentUserService;
         this.linkGenerator = linkGenerator;
         this.eventsFilterService = eventsFilterService;
@@ -220,7 +220,7 @@ public class EventController : Controller
         if (!ModelState.IsValid)
             return UnprocessableEntity(ModelState);
         var eventForSave = mapper.Map<EventInfo>(updatedEvent) with { OwnerId = user.Id };
-        await eventUpdateService.SendEventForUpdate(eventForSave);
+        await updateEventService.SendEventForUpdate(eventForSave);
         return Accepted();
     }
 
@@ -239,7 +239,7 @@ public class EventController : Controller
             return NotFound();
         }
         
-        await eventUpdateService.SendPhotosForUpdate(eventId,
+        await updateEventService.SendPhotosForUpdate(eventId,
             photosUpdateModel.NewPhotos ?? Array.Empty<IFormFile>(),
             photosUpdateModel.PhotosIdToDelete ?? Array.Empty<Guid>());
         return Accepted();

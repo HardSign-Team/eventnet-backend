@@ -22,7 +22,7 @@ public class EventSaveService : IEventSaveService
         try
         {
             var rabbitMqPhotos = await GetRabbitMqPhotosAsync(photos);
-            var message = JsonSerializer.Serialize(new RabbitMqMessage(eventForSave, rabbitMqPhotos));
+            var message = JsonSerializer.Serialize(new RabbitMqSaveMessage(eventForSave, rabbitMqPhotos));
             await publishEventSaveService.PublishAsync(message);
         }
         catch (Exception e)

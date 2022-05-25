@@ -7,14 +7,14 @@ using RabbitMQ.Client.Events;
 
 namespace Eventnet.Api.Services.UpdateServices;
 
-public class ConsumeEventUpdateService : IConsumeEventUpdateService
+public class ConsumeUpdateEventService : IConsumeUpdateEventService
 {
     private readonly IRabbitMqMessageUpdateHandler rabbitMqMessageUpdateHandler;
     private readonly IModel channel;
     private readonly IConnection connection;
     private readonly string queue;
 
-    public ConsumeEventUpdateService(RabbitMqConfig config, IRabbitMqMessageUpdateHandler rabbitMqMessageUpdateHandler)
+    public ConsumeUpdateEventService(RabbitMqConfig config, IRabbitMqMessageUpdateHandler rabbitMqMessageUpdateHandler)
     {
         this.rabbitMqMessageUpdateHandler = rabbitMqMessageUpdateHandler;
         queue = config.QueueEventUpdate;
