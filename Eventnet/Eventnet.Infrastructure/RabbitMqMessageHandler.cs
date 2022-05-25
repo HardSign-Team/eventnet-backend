@@ -1,5 +1,6 @@
 ﻿using Eventnet.Domain;
 using Eventnet.Domain.Events;
+using Eventnet.Infrastructure.PhotoServices;
 using Eventnet.Infrastructure.Validators;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -52,8 +53,10 @@ public class RabbitMqMessageHandler : IRabbitMqMessageHandler
     private async Task SaveEventAsync(EventInfo info, List<Photo> photos)
     {
         using var scope = serviceScopeFactory.CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<ISaveToDbService>();
-        await service.SaveEventAsync(info);
-        await service.SavePhotosAsync(photos, info.EventId);
+        var eventInfoService = scope.ServiceProvider.GetRequiredService<IEventSaveToDbService>();
+        await eventInfoService.SaveEventAsync(info);
+
+        var photosService = scope.ServiceProvider.GetRequiredService<IPhotosDbService>();
+        await photosService.SavePhotosAsync(photos, info.EventId);
     }
 }
