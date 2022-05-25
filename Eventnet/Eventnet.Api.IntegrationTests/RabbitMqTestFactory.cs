@@ -34,7 +34,8 @@ public class RabbitMqTestFactory<TStartup> : WebApplicationFactory<TStartup> whe
             var testRabbitMqConfig = new RabbitMqConfig
             {
                 HostName = "localhost",
-                Queue = "MyTestQueue",
+                QueueEventSave = "SaveTestQueue",
+                QueueEventUpdate = "UpdateTestQueue",
                 Port = 5672,
                 RecommendedMessageSizeInBytes = 128 * 1024 * 1024
             };
