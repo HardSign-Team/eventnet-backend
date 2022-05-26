@@ -29,7 +29,7 @@ public static class FixtureExtensions
         return fixture.Build<Event>().With(x => x.EndDate, endDate).Create();
     }
 
-    public static Event CreateEventWithOwner(this Fixture fixture, string ownerId)
+    public static Event CreateEventWithOwner(this Fixture fixture, Guid ownerId)
     {
         return fixture.Build<Event>().With(x => x.OwnerId, ownerId).Create();
     }

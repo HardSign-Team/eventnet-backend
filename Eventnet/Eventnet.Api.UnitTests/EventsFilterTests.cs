@@ -87,17 +87,18 @@ public class EventsFilterTests
     public void Filter_ShouldFilterByOwner()
     {
         var fixture = new Fixture();
+        var ownerId = Guid.NewGuid();
         var events = new[]
         {
-            fixture.CreateEventWithOwner("A"),
-            fixture.CreateEventWithOwner("A"),
-            fixture.CreateEventWithOwner("A"),
-            fixture.CreateEventWithOwner("B"),
-            fixture.CreateEventWithOwner("AB")
+            fixture.CreateEventWithOwner(ownerId),
+            fixture.CreateEventWithOwner(ownerId),
+            fixture.CreateEventWithOwner(ownerId),
+            fixture.CreateEventWithOwner(Guid.NewGuid()),
+            fixture.CreateEventWithOwner(Guid.NewGuid())
         };
         var filterModel = new EventsFilterModel
         {
-            Owner = new OwnerFilterModel("A")
+            Owner = new OwnerFilterModel(ownerId)
         };
         var sut = CreateDefaultService(filterModel);
 
