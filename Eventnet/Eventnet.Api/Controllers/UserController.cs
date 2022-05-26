@@ -80,7 +80,7 @@ public class UserController : Controller
 
         await userAvatarsService.UploadAvatarAsync(user, form.Avatar);
 
-        return Ok(UserAvatarHelpers.GetUserAvatar(user));
+        return Ok(UserAvatarHelpers.GetUserAvatar(user.AvatarId));
     }
 
     [HttpGet("search/prefix/{prefix:alpha:required}")]

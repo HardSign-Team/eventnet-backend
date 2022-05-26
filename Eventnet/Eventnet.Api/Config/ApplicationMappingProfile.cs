@@ -23,7 +23,7 @@ public class ApplicationMappingProfile : Profile
         CreateMap<UserEntity, UserViewModel>()
             .ForMember(x => x.AvatarUrl,
                 opt => 
-                    opt.MapFrom(x => UserAvatarHelpers.GetUserAvatar(x)));
+                    opt.MapFrom(x => UserAvatarHelpers.GetUserAvatar(x.AvatarId)));
         CreateMap<UpdateUserForm, UserEntity>();
         CreateMap<RegisterModel, UserEntity>()
             .ForSourceMember(x => x.Password,
