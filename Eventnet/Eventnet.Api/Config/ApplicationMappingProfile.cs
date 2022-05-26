@@ -35,7 +35,7 @@ public class ApplicationMappingProfile : Profile
         CreateMap<EventEntity, Event>();
         CreateMap<EventEntity, EventViewModel>()
             .ForMember(x => x.TotalSubscriptions,
-                expression => expression.MapFrom(x => x.Subscriptions.Count))
+                expression => expression.MapFrom(x => x.Subscriptions.ToList().Count))
             .ForMember(x => x.Marks,
                 e =>
                     e.MapFrom(x => new MarksCountViewModel(x.Marks.Count(mark => mark.IsLike),
