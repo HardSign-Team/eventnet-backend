@@ -85,6 +85,23 @@ public class EventController : Controller
             .ToListAsync();
         return Ok(viewModels);
     }
+    
+    [Authorize]
+    [HttpGet("my")]
+    [Produces(typeof(List<EventViewModel>))]
+    public async Task<IActionResult> GetUserEvents()
+    {
+        var user = await currentUserService.GetCurrentUserAsync();
+        if (user is null)
+            return Unauthorized();
+        
+        var viewModels = await dbContext.Events
+            .ProjectTo<EventViewModel>(mapper.ConfigurationProvider)
+            .AsNoTracking()
+            .Where(x => x.OwnerId == user.Id)
+            .ToListAsync();
+        return Ok(viewModels);
+    }
 
     [HttpGet("search/name/{eventName}")]
     [Produces(typeof(List<EventNameViewModel>))]
