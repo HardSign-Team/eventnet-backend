@@ -23,8 +23,10 @@ public class UserController : Controller
     private readonly IUserAvatarsService userAvatarsService;
     private static readonly string[] SupportedContentTypes = { "image/bmp", "image/png", "image/jpeg" };
 
-    public UserController(ApplicationDbContext dbContext, 
-        IMapper mapper, UserManager<UserEntity> userManager, 
+    public UserController(
+        ApplicationDbContext dbContext,
+        IMapper mapper,
+        UserManager<UserEntity> userManager,
         CurrentUserService currentUserService,
         IUserAvatarsService userAvatarsService)
     {
@@ -41,12 +43,14 @@ public class UserController : Controller
     public async Task<IActionResult> UpdateUser(Guid userId, [FromBody] UpdateUserForm updateUserForm)
     {
         var user = await userManager.Users.FirstOrDefaultAsync(x => x.Id == userId);
-        
+
         if (user is null)
             return NotFound();
 
-        var conflictUser = await userManager.Users
-            .FirstOrDefaultAsync(x => x.UserName == updateUserForm.UserName);
+        var conflictUser = user.UserName != updateUserForm.UserName
+            ? await userManager.Users
+                .FirstOrDefaultAsync(x => x.UserName == updateUserForm.UserName)
+            : null;
         if (conflictUser is not null)
             return Conflict();
 
@@ -67,15 +71,15 @@ public class UserController : Controller
     public async Task<IActionResult> UploadAvatar([FromForm] FileForm form)
     {
         var user = await currentUserService.GetCurrentUserAsync();
-        
+
         if (user is null)
             return NotFound();
-        
-        if(SupportedContentTypes.All(x => x != form.Avatar.ContentType))
+
+        if (SupportedContentTypes.All(x => x != form.Avatar.ContentType))
             return BadRequest("Not supported ContentType");
 
         await userAvatarsService.UploadAvatarAsync(user, form.Avatar);
-        
+
         return Ok(UserAvatarHelpers.GetUserAvatar(user));
     }
 
