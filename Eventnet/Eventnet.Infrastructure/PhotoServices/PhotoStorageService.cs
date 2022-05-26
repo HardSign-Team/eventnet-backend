@@ -8,9 +8,7 @@ public class PhotoStorageService : IPhotoStorageService
 
     public PhotoStorageService(PhotoStorageConfig config)
     {
-        if (!Directory.Exists(config.Path))
-            Directory.CreateDirectory(config.Path);
-        //    throw new DirectoryNotFoundException($"Directory {config.Path} not found");
+        Directory.CreateDirectory(config.Path);
         dirToSave = config.Path;
     }
 

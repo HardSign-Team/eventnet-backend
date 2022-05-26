@@ -9,5 +9,5 @@ public record UpdateEventModel(
     [Required] string Name,
     [Required] string Description,
     [Required] [Range(-90, 90)] double Longitude,
-    [Required] [Range(-90, 90)] double Latitude,
+    [Required] [Range(-180, 180)] double Latitude,
     string[]? Tags);

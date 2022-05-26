@@ -198,6 +198,8 @@ public class EventController : Controller
     [Produces("application/json-patch+json", "application/xml")]
     public async Task<IActionResult> UpdateEvent(Guid eventId, [FromBody] JsonPatchDocument<UpdateEventModel> updatePatchModel)
     {
+        if (!ModelState.IsValid)
+            return UnprocessableEntity(ModelState);
         var user = await currentUserService.GetCurrentUserAsync();
         if (user is null)
             return Unauthorized();
@@ -217,8 +219,6 @@ public class EventController : Controller
         updatePatchModel.ApplyTo(updatedEvent);
         TryValidateModel(updatedEvent);
         
-        if (!ModelState.IsValid)
-            return UnprocessableEntity(ModelState);
         var eventForSave = mapper.Map<EventInfo>(updatedEvent) with { OwnerId = user.Id };
         await updateEventService.SendEventForUpdate(eventForSave);
         return Accepted();
@@ -229,16 +229,13 @@ public class EventController : Controller
     public async Task<IActionResult> UpdatePhotos(Guid eventId, [FromForm] PhotosUpdateModel photosUpdateModel)
     {
         if (photosUpdateModel.NewPhotos is null && photosUpdateModel.PhotosIdToDelete is null)
-        {
             return BadRequest("Send values to update");
-        }
+        
         
         var repoEvent = await dbContext.Events.FirstOrDefaultAsync(e => e.Id == eventId);
         if (repoEvent is null)
-        {
             return NotFound();
-        }
-        
+
         await updateEventService.SendPhotosForUpdate(eventId,
             photosUpdateModel.NewPhotos ?? Array.Empty<IFormFile>(),
             photosUpdateModel.PhotosIdToDelete ?? Array.Empty<Guid>());

@@ -30,7 +30,7 @@ public abstract class EventPublisher : IDisposable
         {
             var properties = channel.CreateBasicProperties();
             properties.Persistent = false;
-            channel.BasicPublish("", queue, null, Encoding.UTF8.GetBytes(message));
+            channel.BasicPublish(string.Empty, queue, null, Encoding.UTF8.GetBytes(message));
         });
     }
 }
