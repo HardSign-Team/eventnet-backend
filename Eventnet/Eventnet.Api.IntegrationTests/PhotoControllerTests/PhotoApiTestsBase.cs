@@ -16,19 +16,13 @@ public class PhotoApiTestsBase : TestsBase
         Path = $"{BaseRoute}/{eventId}"
     }.Uri;
 
-    protected Uri BuildGetTitlePhotos(Guid[] eventIds) => BuildGetTitlePhotosUri(
-        Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new EventIdsListModel(eventIds)))));
+    protected Uri BuildGetTitlePhotos() => BuildGetTitlePhotosUri();
 
-    protected Uri BuildGetTitlePhotosUri(string base64EventIds)
+    protected Uri BuildGetTitlePhotosUri()
     {
-        var qb = new QueryBuilder
-        {
-            { "events", base64EventIds }
-        };
         var builder = new UriBuilder(Configuration.BaseUrl)
         {
             Path = $"{BaseRoute}/title",
-            Query = qb.ToString()
         };
         return builder.Uri;
     }
