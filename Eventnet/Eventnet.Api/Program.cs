@@ -205,13 +205,13 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = "/static"
 });
 
-if (app.Environment.IsProduction())
-{
-    using var scope = app.Services.CreateScope();
-    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    if (context.Database.GetPendingMigrations().Any())
-        context.Database.Migrate();
-}
+// if (app.Environment.IsProduction())
+// {
+//     using var scope = app.Services.CreateScope();
+//     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+//     if (context.Database.GetPendingMigrations().Any())
+//         context.Database.Migrate();
+// }
 
 app.Run();
 

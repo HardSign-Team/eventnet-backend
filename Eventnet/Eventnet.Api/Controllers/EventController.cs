@@ -69,10 +69,9 @@ public class EventController : Controller
         return Ok(entity);
     }
 
-    [HttpGet("full")]
+    [HttpPost("full")]
     [Produces(typeof(List<EventViewModel>))]
-    public async Task<IActionResult> GetEventsByIds(
-        [FromQuery(Name = "events")] [ModelBinder] EventIdsListModel? listModel)
+    public async Task<IActionResult> GetEventsByIds([FromBody] EventIdsListModel? listModel)
     {
         if (listModel is null)
             return BadRequest($"{nameof(listModel)} was null");

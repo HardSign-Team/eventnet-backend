@@ -24,19 +24,11 @@ public abstract class EventApiTestsBase : TestsBase
         return uriBuilder.Uri;
     }
 
-    protected Uri BuildEventsByIdsUri(Guid[] guids)
+    protected Uri BuildEventsByIdsUri()
     {
-        var model = new EventIdsListModel(guids);
-        var qb = new QueryBuilder
-        {
-            {
-                "events", Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(model)))
-            }
-        };
         var uriBuilder = new UriBuilder(Configuration.BaseUrl)
         {
             Path = $"{BaseRoute}/full",
-            Query = qb.ToString()
         };
         return uriBuilder.Uri;
     }
