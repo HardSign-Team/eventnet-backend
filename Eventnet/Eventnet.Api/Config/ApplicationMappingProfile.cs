@@ -22,7 +22,7 @@ public class ApplicationMappingProfile : Profile
         CreateProjection<UserEntity, UserNameModel>();
         CreateMap<UserEntity, UserViewModel>()
             .ForMember(x => x.AvatarUrl,
-                opt => 
+                opt =>
                     opt.MapFrom(x => UserAvatarHelpers.GetUserAvatar(x)));
         CreateMap<UpdateUserForm, UserEntity>();
         CreateMap<RegisterModel, UserEntity>()
@@ -45,14 +45,11 @@ public class ApplicationMappingProfile : Profile
         CreateMap<Event, EventEntity>();
         CreateMap<EventName, EventNameViewModel>();
         CreateMap<CreateEventModel, EventInfo>()
-            .ForMember(x => x.Tags, opt => opt.MapFrom(
-                src => src.Tags ?? Array.Empty<string>()))
+            .ForMember(x => x.Tags, opt => opt.MapFrom(src => src.Tags ?? Array.Empty<string>()))
             .ForMember(x => x.Location,
-                opt => opt.MapFrom(
-                    src => new Location(src.Latitude, src.Longitude)))
+                opt => opt.MapFrom(src => new Location(src.Latitude, src.Longitude)))
             .ForMember(x => x.OwnerId,
-                opt => opt.MapFrom(
-                    x => Guid.Empty));
+                opt => opt.MapFrom(x => Guid.Empty));
     }
 
     private void CreateTagsMap()

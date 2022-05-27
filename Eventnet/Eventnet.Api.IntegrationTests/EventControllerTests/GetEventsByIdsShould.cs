@@ -21,7 +21,7 @@ public class GetEventsByIdsShould : EventApiTestsBase
         var guids = new[] { Guid.Empty };
 
         var response = await PostAsync(guids);
-        
+
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var result = response.ReadContentAs<List<EventViewModel>>();
         result.Should().BeEmpty();
@@ -62,7 +62,7 @@ public class GetEventsByIdsShould : EventApiTestsBase
             context.AddEvents(context.Users);
         });
     }
-    
+
     private async Task<HttpResponseMessage> PostAsync(Guid[] guids)
     {
         var request = new HttpRequestMessage();
@@ -70,7 +70,6 @@ public class GetEventsByIdsShould : EventApiTestsBase
         request.RequestUri = BuildEventsByIdsUri();
         request.Headers.Add("Accept", "application/json");
 
-        
-        return await HttpClient.PostAsJsonAsync(request.RequestUri, new EventIdsListModel(guids));   
+        return await HttpClient.PostAsJsonAsync(request.RequestUri, new EventIdsListModel(guids));
     }
 }

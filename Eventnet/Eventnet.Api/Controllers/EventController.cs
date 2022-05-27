@@ -84,7 +84,7 @@ public class EventController : Controller
             .ToListAsync();
         return Ok(viewModels);
     }
-    
+
     [Authorize]
     [HttpGet("my")]
     [Produces(typeof(List<EventViewModel>))]
@@ -93,7 +93,7 @@ public class EventController : Controller
         var user = await currentUserService.GetCurrentUserAsync();
         if (user is null)
             return Unauthorized();
-        
+
         var viewModels = await dbContext.Events
             .ProjectTo<EventViewModel>(mapper.ConfigurationProvider)
             .AsNoTracking()
@@ -150,7 +150,7 @@ public class EventController : Controller
     [HttpGet("request-event-creation")]
     [Produces(typeof(Guid))]
     public IActionResult RequestEventCreation() => Ok(Guid.NewGuid());
-    
+
     [Authorize]
     [HttpPost]
     public async Task<IActionResult> CreateEvent([FromForm] CreateEventModel? createModel)
@@ -160,11 +160,11 @@ public class EventController : Controller
 
         if (!ModelState.IsValid)
             return UnprocessableEntity(ModelState);
-        
+
         var user = await currentUserService.GetCurrentUserAsync();
         if (user is null)
             return Unauthorized();
-        
+
         var photos = createModel.Photos ?? Array.Empty<IFormFile>();
         if (!IsContentTypesSupported(photos))
             return BadRequest("Not supported ContentType");
@@ -218,7 +218,6 @@ public class EventController : Controller
 
         return Ok(eventId);
     }
-
 
     private static bool IsContentTypesSupported(IFormFile[] files)
     {

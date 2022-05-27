@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Text;
 using Eventnet.Api.IntegrationTests.Helpers;
-using Eventnet.Api.Models.Events;
-using Microsoft.AspNetCore.Http.Extensions;
-using Newtonsoft.Json;
 
 namespace Eventnet.Api.IntegrationTests.PhotoControllerTests;
 
@@ -22,7 +18,7 @@ public class PhotoApiTestsBase : TestsBase
     {
         var builder = new UriBuilder(Configuration.BaseUrl)
         {
-            Path = $"{BaseRoute}/title",
+            Path = $"{BaseRoute}/title"
         };
         return builder.Uri;
     }

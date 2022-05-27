@@ -22,7 +22,7 @@ public class GetTitlePhotosShould : PhotoApiTestsBase
     {
         FillDatabase();
         var eventIds = ApplyToDb(context => context.Events.Take(3).Select(ev => ev.Id).ToArray());
-        
+
         var response = await PostAsync(eventIds);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);

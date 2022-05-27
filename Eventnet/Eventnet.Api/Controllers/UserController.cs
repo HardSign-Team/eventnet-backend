@@ -16,12 +16,12 @@ namespace Eventnet.Api.Controllers;
 [Route("api/users")]
 public class UserController : Controller
 {
+    private static readonly string[] SupportedContentTypes = { "image/bmp", "image/png", "image/jpeg" };
     private readonly ApplicationDbContext dbContext;
     private readonly IMapper mapper;
     private readonly UserManager<UserEntity> userManager;
     private readonly CurrentUserService currentUserService;
     private readonly IUserAvatarsService userAvatarsService;
-    private static readonly string[] SupportedContentTypes = { "image/bmp", "image/png", "image/jpeg" };
 
     public UserController(
         ApplicationDbContext dbContext,

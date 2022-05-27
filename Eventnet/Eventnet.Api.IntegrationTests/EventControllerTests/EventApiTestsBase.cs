@@ -2,7 +2,6 @@
 using System.Text;
 using System.Web;
 using Eventnet.Api.IntegrationTests.Helpers;
-using Eventnet.Api.Models.Events;
 using Eventnet.Api.Models.Filtering;
 using Microsoft.AspNetCore.Http.Extensions;
 using Newtonsoft.Json;
@@ -28,7 +27,7 @@ public abstract class EventApiTestsBase : TestsBase
     {
         var uriBuilder = new UriBuilder(Configuration.BaseUrl)
         {
-            Path = $"{BaseRoute}/full",
+            Path = $"{BaseRoute}/full"
         };
         return uriBuilder.Uri;
     }

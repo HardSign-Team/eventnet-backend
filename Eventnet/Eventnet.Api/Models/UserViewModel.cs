@@ -1,4 +1,5 @@
 ﻿using Eventnet.DataAccess.Models;
+
 #pragma warning disable CS8618
 
 namespace Eventnet.Api.Models;
