@@ -19,8 +19,8 @@ public class PhotoStorageService : IPhotoStorageService
 
     public void Delete(Guid photoId)
     {
-        var path = GetPhotoPath(photoId) + ".jpeg";
-        if (File.Exists(path))
+        var path = Directory.GetFiles("static", photoId + ".*").FirstOrDefault();
+        if (path != null)
             File.Delete(path);
     }
 
