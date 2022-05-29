@@ -43,7 +43,10 @@ public class UserAvatarsService : IUserAvatarsService
 
     private Task DeleteUserAvatarAsync(Guid avatarId)
     {
-        var avatarPath = photoStorageService.GetPhotoPath(avatarId) + ".jpeg";
-        return Task.Run(() => File.Delete(avatarPath));
+        var path = Directory.GetFiles("static", avatarId + ".*").FirstOrDefault();
+
+        return path is null
+            ? Task.CompletedTask
+            : Task.Run(() => File.Delete(path));
     }
 }

@@ -1,11 +1,17 @@
-﻿using Eventnet.DataAccess.Entities;
-
-namespace Eventnet.Api.Services.UserAvatars;
+﻿namespace Eventnet.Api.Services.UserAvatars;
 
 public static class UserAvatarHelpers
 {
-    public static string GetUserAvatar(UserEntity user) =>
-        !user.AvatarId.HasValue
-            ? "default-avatar.jpeg"
-            : $"{user.AvatarId.Value}.jpeg";
+    private const string DefaultAvatar = "default-avatar.jpeg";
+    public static string GetUserAvatar(Guid? avatarId)
+    {
+        if (!avatarId.HasValue)
+            return DefaultAvatar;
+
+        var path = Directory.GetFiles("static", avatarId + ".*").FirstOrDefault();
+
+        return path == null
+            ? DefaultAvatar
+            : Path.GetFileName(path);
+    }
 }
