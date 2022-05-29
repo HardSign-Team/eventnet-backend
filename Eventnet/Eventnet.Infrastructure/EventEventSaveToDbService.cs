@@ -8,13 +8,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Eventnet.Infrastructure;
 
-public class SaveToDbService : ISaveToDbService
+public class EventEventSaveToDbService : IEventSaveToDbService
 {
     private readonly IMapper mapper;
     private readonly ApplicationDbContext dbContext;
     private readonly IPhotoStorageService storageService;
 
-    public SaveToDbService(
+    public EventEventSaveToDbService(
         IPhotoStorageService storageService,
         IMapper mapper,
         ApplicationDbContext dbContext)
@@ -22,17 +22,6 @@ public class SaveToDbService : ISaveToDbService
         this.storageService = storageService;
         this.mapper = mapper;
         this.dbContext = dbContext;
-    }
-
-    public async Task SavePhotosAsync(List<Photo> photos, Guid eventId)
-    {
-        foreach (var photo in photos)
-        {
-            var photoId = Guid.NewGuid();
-            storageService.Save(photo, photoId);
-            var photoEntity = new PhotoEntity(photoId, eventId);
-            await SavePhotoToDbAsync(photoEntity);
-        }
     }
 
     public async Task SaveEventAsync(EventInfo info)
@@ -49,6 +38,22 @@ public class SaveToDbService : ISaveToDbService
         await dbContext.SaveChangesAsync();
     }
 
+    public async Task UpdateEventAsync(EventInfo eventInfo)
+    {
+        var oldValue = await dbContext.Events.FindAsync(eventInfo.EventId);
+        if (oldValue is not null)
+        {
+            oldValue.Description = eventInfo.Description;
+            oldValue.Location = new LocationEntity(eventInfo.Location.Latitude, eventInfo.Location.Longitude);
+            oldValue.Name = eventInfo.Name;
+            oldValue.EndDate = eventInfo.EndDate;
+            oldValue.StartDate = eventInfo.StartDate;
+            await SaveTagsAsync(oldValue, eventInfo.Tags, dbContext);
+            dbContext.Events.Update(oldValue);
+            await dbContext.SaveChangesAsync();
+        }
+    }
+
     private static async Task SaveTagsAsync(EventEntity eventEntity, string[] tags, ApplicationDbContext dbContext)
     {
         var exists = await dbContext.Tags
@@ -63,11 +68,5 @@ public class SaveToDbService : ISaveToDbService
         await dbContext.SaveChangesAsync();
 
         eventEntity.AddTags(exists.Values.Concat(notExists));
-    }
-
-    private async Task SavePhotoToDbAsync(PhotoEntity photoEntity)
-    {
-        dbContext.Photos.Add(photoEntity);
-        await dbContext.SaveChangesAsync();
     }
 }

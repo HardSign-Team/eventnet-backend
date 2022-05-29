@@ -8,12 +8,14 @@ using Eventnet.Api.Services;
 using Eventnet.Api.Services.Filters;
 using Eventnet.Api.Services.Photo;
 using Eventnet.Api.Services.SaveServices;
+using Eventnet.Api.Services.UpdateServices;
 using Eventnet.Api.Services.UserAvatars;
 using Eventnet.DataAccess;
 using Eventnet.DataAccess.Entities;
 using Eventnet.Domain;
 using Eventnet.Infrastructure;
 using Eventnet.Infrastructure.PhotoServices;
+using Eventnet.Infrastructure.UpdateServices;
 using Eventnet.Infrastructure.Validators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -55,18 +57,24 @@ services.AddSingleton<IEventFilterFactory, EndDateFilterFactory>();
 services.AddSingleton<IEventFilterFactory, OwnerFilterFactory>();
 services.AddSingleton<IEventFilterFactory, TagsFilterFactory>();
 services.AddSingleton<IEventFilterMapper, EventFilterMapper>();
-services.AddSingleton<IPublishEventService, PublishEventService>();
+services.AddSingleton<IPublishEventSaveService, PublishEventSaveService>();
 services.AddSingleton<EventSaveHandler>();
 services.AddSingleton<EventsFilterService>();
 services.AddMemoryCache();
-services.AddSingleton<IConsumeEventService, RabbitMqConsumeEventService>();
+services.AddSingleton<IConsumeSaveEventService, RabbitMqConsumeSaveEventService>();
 services.AddSingleton<IEventSaveService, EventSaveService>();
 services.AddSingleton<IPhotoValidator, PhotoValidator>();
 services.AddScoped<IPhotoStorageService, PhotoStorageService>();
-services.AddScoped<ISaveToDbService, SaveToDbService>();
+services.AddScoped<IEventSaveToDbService, EventEventSaveToDbService>();
 services.AddSingleton<IEventValidator, EventValidator>();
 services.AddSingleton<IEventCreationValidator, EventCreationValidator>();
 services.AddSingleton<IRabbitMqMessageHandler, RabbitMqMessageHandler>();
+
+services.AddScoped<IUpdateEventService, UpdateEventService>();
+services.AddScoped<IPublishUpdateEventService, PublishUpdateEventService>();
+services.AddSingleton<IConsumeUpdateEventService, ConsumeUpdateEventService>();
+services.AddSingleton<IRabbitMqMessageUpdateHandler, RabbitMqMessageUpdateHandler>();
+services.AddScoped<IPhotosDbService, PhotosDbService>();
 
 services.AddScoped<IEmailService, EmailService>();
 services.AddScoped<IForgotPasswordService, ForgotPasswordService>();
@@ -182,8 +190,10 @@ services.AddSwaggerGen(option =>
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
-services.AddHostedService<BackgroundConsumeEventService>();
-
+services.AddHostedService<BackgroundConsumeSaveEventService>();
+services.AddHostedService<BackgroundConsumeUpdateEventService>();
+builder.Services.AddControllers()
+    .AddNewtonsoftJson();
 var app = builder.Build();
 
 app.UseSwagger();

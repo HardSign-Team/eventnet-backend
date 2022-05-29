@@ -3,7 +3,7 @@ using Eventnet.Api.Services.SaveServices;
 
 namespace Eventnet.Api.IntegrationTests.Mocks;
 
-public class PublishEventMock : IPublishEventService
+public class PublishEventSaveMock : IPublishEventSaveService
 {
     public Task PublishAsync(string message) => Task.CompletedTask;
 

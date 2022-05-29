@@ -3,8 +3,8 @@ using Eventnet.Domain.Events;
 
 namespace Eventnet.Infrastructure;
 
-public interface ISaveToDbService
+public interface IEventSaveToDbService
 {
-    Task SavePhotosAsync(List<Photo> photos, Guid eventId);
     Task SaveEventAsync(EventInfo info);
+    Task UpdateEventAsync(EventInfo eventInfo);
 }

@@ -28,13 +28,13 @@ public class TestWebApplicationFactory<TStartup> : WebApplicationFactory<TStartu
                 options.UseInMemoryDatabase("InMemoryDbForTesting");
             });
 
-            var consumer = services.SingleOrDefault(d => d.ServiceType == typeof(IConsumeEventService));
+            var consumer = services.SingleOrDefault(d => d.ServiceType == typeof(IConsumeSaveEventService));
             services.Remove(consumer!);
-            services.AddSingleton<IConsumeEventService, ConsumeEventMock>();
+            services.AddSingleton<IConsumeSaveEventService, ConsumeSaveEventMock>();
 
-            var publisher = services.SingleOrDefault(d => d.ServiceType == typeof(IPublishEventService));
+            var publisher = services.SingleOrDefault(d => d.ServiceType == typeof(IPublishEventSaveService));
             services.Remove(publisher!);
-            services.AddSingleton<IPublishEventService, PublishEventMock>();
+            services.AddSingleton<IPublishEventSaveService, PublishEventSaveMock>();
 
             var sp = services.BuildServiceProvider();
 

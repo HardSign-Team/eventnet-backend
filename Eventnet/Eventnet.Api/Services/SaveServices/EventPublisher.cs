@@ -1,22 +1,27 @@
 ﻿using System.Text;
-using Eventnet.Api.Config;
 using RabbitMQ.Client;
 
 namespace Eventnet.Api.Services.SaveServices;
 
-public class PublishEventService : IPublishEventService
+public abstract class EventPublisher : IDisposable
 {
     private readonly IModel channel;
-    private readonly string queue;
     private readonly IConnection connection;
+    private readonly string queue;
 
-    public PublishEventService(RabbitMqConfig config)
+    protected EventPublisher(string queueName, string hostName, int port)
     {
-        queue = config.Queue;
-        var factory = new ConnectionFactory { HostName = config.HostName, Port = config.Port };
+        queue = queueName;
+        var factory = new ConnectionFactory { HostName = hostName, Port = port };
         connection = factory.CreateConnection();
         channel = connection.CreateModel();
         channel.QueueDeclare(queue, true, false, false);
+    }
+
+    public void Dispose()
+    {
+        channel.Dispose();
+        connection.Dispose();
     }
 
     public async Task PublishAsync(string message)
@@ -27,11 +32,5 @@ public class PublishEventService : IPublishEventService
             properties.Persistent = false;
             channel.BasicPublish(string.Empty, queue, null, Encoding.UTF8.GetBytes(message));
         });
-    }
-
-    public void Dispose()
-    {
-        channel.Dispose();
-        connection.Dispose();
     }
 }

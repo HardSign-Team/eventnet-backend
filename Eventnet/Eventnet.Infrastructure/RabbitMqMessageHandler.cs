@@ -1,5 +1,6 @@
 ﻿using Eventnet.Domain;
 using Eventnet.Domain.Events;
+using Eventnet.Infrastructure.PhotoServices;
 using Eventnet.Infrastructure.Validators;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,25 +11,27 @@ public class RabbitMqMessageHandler : IRabbitMqMessageHandler
     private readonly EventSaveHandler eventSaveHandler;
     private readonly IEventCreationValidator validator;
     private readonly IServiceScopeFactory serviceScopeFactory;
+    private readonly RabbitMqMessageHandlerHelper rabbitMqMessageHandlerHelper;
 
     public RabbitMqMessageHandler(
         EventSaveHandler eventSaveHandler,
         IEventCreationValidator validator,
         IServiceScopeFactory serviceScopeFactory)
     {
+        rabbitMqMessageHandlerHelper = new RabbitMqMessageHandlerHelper();
         this.eventSaveHandler = eventSaveHandler;
         this.validator = validator;
         this.serviceScopeFactory = serviceScopeFactory;
     }
 
-    public async Task HandleAsync(RabbitMqMessage rabbitMqMessage)
+    public async Task HandleAsync(RabbitMqSaveMessage rabbitMqSaveMessage)
     {
-        var (eventForSave, binaryPhotos) = rabbitMqMessage;
+        var (eventForSave, binaryPhotos) = rabbitMqSaveMessage;
         var errorMessage = string.Empty;
         EventSaveStatus status;
         try
         {
-            var photos = GetPhotos(binaryPhotos);
+            var photos = rabbitMqMessageHandlerHelper.GetPhotos(binaryPhotos);
             (var isOk, errorMessage) = validator.Validate(photos, eventForSave);
             if (isOk)
             {
@@ -50,13 +53,10 @@ public class RabbitMqMessageHandler : IRabbitMqMessageHandler
     private async Task SaveEventAsync(EventInfo info, List<Photo> photos)
     {
         using var scope = serviceScopeFactory.CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<ISaveToDbService>();
-        await service.SaveEventAsync(info);
-        await service.SavePhotosAsync(photos, info.EventId);
-    }
+        var eventInfoService = scope.ServiceProvider.GetRequiredService<IEventSaveToDbService>();
+        await eventInfoService.SaveEventAsync(info);
 
-    private static List<Photo> GetPhotos(IEnumerable<RabbitMqPhoto> rabbitMqPhotos) =>
-        rabbitMqPhotos
-            .Select(rabbitMqPhoto => new Photo(rabbitMqPhoto.PhotoInBytes, rabbitMqPhoto.ContentType))
-            .ToList();
+        var photosService = scope.ServiceProvider.GetRequiredService<IPhotosDbService>();
+        await photosService.SavePhotosAsync(photos, info.EventId);
+    }
 }

@@ -41,8 +41,8 @@ public class SaveToDbServiceTests : BaseTests<SaveToDbServiceTests>
         entity.Tags.Select(x => x.Name).ToHashSet().Should().Equal(tagsInModel.ToHashSet());
     }
 
-    private ISaveToDbService CreateSut(ApplicationDbContext context) =>
-        new SaveToDbService(Mock.Of<IPhotoStorageService>(), CreateMapper(), context);
+    private IEventSaveToDbService CreateSut(ApplicationDbContext context) =>
+        new EventEventSaveToDbService(Mock.Of<IPhotoStorageService>(), CreateMapper(), context);
 
     private static async Task SaveTags(IEnumerable<string> tagsInDb, ApplicationDbContext context)
     {

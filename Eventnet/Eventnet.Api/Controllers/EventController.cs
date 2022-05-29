@@ -9,11 +9,15 @@ using Eventnet.Api.Models.Filtering;
 using Eventnet.Api.Models.Pages;
 using Eventnet.Api.Services;
 using Eventnet.Api.Services.SaveServices;
+using Eventnet.Api.Services.UpdateServices;
 using Eventnet.DataAccess;
+using Eventnet.DataAccess.Entities;
 using Eventnet.Domain.Events;
 using Eventnet.Domain.Selectors;
 using Eventnet.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,7 +29,9 @@ public class EventController : Controller
     private const int Timeout = 20;
     private static readonly string[] SupportedContentTypes = { "image/bmp", "image/png", "image/jpeg" };
     private readonly ApplicationDbContext dbContext;
+    private readonly UserManager<UserEntity> userManager;
     private readonly IEventSaveService eventSaveService;
+    private readonly IUpdateEventService updateEventService;
     private readonly CurrentUserService currentUserService;
     private readonly LinkGenerator linkGenerator;
     private readonly EventsFilterService eventsFilterService;
@@ -34,16 +40,20 @@ public class EventController : Controller
 
     public EventController(
         ApplicationDbContext dbContext,
+        UserManager<UserEntity> userManager,
         IMapper mapper,
         IEventSaveService eventSaveService,
+        IUpdateEventService updateEventService,
         CurrentUserService currentUserService,
         LinkGenerator linkGenerator,
         EventsFilterService eventsFilterService,
         RabbitMqConfig rabbitMqConfig)
     {
         this.dbContext = dbContext;
+        this.userManager = userManager;
         this.mapper = mapper;
         this.eventSaveService = eventSaveService;
+        this.updateEventService = updateEventService;
         this.currentUserService = currentUserService;
         this.linkGenerator = linkGenerator;
         this.eventsFilterService = eventsFilterService;
@@ -198,11 +208,55 @@ public class EventController : Controller
             _ => throw new ArgumentOutOfRangeException($"Unknown SaveState {saveStatus}")
         };
     }
-
-    // TODO use format https://datatracker.ietf.org/doc/html/rfc6902
+    
     [HttpPatch("{eventId:guid}")]
-    public IActionResult UpdateEvent(Guid eventId, [FromBody] UpdateEventModel updateModel) =>
-        throw new NotImplementedException();
+    [Authorize]
+    [Produces("application/json-patch+json", "application/xml")]
+    public async Task<IActionResult> UpdateEvent(Guid eventId, [FromBody] JsonPatchDocument<UpdateEventModel> updatePatchModel)
+    {
+        if (!ModelState.IsValid)
+            return UnprocessableEntity(ModelState);
+        var user = await currentUserService.GetCurrentUserAsync();
+        if (user is null)
+            return Unauthorized();
+        
+        var repoEvent = await dbContext.Events.FirstOrDefaultAsync(e => e.Id == eventId);
+        if (repoEvent is null)
+            return NotFound();
+
+        var updatedEvent = new UpdateEventModel(repoEvent.Id,
+            repoEvent.StartDate,
+            repoEvent.EndDate,
+            repoEvent.Name,
+            repoEvent.Description,
+            repoEvent.Location.Latitude, 
+            repoEvent.Location.Longitude,
+            repoEvent.Tags.Select(tag => tag.Name).ToArray());
+        updatePatchModel.ApplyTo(updatedEvent);
+        TryValidateModel(updatedEvent);
+        
+        var eventForSave = mapper.Map<EventInfo>(updatedEvent) with { OwnerId = user.Id };
+        await updateEventService.SendEventForUpdate(eventForSave);
+        return Accepted();
+    }
+
+    [HttpPost("update-photos/{eventId:guid}")]
+    [Authorize]
+    public async Task<IActionResult> UpdatePhotos(Guid eventId, [FromForm] PhotosUpdateModel photosUpdateModel)
+    {
+        if (photosUpdateModel.NewPhotos is null && photosUpdateModel.PhotosIdToDelete is null)
+            return BadRequest("Send values to update");
+        
+        
+        var repoEvent = await dbContext.Events.FirstOrDefaultAsync(e => e.Id == eventId);
+        if (repoEvent is null)
+            return NotFound();
+
+        await updateEventService.SendPhotosForUpdate(eventId,
+            photosUpdateModel.NewPhotos ?? Array.Empty<IFormFile>(),
+            photosUpdateModel.PhotosIdToDelete ?? Array.Empty<Guid>());
+        return Accepted();
+    }
 
     [Authorize]
     [HttpDelete("{eventId:guid}")]
