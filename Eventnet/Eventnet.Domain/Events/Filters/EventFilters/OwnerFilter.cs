@@ -2,9 +2,9 @@
 
 public class OwnerFilter : IEventFilter
 {
-    private readonly string ownerId;
+    private readonly Guid ownerId;
 
-    public OwnerFilter(string ownerId)
+    public OwnerFilter(Guid ownerId)
     {
         this.ownerId = ownerId;
     }

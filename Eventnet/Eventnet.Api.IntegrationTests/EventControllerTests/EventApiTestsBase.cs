@@ -2,7 +2,6 @@
 using System.Text;
 using System.Web;
 using Eventnet.Api.IntegrationTests.Helpers;
-using Eventnet.Api.Models.Events;
 using Eventnet.Api.Models.Filtering;
 using Microsoft.AspNetCore.Http.Extensions;
 using Newtonsoft.Json;
@@ -24,19 +23,11 @@ public abstract class EventApiTestsBase : TestsBase
         return uriBuilder.Uri;
     }
 
-    protected Uri BuildEventsByIdsUri(Guid[] guids)
+    protected Uri BuildEventsByIdsUri()
     {
-        var model = new EventIdsListModel(guids);
-        var qb = new QueryBuilder
-        {
-            {
-                "events", Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(model)))
-            }
-        };
         var uriBuilder = new UriBuilder(Configuration.BaseUrl)
         {
-            Path = $"{BaseRoute}/full",
-            Query = qb.ToString()
+            Path = $"{BaseRoute}/full"
         };
         return uriBuilder.Uri;
     }

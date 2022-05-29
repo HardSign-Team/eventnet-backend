@@ -190,7 +190,7 @@ public class CreateEventShould : CreateEventTestsBase
             DateTime.Now.AddDays(3),
             "Test",
             "Description",
-            0, 
+            0,
             0,
             new[] { "Tag1", "Tag2", "Tag3" },
             formFiles);
@@ -216,7 +216,7 @@ public class CreateEventShould : CreateEventTestsBase
             eventEntity.EndDate.Should().BeCloseTo(endDate, TimeSpan.FromSeconds(30));
         else
             eventEntity.EndDate.Should().BeNull();
-        if (model.Tags is {} tags)
+        if (model.Tags is { } tags)
             eventEntity.Tags.Select(x => x.Name).OrderBy(x => x).Should().Equal(tags.OrderBy(x => x));
         else
             eventEntity.Tags.Should().BeEmpty();

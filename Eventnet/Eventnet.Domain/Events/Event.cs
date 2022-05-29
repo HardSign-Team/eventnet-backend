@@ -2,7 +2,7 @@
 
 public record Event(
     Guid Id,
-    string OwnerId,
+    Guid OwnerId,
     DateTime StartDate,
     DateTime? EndDate,
     string Name,

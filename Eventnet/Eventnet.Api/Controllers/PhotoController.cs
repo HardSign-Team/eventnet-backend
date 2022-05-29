@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Eventnet.Api.Models.Events;
+using Eventnet.Api.Models.Photos;
 using Eventnet.Api.Services.Photo;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,8 +16,9 @@ public class PhotoController : Controller
         this.photoService = photoService;
     }
 
-    [HttpGet("title")]
-    public async Task<IActionResult> GetTitlePhotos([FromQuery(Name = "events")] [ModelBinder] EventIdsListModel? model)
+    [HttpPost("title")]
+    [Produces(typeof(List<PhotoViewModel>))]
+    public async Task<IActionResult> GetTitlePhotos([FromBody] EventIdsListModel? model)
     {
         if (model is null)
             return BadRequest();
@@ -29,7 +31,7 @@ public class PhotoController : Controller
 
     [HttpGet("{eventId:guid}")]
     [Produces(typeof(List<string>))]
-    public async Task<IActionResult> GetTitlePhotos(Guid eventId)
+    public async Task<IActionResult> GetPhoto(Guid eventId)
     {
         if (eventId == Guid.Empty)
             return BadRequest();

@@ -81,7 +81,7 @@ public class CreateEventTestsBase : TestWithRabbitMqBase
                 nameof(CreateEventModel.EndDate));
         yield return (new StringContent(eventInfo.Name), nameof(CreateEventModel.Name));
         yield return (new StringContent(eventInfo.Description), nameof(CreateEventModel.Description));
-        foreach (var tag in eventInfo.Tags ?? Array.Empty<string>()) 
+        foreach (var tag in eventInfo.Tags ?? Array.Empty<string>())
             yield return (new StringContent(tag), nameof(CreateEventModel.Tags));
         yield return (new StringContent(eventInfo.Latitude.ToString(CultureInfo.InvariantCulture)),
             nameof(CreateEventModel.Latitude));

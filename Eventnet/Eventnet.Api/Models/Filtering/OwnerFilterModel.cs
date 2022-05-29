@@ -1,3 +1,3 @@
 ﻿namespace Eventnet.Api.Models.Filtering;
 
-public record OwnerFilterModel(string OwnerId);
+public record OwnerFilterModel(Guid OwnerId);

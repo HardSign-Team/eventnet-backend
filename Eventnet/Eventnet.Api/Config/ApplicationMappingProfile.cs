@@ -4,6 +4,7 @@ using Eventnet.Api.Models.Authentication;
 using Eventnet.Api.Models.Events;
 using Eventnet.Api.Models.Marks;
 using Eventnet.Api.Models.Tags;
+using Eventnet.Api.Services.UserAvatars;
 using Eventnet.DataAccess.Entities;
 using Eventnet.Domain.Events;
 using Eventnet.Domain.Selectors;
@@ -19,7 +20,10 @@ public class ApplicationMappingProfile : Profile
         CreateTagsMap();
         CreateMap<CreateEventModel, Event>();
         CreateProjection<UserEntity, UserNameModel>();
-        CreateMap<UserEntity, UserViewModel>();
+        CreateMap<UserEntity, UserViewModel>()
+            .ForMember(x => x.AvatarUrl,
+                opt => 
+                    opt.MapFrom(x => UserAvatarHelpers.GetUserAvatar(x.AvatarId)));
         CreateMap<UpdateUserForm, UserEntity>();
         CreateMap<RegisterModel, UserEntity>()
             .ForSourceMember(x => x.Password,
@@ -31,7 +35,7 @@ public class ApplicationMappingProfile : Profile
         CreateMap<EventEntity, Event>();
         CreateMap<EventEntity, EventViewModel>()
             .ForMember(x => x.TotalSubscriptions,
-                expression => expression.MapFrom(x => x.Subscriptions.Count))
+                expression => expression.MapFrom(x => x.Subscriptions.ToList().Count))
             .ForMember(x => x.Marks,
                 e =>
                     e.MapFrom(x => new MarksCountViewModel(x.Marks.Count(mark => mark.IsLike),
@@ -41,14 +45,11 @@ public class ApplicationMappingProfile : Profile
         CreateMap<Event, EventEntity>();
         CreateMap<EventName, EventNameViewModel>();
         CreateMap<CreateEventModel, EventInfo>()
-            .ForMember(x => x.Tags, opt => opt.MapFrom(
-                src => src.Tags ?? Array.Empty<string>()))
+            .ForMember(x => x.Tags, opt => opt.MapFrom(src => src.Tags ?? Array.Empty<string>()))
             .ForMember(x => x.Location,
-                opt => opt.MapFrom(
-                    src => new Location(src.Latitude, src.Longitude)))
+                opt => opt.MapFrom(src => new Location(src.Latitude, src.Longitude)))
             .ForMember(x => x.OwnerId,
-                opt => opt.MapFrom(
-                    x => Guid.Empty));
+                opt => opt.MapFrom(x => Guid.Empty));
     }
 
     private void CreateTagsMap()
