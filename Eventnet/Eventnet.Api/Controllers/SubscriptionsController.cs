@@ -1,4 +1,5 @@
-﻿using Eventnet.Api.Models.Subscriptions;
+﻿using System.Diagnostics.CodeAnalysis;
+using Eventnet.Api.Models.Subscriptions;
 using Eventnet.Api.Services;
 using Eventnet.DataAccess;
 using Eventnet.DataAccess.Extensions;
@@ -82,16 +83,18 @@ public class SubscriptionsController : Controller
 
     [HttpGet("count/{eventId:guid}")]
     [Produces(typeof(SubscriptionsCountViewModel))]
+    [SuppressMessage("Performance", "CA1829:Используйте свойство Length/Count вместо Count(), если оно доступно")]
     public async Task<IActionResult> GetSubscriptionsCount(Guid eventId)
     {
         if (eventId == Guid.Empty)
             return NotFound();
 
         var result = await dbContext.Events
+            .Include(x => x.Subscriptions)
             .Select(x => new
             {
                 x.Id,
-                SubscriptionsCount = x.Subscriptions.Count
+                SubscriptionsCount = x.Subscriptions.Count()
             })
             .FirstOrDefaultAsync(x => x.Id == eventId);
 

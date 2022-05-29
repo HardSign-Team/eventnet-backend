@@ -12,7 +12,7 @@ public class EventEntity
     public Guid OwnerId { get; }
     public DateTime StartDate { get; set; }
     public List<TagEntity> Tags { get; set; } = new();
-    public IReadOnlyCollection<SubscriptionEntity> Subscriptions { get; private set; } = new List<SubscriptionEntity>();
+    public ICollection<SubscriptionEntity> Subscriptions { get; private set; } = new List<SubscriptionEntity>();
     public IReadOnlyCollection<MarkEntity> Marks { get; private set; } = new List<MarkEntity>();
 
     private EventEntity(
