@@ -24,6 +24,26 @@ public class SubscriptionsController : Controller
     }
 
     [Authorize]
+    [HttpGet("me/{eventId:guid}")]
+    [Produces(typeof(IsSubscribedViewModel))]
+    public async Task<IActionResult> GetIsUserSubscribed(Guid eventId)
+    {
+        if (eventId == Guid.Empty)
+            return NotFound();
+
+        var exists = await dbContext.Events.AnyAsync(x => x.Id == eventId);
+        if (!exists)
+            return NotFound();
+
+        var user = await currentUserService.GetCurrentUserAsync();
+        if (user is null)
+            return Unauthorized();
+
+        var isSubscribed = await dbContext.Subscriptions.AnyAsync(x => x.EventId == eventId && x.UserId == user.Id);
+        return Ok(new IsSubscribedViewModel(eventId, isSubscribed));
+    }
+
+    [Authorize]
     [HttpPut("{eventId:guid}")]
     [Produces(typeof(SubscriptionsCountViewModel))]
     public async Task<IActionResult> Subscribe(Guid eventId)
