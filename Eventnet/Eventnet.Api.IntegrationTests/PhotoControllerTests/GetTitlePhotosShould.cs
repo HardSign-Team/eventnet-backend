@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Eventnet.Api.IntegrationTests.Helpers;
+using Eventnet.Api.Models.Events;
 using Eventnet.Api.Models.Photos;
 using Eventnet.Api.UnitTests.Helpers;
 using FluentAssertions;
@@ -14,25 +17,13 @@ namespace Eventnet.Api.IntegrationTests.PhotoControllerTests;
 [TestFixture]
 public class GetTitlePhotosShould : PhotoApiTestsBase
 {
-    [TestCase("")]
-    [TestCase("trash")]
-    public async Task Response400_WhenIncorrectModel(string base64Model)
-    {
-        var request = new HttpRequestMessage(HttpMethod.Get, BuildGetTitlePhotosUri(base64Model));
-
-        var response = await HttpClient.SendAsync(request);
-
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-    }
-
     [Test]
     public async Task Response200_WhenCorrectModel()
     {
         FillDatabase();
         var eventIds = ApplyToDb(context => context.Events.Take(3).Select(ev => ev.Id).ToArray());
-        var request = new HttpRequestMessage(HttpMethod.Get, BuildGetTitlePhotos(eventIds));
 
-        var response = await HttpClient.SendAsync(request);
+        var response = await PostAsync(eventIds);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var viewModels = response.ReadContentAs<List<PhotoViewModel>>();
@@ -48,5 +39,12 @@ public class GetTitlePhotosShould : PhotoApiTestsBase
             context.AddEvents(context.Users.ToList());
             context.AddPhotos(context.Events.ToList());
         });
+    }
+
+    private async Task<HttpResponseMessage> PostAsync(Guid[] guids)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Post, BuildGetTitlePhotos());
+
+        return await HttpClient.PostAsJsonAsync(request.RequestUri, new EventIdsListModel(guids));
     }
 }

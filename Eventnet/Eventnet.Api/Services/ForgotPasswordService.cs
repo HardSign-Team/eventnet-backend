@@ -25,7 +25,7 @@ public class ForgotPasswordService : IForgotPasswordService
             $"Ваш код: {code}");
     }
 
-    public bool VerifyCode(string email, string code) 
+    public bool VerifyCode(string email, string code)
         => cache.TryGetValue(email, out string cachedCode) && cachedCode == code;
 
     private static string GenerateCode()

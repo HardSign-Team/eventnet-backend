@@ -8,7 +8,7 @@ public class UserAvatarsService : IUserAvatarsService
 {
     private readonly IPhotoStorageService photoStorageService;
     private readonly ApplicationDbContext dbContext;
-    
+
     public UserAvatarsService(
         IPhotoStorageService photoStorageService,
         ApplicationDbContext dbContext)
@@ -16,12 +16,12 @@ public class UserAvatarsService : IUserAvatarsService
         this.photoStorageService = photoStorageService;
         this.dbContext = dbContext;
     }
-    
+
     public async Task<Guid> UploadAvatarAsync(UserEntity user, IFormFile avatar)
     {
-        if(user.AvatarId.HasValue)
+        if (user.AvatarId.HasValue)
             await DeleteUserAvatarAsync(user.AvatarId.Value);
-        
+
         var avatarId = Guid.NewGuid();
 
         await SaveAvatarAsync(avatar, avatarId);

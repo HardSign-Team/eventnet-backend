@@ -69,10 +69,9 @@ public class EventController : Controller
         return Ok(entity);
     }
 
-    [HttpGet("full")]
+    [HttpPost("full")]
     [Produces(typeof(List<EventViewModel>))]
-    public async Task<IActionResult> GetEventsByIds(
-        [FromQuery(Name = "events")] [ModelBinder] EventIdsListModel? listModel)
+    public async Task<IActionResult> GetEventsByIds([FromBody] EventIdsListModel? listModel)
     {
         if (listModel is null)
             return BadRequest($"{nameof(listModel)} was null");
@@ -82,6 +81,23 @@ public class EventController : Controller
             .ProjectTo<EventViewModel>(mapper.ConfigurationProvider)
             .AsNoTracking()
             .Where(x => ids.Contains(x.Id))
+            .ToListAsync();
+        return Ok(viewModels);
+    }
+
+    [Authorize]
+    [HttpGet("my")]
+    [Produces(typeof(List<EventViewModel>))]
+    public async Task<IActionResult> GetUserEvents()
+    {
+        var user = await currentUserService.GetCurrentUserAsync();
+        if (user is null)
+            return Unauthorized();
+
+        var viewModels = await dbContext.Events
+            .ProjectTo<EventViewModel>(mapper.ConfigurationProvider)
+            .AsNoTracking()
+            .Where(x => x.OwnerId == user.Id)
             .ToListAsync();
         return Ok(viewModels);
     }
@@ -134,7 +150,7 @@ public class EventController : Controller
     [HttpGet("request-event-creation")]
     [Produces(typeof(Guid))]
     public IActionResult RequestEventCreation() => Ok(Guid.NewGuid());
-    
+
     [Authorize]
     [HttpPost]
     public async Task<IActionResult> CreateEvent([FromForm] CreateEventModel? createModel)
@@ -144,11 +160,11 @@ public class EventController : Controller
 
         if (!ModelState.IsValid)
             return UnprocessableEntity(ModelState);
-        
+
         var user = await currentUserService.GetCurrentUserAsync();
         if (user is null)
             return Unauthorized();
-        
+
         var photos = createModel.Photos ?? Array.Empty<IFormFile>();
         if (!IsContentTypesSupported(photos))
             return BadRequest("Not supported ContentType");
@@ -202,7 +218,6 @@ public class EventController : Controller
 
         return Ok(eventId);
     }
-
 
     private static bool IsContentTypesSupported(IFormFile[] files)
     {

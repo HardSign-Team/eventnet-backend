@@ -6,8 +6,8 @@ namespace Eventnet.Domain;
 #pragma warning disable CA1416
 public class Photo
 {
-    private readonly byte[] rawData;
     public readonly string Extension;
+    private readonly byte[] rawData;
 
     public Photo(byte[] rawData, string contentType)
     {
@@ -22,11 +22,11 @@ public class Photo
         photo.Save(path + Extension);
     }
 
-    private static  string GetFormatAndExtensionFromContentType(string contentType)
+    private static string GetFormatAndExtensionFromContentType(string contentType)
     {
         return contentType switch
         {
-            "image/jpeg" =>  ".jpeg",
+            "image/jpeg" => ".jpeg",
             "image/png"  => ".png",
             "image/bmp"  => ".bmp",
             _            => throw new ArgumentOutOfRangeException($"Unknown content type {contentType}")

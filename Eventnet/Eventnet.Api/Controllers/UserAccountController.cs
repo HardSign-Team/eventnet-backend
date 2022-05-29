@@ -50,7 +50,7 @@ public class UserAccountController : Controller
         if (!ModelState.IsValid)
             return UnprocessableEntity(ModelState);
 
-        var user = await userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginModel.Login); 
+        var user = await userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginModel.Login);
         user ??= await userManager.FindByEmailAsync(loginModel.Login);
 
         var passwordCorrect = await userManager.CheckPasswordAsync(user, loginModel.Password);
@@ -252,7 +252,7 @@ public class UserAccountController : Controller
     {
         var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
         var clientAddress = GetClientAddress() + "completed-register";
-        
+
         var query = new Dictionary<string, string> { { "userId", user.Id.ToString() }, { "code", code } };
         var uri = new Uri(QueryHelpers.AddQueryString(clientAddress, query!));
 

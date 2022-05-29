@@ -5,8 +5,10 @@ namespace Eventnet.DataAccess.Entities;
 public class UserRole : IdentityRole<Guid>
 {
     // ReSharper disable once UnusedMember.Global
-    public UserRole() { }
-    
+    public UserRole()
+    {
+    }
+
     public UserRole(string roleName) : base(roleName)
     {
     }

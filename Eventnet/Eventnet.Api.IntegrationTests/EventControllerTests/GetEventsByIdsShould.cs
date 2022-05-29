@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Eventnet.Api.IntegrationTests.Helpers;
 using Eventnet.Api.Models.Events;
@@ -15,14 +16,11 @@ namespace Eventnet.Api.IntegrationTests.EventControllerTests;
 public class GetEventsByIdsShould : EventApiTestsBase
 {
     [Test]
-    public async Task ResponseCode404_WhenInvalidGuid()
+    public async Task ResponseCode200_WhenInvalidGuid()
     {
-        var request = new HttpRequestMessage();
-        request.Method = HttpMethod.Get;
-        request.RequestUri = BuildEventsByIdsUri(new[] { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() });
-        request.Headers.Add("Accept", "application/json");
+        var guids = new[] { Guid.Empty };
 
-        var response = await HttpClient.SendAsync(request);
+        var response = await PostAsync(guids);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var result = response.ReadContentAs<List<EventViewModel>>();
@@ -34,10 +32,8 @@ public class GetEventsByIdsShould : EventApiTestsBase
     {
         AddEvents();
         var guids = ApplyToDb(context => context.Events.Select(x => x.Id).ToArray());
-        var request = new HttpRequestMessage(HttpMethod.Get, BuildEventsByIdsUri(guids));
-        request.Headers.Add("Accept", "application/json");
 
-        var response = await HttpClient.SendAsync(request);
+        var response = await PostAsync(guids);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var result = response.ReadContentAs<List<EventViewModel>>();
@@ -50,10 +46,8 @@ public class GetEventsByIdsShould : EventApiTestsBase
         AddEvents();
         var guids = ApplyToDb(context => context.Events.Select(x => x.Id).ToArray());
         var notExists = new[] { Guid.NewGuid(), Guid.NewGuid() };
-        var request = new HttpRequestMessage(HttpMethod.Get, BuildEventsByIdsUri(guids.Concat(notExists).ToArray()));
-        request.Headers.Add("Accept", "application/json");
 
-        var response = await HttpClient.SendAsync(request);
+        var response = await PostAsync(guids.Union(notExists).ToArray());
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var result = response.ReadContentAs<List<EventViewModel>>();
@@ -67,5 +61,15 @@ public class GetEventsByIdsShould : EventApiTestsBase
             context.AddUsers();
             context.AddEvents(context.Users);
         });
+    }
+
+    private async Task<HttpResponseMessage> PostAsync(Guid[] guids)
+    {
+        var request = new HttpRequestMessage();
+        request.Method = HttpMethod.Post;
+        request.RequestUri = BuildEventsByIdsUri();
+        request.Headers.Add("Accept", "application/json");
+
+        return await HttpClient.PostAsJsonAsync(request.RequestUri, new EventIdsListModel(guids));
     }
 }
