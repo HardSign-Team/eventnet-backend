@@ -35,6 +35,8 @@ var builder = WebApplication.CreateBuilder(new WebApplicationOptions
     ContentRootPath = Directory.GetCurrentDirectory(),
     WebRootPath = "static"
 });
+builder.Configuration.AddJsonFile("config.json", false, true);
+
 var services = builder.Services;
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var jwtTokenConfig = builder.Configuration.GetSection("JWT").Get<JwtTokenConfig>();
