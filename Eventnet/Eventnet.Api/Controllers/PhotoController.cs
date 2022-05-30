@@ -37,9 +37,22 @@ public class PhotoController : Controller
             return BadRequest();
 
         var basePath = GetBaseUrl();
-        var urls = await photoService.GetPhotoUrls(basePath, eventId);
+        var urls = await photoService.GetPhotosViewModels(basePath, eventId);
 
-        return Ok(urls);
+        return Ok(urls.Select(x => x.Url).ToList());
+    }
+    
+    [HttpGet("models/{eventId:guid}")]
+    [Produces(typeof(List<PhotoViewModel>))]
+    public async Task<IActionResult> GetPhotoWithIds(Guid eventId)
+    {
+        if (eventId == Guid.Empty)
+            return BadRequest();
+
+        var basePath = GetBaseUrl();
+        var viewModels = await photoService.GetPhotosViewModels(basePath, eventId);
+
+        return Ok(viewModels);
     }
 
     private string GetBaseUrl()
