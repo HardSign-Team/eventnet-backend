@@ -353,3 +353,4 @@ MigrationBackup/
 # Image files
 static/
 storage/
+/Eventnet/Eventnet.Api/config.json
