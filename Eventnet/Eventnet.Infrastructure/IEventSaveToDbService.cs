@@ -1,5 +1,4 @@
-﻿using Eventnet.Domain;
-using Eventnet.Domain.Events;
+﻿using Eventnet.Domain.Events;
 
 namespace Eventnet.Infrastructure;
 

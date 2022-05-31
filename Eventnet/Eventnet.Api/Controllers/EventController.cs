@@ -11,12 +11,10 @@ using Eventnet.Api.Services;
 using Eventnet.Api.Services.SaveServices;
 using Eventnet.Api.Services.UpdateServices;
 using Eventnet.DataAccess;
-using Eventnet.DataAccess.Entities;
 using Eventnet.Domain.Events;
 using Eventnet.Domain.Selectors;
 using Eventnet.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -29,7 +27,6 @@ public class EventController : Controller
     private const int Timeout = 20;
     private static readonly string[] SupportedContentTypes = { "image/bmp", "image/png", "image/jpeg" };
     private readonly ApplicationDbContext dbContext;
-    private readonly UserManager<UserEntity> userManager;
     private readonly IEventSaveService eventSaveService;
     private readonly IUpdateEventService updateEventService;
     private readonly CurrentUserService currentUserService;
@@ -40,7 +37,6 @@ public class EventController : Controller
 
     public EventController(
         ApplicationDbContext dbContext,
-        UserManager<UserEntity> userManager,
         IMapper mapper,
         IEventSaveService eventSaveService,
         IUpdateEventService updateEventService,
@@ -50,7 +46,6 @@ public class EventController : Controller
         RabbitMqConfig rabbitMqConfig)
     {
         this.dbContext = dbContext;
-        this.userManager = userManager;
         this.mapper = mapper;
         this.eventSaveService = eventSaveService;
         this.updateEventService = updateEventService;

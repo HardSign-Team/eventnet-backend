@@ -60,7 +60,7 @@ public class GetUsersByPrefixShould : UserApiTestsBase
 
         var result = JsonConvert.DeserializeObject<UserNameListViewModel>(response.Content.ReadAsStringAsync().Result);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        result.Count.Should().Be(2);
+        result!.Count.Should().Be(2);
         result.Models.Select(x => x.UserName).Should().Contain(names[1..3]);
     }
 
