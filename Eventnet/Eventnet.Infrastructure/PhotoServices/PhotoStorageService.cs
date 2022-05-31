@@ -15,7 +15,7 @@ public class PhotoStorageService : IPhotoStorageService
 
     public void Save(Photo photo, Guid photoId)
     {
-        photo.Save(GetPhotoPath(photoId));
+        photo.Save(Path.Combine(dirToSave, $"{photoId}.{photo.Extension}"));
     }
 
     public void Delete(Guid photoId)
@@ -27,6 +27,6 @@ public class PhotoStorageService : IPhotoStorageService
 
     public string GetPhotoPath(Guid photoId) => FindPathOfImage(photoId) ?? DefaultAvatarJpeg;
 
-    private static string? FindPathOfImage(Guid photoId)
-        => Directory.GetFiles("static", photoId + ".*").FirstOrDefault();
+    private string? FindPathOfImage(Guid photoId)
+        => Directory.GetFiles(dirToSave, $"{photoId}.*").FirstOrDefault();
 }

@@ -49,6 +49,7 @@
 
     <ItemGroup>
         <Content Remove="storage\**" />
+        <Content Remove="appsettings.json" />
     </ItemGroup>
 
     <ItemGroup>
