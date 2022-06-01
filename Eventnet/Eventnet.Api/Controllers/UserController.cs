@@ -37,10 +37,9 @@ public class UserController : Controller
         this.userAvatarsService = userAvatarsService;
     }
     
-    [Authorize]
     [HttpGet("{userId:guid}")]
     [Produces(typeof(UserViewModel))]
-    public async Task<IActionResult> UpdateUser(Guid userId)
+    public async Task<IActionResult> GetUser(Guid userId)
     {
         var user = await userManager.Users.FirstOrDefaultAsync(x => x.Id == userId);
 
