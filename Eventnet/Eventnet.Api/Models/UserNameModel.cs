@@ -1,3 +1,3 @@
 ﻿namespace Eventnet.Api.Models;
 
-public record UserNameModel(string Id, string UserName);
+public record UserNameModel(Guid Id, string UserName);
