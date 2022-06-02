@@ -281,8 +281,8 @@ public class GetEventsShould : EventApiTestsBase
     private Pagination GetPaginationFromResponse(HttpResponseMessage response)
     {
         var paginationHeader = response.GetRequiredHeader("X-Pagination").SingleOrDefault();
-        var pagination = JsonConvert.DeserializeObject<Pagination>(paginationHeader);
-        return pagination;
+        var pagination = JsonConvert.DeserializeObject<Pagination>(paginationHeader!);
+        return pagination!;
     }
 
     [SuppressMessage("ReSharper", "UnusedMember.Local")]

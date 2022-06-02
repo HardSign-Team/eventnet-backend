@@ -8,10 +8,8 @@ public static class UserAvatarHelpers
         if (!avatarId.HasValue)
             return DefaultAvatar;
 
-        var path = Directory.GetFiles("static", avatarId + ".*").FirstOrDefault();
+        var path = Directory.GetFiles("static", $"{avatarId}.*").FirstOrDefault();
 
-        return path == null
-            ? DefaultAvatar
-            : Path.GetFileName(path);
+        return path == null ? DefaultAvatar : Path.GetFileName(path);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.Json;
+using Newtonsoft.Json;
 
 namespace Eventnet.Api.Models.Filtering;
 
@@ -18,7 +19,7 @@ public class EventsFilterModel
         {
             var bytes = Convert.FromBase64String(base64Model);
             var json = Encoding.UTF8.GetString(bytes);
-            result = JsonSerializer.Deserialize<EventsFilterModel>(json);
+            result = JsonConvert.DeserializeObject<EventsFilterModel>(json);
         }
         catch (Exception)
         {

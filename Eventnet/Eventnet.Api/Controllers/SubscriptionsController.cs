@@ -1,4 +1,5 @@
-﻿using Eventnet.Api.Models.Subscriptions;
+﻿using System.Diagnostics.CodeAnalysis;
+using Eventnet.Api.Models.Subscriptions;
 using Eventnet.Api.Services;
 using Eventnet.DataAccess;
 using Eventnet.DataAccess.Extensions;
@@ -20,6 +21,42 @@ public class SubscriptionsController : Controller
     {
         this.dbContext = dbContext;
         this.currentUserService = currentUserService;
+    }
+
+    [Authorize]
+    [HttpGet("my")]
+    [Produces(typeof(SubscribedEventsListViewModel))]
+    public async Task<IActionResult> GetUserSubscribedEventsIds()
+    {
+        var user = await currentUserService.GetCurrentUserAsync();
+        if (user is null)
+            return Unauthorized();
+
+        var eventsIds = await dbContext.Subscriptions
+            .Where(x => x.UserId == user.Id)
+            .Select(x => x.EventId)
+            .ToListAsync();
+        return Ok(new SubscribedEventsListViewModel(eventsIds));
+    }
+
+    [Authorize]
+    [HttpGet("me/{eventId:guid}")]
+    [Produces(typeof(IsSubscribedViewModel))]
+    public async Task<IActionResult> GetIsUserSubscribed(Guid eventId)
+    {
+        if (eventId == Guid.Empty)
+            return NotFound();
+
+        var exists = await dbContext.Events.AnyAsync(x => x.Id == eventId);
+        if (!exists)
+            return NotFound();
+
+        var user = await currentUserService.GetCurrentUserAsync();
+        if (user is null)
+            return Unauthorized();
+
+        var isSubscribed = await dbContext.Subscriptions.AnyAsync(x => x.EventId == eventId && x.UserId == user.Id);
+        return Ok(new IsSubscribedViewModel(eventId, isSubscribed));
     }
 
     [Authorize]
@@ -82,16 +119,18 @@ public class SubscriptionsController : Controller
 
     [HttpGet("count/{eventId:guid}")]
     [Produces(typeof(SubscriptionsCountViewModel))]
+    [SuppressMessage("Performance", "CA1829:Используйте свойство Length/Count вместо Count(), если оно доступно")]
     public async Task<IActionResult> GetSubscriptionsCount(Guid eventId)
     {
         if (eventId == Guid.Empty)
             return NotFound();
 
         var result = await dbContext.Events
+            .Include(x => x.Subscriptions)
             .Select(x => new
             {
                 x.Id,
-                SubscriptionsCount = x.Subscriptions.Count
+                SubscriptionsCount = x.Subscriptions.Count()
             })
             .FirstOrDefaultAsync(x => x.Id == eventId);
 

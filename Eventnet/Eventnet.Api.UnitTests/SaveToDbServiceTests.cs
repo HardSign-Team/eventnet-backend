@@ -6,10 +6,8 @@ using Eventnet.DataAccess;
 using Eventnet.DataAccess.Entities;
 using Eventnet.Domain.Events;
 using Eventnet.Infrastructure;
-using Eventnet.Infrastructure.PhotoServices;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using Moq;
 using NUnit.Framework;
 
 namespace Eventnet.Api.UnitTests;
@@ -42,7 +40,7 @@ public class SaveToDbServiceTests : BaseTests<SaveToDbServiceTests>
     }
 
     private IEventSaveToDbService CreateSut(ApplicationDbContext context) =>
-        new EventEventSaveToDbService(Mock.Of<IPhotoStorageService>(), CreateMapper(), context);
+        new EventEventSaveToDbService(CreateMapper(), context);
 
     private static async Task SaveTags(IEnumerable<string> tagsInDb, ApplicationDbContext context)
     {

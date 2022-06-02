@@ -1,9 +1,7 @@
 ﻿using AutoMapper;
 using Eventnet.DataAccess;
 using Eventnet.DataAccess.Entities;
-using Eventnet.Domain;
 using Eventnet.Domain.Events;
-using Eventnet.Infrastructure.PhotoServices;
 using Microsoft.EntityFrameworkCore;
 
 namespace Eventnet.Infrastructure;
@@ -12,14 +10,11 @@ public class EventEventSaveToDbService : IEventSaveToDbService
 {
     private readonly IMapper mapper;
     private readonly ApplicationDbContext dbContext;
-    private readonly IPhotoStorageService storageService;
 
     public EventEventSaveToDbService(
-        IPhotoStorageService storageService,
         IMapper mapper,
         ApplicationDbContext dbContext)
     {
-        this.storageService = storageService;
         this.mapper = mapper;
         this.dbContext = dbContext;
     }
@@ -31,7 +26,7 @@ public class EventEventSaveToDbService : IEventSaveToDbService
             info.StartDate,
             info.EndDate,
             info.Name,
-            info.Description ?? "",
+            info.Description,
             mapper.Map<LocationEntity>(info.Location));
         dbContext.Events.Add(eventEntity);
         await SaveTagsAsync(eventEntity, info.Tags, dbContext);

@@ -22,17 +22,17 @@ public class PhotoService : IPhotoService
             .GroupBy(x => x.EventId)
             .Where(x => eventIds.Contains(x.Key))
             .Select(x => new { EventId = x.Key, PhotoId = x.Select(y => y.Id).FirstOrDefault() })
-            .Select(x => new PhotoViewModel(x.EventId, GetPhotoPath(basePath, x.PhotoId)))
+            .Select(x => new PhotoViewModel(x.EventId, x.PhotoId, GetPhotoPath(basePath, x.PhotoId)))
             .ToListAsync();
     }
 
-    public async Task<List<string>> GetPhotoUrls(string basePath, Guid eventId)
+    public async Task<List<PhotoViewModel>> GetPhotosViewModels(string basePath, Guid eventId)
     {
         var ids = await dbContext.Photos
             .Where(x => x.EventId == eventId)
             .Select(x => x.Id)
             .ToListAsync();
-        return ids.Select(photoId => GetPhotoPath(basePath, photoId)).ToList();
+        return ids.Select(photoId => new PhotoViewModel(eventId, photoId, GetPhotoPath(basePath, photoId))).ToList();
     }
 
     private string GetPhotoPath(string basePath, Guid photoId) => basePath + photoStorageService.GetPhotoPath(photoId);

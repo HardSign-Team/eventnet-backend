@@ -36,6 +36,18 @@ public class UserController : Controller
         this.currentUserService = currentUserService;
         this.userAvatarsService = userAvatarsService;
     }
+    
+    [HttpGet("{userId:guid}")]
+    [Produces(typeof(UserViewModel))]
+    public async Task<IActionResult> GetUser(Guid userId)
+    {
+        var user = await userManager.Users.FirstOrDefaultAsync(x => x.Id == userId);
+
+        if (user is null)
+            return NotFound();
+
+        return Ok(mapper.Map<UserViewModel>(user));
+    }
 
     [Authorize]
     [HttpPut("{userId:guid}")]

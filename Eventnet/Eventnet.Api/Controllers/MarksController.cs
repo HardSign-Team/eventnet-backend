@@ -32,6 +32,31 @@ public class MarksController : Controller
     }
 
     [Authorize]
+    [HttpGet("my/{eventId:guid}")]
+    [Produces(typeof(MarksCountViewModel))]
+    public async Task<IActionResult> GetUserMarks(Guid eventId)
+    {
+        if (eventId == Guid.Empty)
+            return NotFound();
+
+        var exists = await dbContext.Events.AnyAsync(x => x.Id == eventId);
+        if (!exists)
+            return NotFound();
+
+        var user = await currentUserService.GetCurrentUserAsync();
+        if (user is null)
+            return Unauthorized();
+
+        var userMarks = await dbContext.Marks
+            .Where(x => x.EventId == eventId && x.UserId == user.Id)
+            .Select(x => new { x.IsLike })
+            .ToListAsync();
+        var likes = userMarks.Count(x => x.IsLike);
+        var dislikes = userMarks.Count(x => !x.IsLike);
+        return Ok(new MarksCountViewModel(likes, dislikes));
+    }
+
+    [Authorize]
     [HttpDelete("likes/{eventId:guid}")]
     [Produces(typeof(MarksCountViewModel))]
     public async Task<IActionResult> RemoveLike(Guid eventId)

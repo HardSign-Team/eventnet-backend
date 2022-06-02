@@ -6,7 +6,7 @@ public record EventInfo(
     DateTime StartDate,
     DateTime? EndDate,
     string Name,
-    string? Description,
+    string Description,
     Location Location,
     string[] Tags)
 {

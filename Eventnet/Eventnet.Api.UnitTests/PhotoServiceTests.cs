@@ -89,7 +89,7 @@ public class PhotoServiceTests : BaseTests<PhotoServiceTests>
     {
         var sut = CreateSut();
 
-        var actual = await sut.GetPhotoUrls("", Guid.Empty);
+        var actual = await sut.GetPhotosViewModels("", Guid.Empty);
 
         actual.Should().HaveCount(0);
     }
@@ -104,7 +104,7 @@ public class PhotoServiceTests : BaseTests<PhotoServiceTests>
         AddPhotos(ev, photosCount);
         var sut = CreateSut();
 
-        var actual = await sut.GetPhotoUrls("", ev.Id);
+        var actual = await sut.GetPhotosViewModels("", ev.Id);
 
         actual.Should().HaveCount(photosCount);
         actual.Should().NotContainNulls();
